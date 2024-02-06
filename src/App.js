@@ -1,4 +1,5 @@
 import React from 'react';
+import NavigationBar from './components/NavigationBar';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './components/pages/HomePage';
 import GamesPage from './components/pages/GamesPage';
@@ -8,6 +9,7 @@ import TimelinePage from './components/pages/TimelinePage';
 function App() {
   return (
     <Router>
+      <NavigationBar />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/games" element={<GamesPage />} />
