@@ -3,6 +3,7 @@ import NavigationBar from './components/NavigationBar';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './components/pages/HomePage';
 import GamesPage from './components/pages/GamesPage';
+import GameDetailsPage from './components/pages/GameDetailsPage';
 import QuotePage from './components/pages/QuotesPage';
 import TimelinePage from './components/pages/TimelinePage';
 import Profile from './components/pages/ProfilePage';
@@ -38,6 +39,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/games" element={<GamesPage />} />
+        <Route path="/games/:gameId" element={<GameDetailsPage />} />
         <Route
           path="/quotes"
           element={

@@ -1,0 +1,28 @@
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.game-block {
+  text-decoration: none;
+  color: inherit;
+  text-align: center;
+}
+
+.game-block img {
+  width: 100%;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.game-block img:hover {
+  transform: scale(1.05);
+}
+
+.game-title {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: bold;
+}
