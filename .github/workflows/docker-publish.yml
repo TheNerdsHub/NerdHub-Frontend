@@ -35,8 +35,7 @@ jobs:
           git tag $TAG
           git push origin $TAG
 
-      # Install the cosign tool except on PR
-      - name: Install cosign
+      - name: Install the cosign tool except on PR
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20
         with:
@@ -59,8 +58,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
+            type=ref,event=branch
+            type=ref,event=tag
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern=latest
 
       - name: Build and push Docker image
