@@ -28,6 +28,17 @@ jobs:
       id-token: write
 
     steps:
+      - name: Auto-tag the commit
+        id: auto-tag
+        run: |
+          TAG="v$(date +'%Y.%m.%d.%H%M%S')"
+          echo "Generated tag: $TAG"
+          echo "tag=$TAG" >> $GITHUB_ENV
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag $TAG
+          git push origin $TAG
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
