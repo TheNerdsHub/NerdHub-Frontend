@@ -1,0 +1,29 @@
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Full viewport height */
+  text-align: center;
+  background-color: #f9f9f9; /* Optional: Add a background color */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.game-details {
+  max-width: 1000px; /* Limit the width of the content */
+  width: 100%;
+  background: #fff; /* Optional: Add a white background */
+  padding: 20px;
+  border-radius: 8px; /* Optional: Add rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+  text-align: left; /* Left-align the content inside the game-details container */
+}
+
+.game-header {
+  display: flex;
+  flex-direction: column; /* Stack the image and title vertically */
+  align-items: center; /* Center the image and title horizontally */
+  justify-content: center; /* Center the content vertically (if needed) */
+  margin-bottom: 20px;
+  text-align: center; /* Ensure the title is centered */
+}

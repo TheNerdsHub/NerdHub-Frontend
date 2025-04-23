@@ -1,28 +1,59 @@
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 16px;
-  padding: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid with a minimum column width */
+  grid-template-columns: repeat(6, 1fr); /* Ensure a maximum of 6 columns */
+  gap: 20px; /* Add spacing between grid items */
+  padding: 20px;
 }
 
 .game-block {
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
   text-decoration: none;
   color: inherit;
-  text-align: center;
 }
 
 .game-block img {
   width: 100%;
-  border-radius: 8px;
-  transition: transform 0.2s;
+  height: auto;
 }
 
-.game-block img:hover {
-  transform: scale(1.05);
+.game-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
 }
 
 .game-title {
-  margin-top: 8px;
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: bold;
+  text-align: left;
+  flex: 1;
+}
+
+.game-price {
+  font-size: 0.9rem;
+  text-align: right;
+  color: #666;
+  margin-left: 10px;
+}
+
+.sort-container {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.sort-container label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.sort-container select {
+  padding: 5px;
+  font-size: 16px;
 }

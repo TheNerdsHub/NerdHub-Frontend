@@ -9,6 +9,8 @@ function GamesPage() {
   useDocumentTitle('Games');
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState(() => localStorage.getItem('sortBy') || 'appid'); // Load from localStorage or default to 'appid'
+  const [sortDirection, setSortDirection] = useState(() => localStorage.getItem('sortDirection') || 'asc'); // Load from localStorage or default to 'asc'
 
   useEffect(() => {
     // Fetch all games from the backend
@@ -27,18 +29,71 @@ function GamesPage() {
     fetchGames();
   }, []);
 
+  // Save sortBy and sortDirection to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('sortBy', sortBy);
+  }, [sortBy]);
+
+  useEffect(() => {
+    localStorage.setItem('sortDirection', sortDirection);
+  }, [sortDirection]);
+
+  // Sort games based on the selected criterion and direction
+  const sortedGames = [...games].sort((a, b) => {
+    let comparison = 0;
+    if (sortBy === 'appid') {
+      comparison = a.appid - b.appid;
+    } else if (sortBy === 'name') {
+      comparison = a.name.localeCompare(b.name);
+    } else if (sortBy === 'price') {
+      const priceA = a.priceOverview?.final || 0;
+      const priceB = b.priceOverview?.final || 0;
+      comparison = priceA - priceB;
+    }
+    return sortDirection === 'asc' ? comparison : -comparison;
+  });
+
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="games-grid">
-      {games.map(game => (
-        <Link to={`/games/${game.steam_appid}`} key={game.steam_appid} className="game-block">
-          <img src={game.header_image} alt={game.name} />
-          <div className="game-title">{game.name}</div>
-        </Link>
-      ))}
+    <div>
+      <div className="sort-container">
+        <label htmlFor="sort-by">Sort By:</label>
+        <select
+          id="sort-by"
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <option value="appid">App ID</option>
+          <option value="name">Name</option>
+          <option value="price">Price</option>
+        </select>
+        <button
+          className="sort-direction-button"
+          onClick={() =>
+            setSortDirection((prevDirection) =>
+              prevDirection === 'asc' ? 'desc' : 'asc'
+            )
+          }
+        >
+          {sortDirection === 'asc' ? 'Ascending' : 'Descending'}
+        </button>
+      </div>
+      <div className="games-grid">
+        {sortedGames.map((game) => (
+          <Link to={`/games/${game.appid}`} key={game.appid} className="game-block">
+            <img src={game.headerImage} alt={game.name} />
+            <div className="game-info">
+              <div className="game-title">{game.name}</div>
+              <div className="game-price">
+                  {game.priceOverview?.finalFormatted || (game.isFree ? 'Free' : 'N/A')}
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
