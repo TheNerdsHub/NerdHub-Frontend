@@ -11,6 +11,7 @@ function GamesPage() {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState(() => localStorage.getItem('sortBy') || 'appid'); // Load from localStorage or default to 'appid'
   const [sortDirection, setSortDirection] = useState(() => localStorage.getItem('sortDirection') || 'asc'); // Load from localStorage or default to 'asc'
+  const [excludeNA, setExcludeNA] = useState(false); // New state for excluding "N/A" results
 
   useEffect(() => {
     // Fetch all games from the backend
@@ -38,20 +39,22 @@ function GamesPage() {
     localStorage.setItem('sortDirection', sortDirection);
   }, [sortDirection]);
 
-  // Sort games based on the selected criterion and direction
-  const sortedGames = [...games].sort((a, b) => {
-    let comparison = 0;
-    if (sortBy === 'appid') {
-      comparison = a.appid - b.appid;
-    } else if (sortBy === 'name') {
-      comparison = a.name.localeCompare(b.name);
-    } else if (sortBy === 'price') {
-      const priceA = a.priceOverview?.final || 0;
-      const priceB = b.priceOverview?.final || 0;
-      comparison = priceA - priceB;
-    }
-    return sortDirection === 'asc' ? comparison : -comparison;
-  });
+  // Sort and filter games based on the selected criterion, direction, and excludeNA
+  const sortedGames = [...games]
+    .filter((game) => !excludeNA || !(game.priceOverview?.finalFormatted == null && !game.isFree)) // Filter out "N/A" results if excludeNA is true
+    .sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === 'appid') {
+        comparison = a.appid - b.appid;
+      } else if (sortBy === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortBy === 'price') {
+        const priceA = a.priceOverview?.final || 0;
+        const priceB = b.priceOverview?.final || 0;
+        comparison = priceA - priceB;
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
 
   if (loading) {
     return <div>Loading...</div>;
@@ -80,6 +83,15 @@ function GamesPage() {
         >
           {sortDirection === 'asc' ? 'Ascending' : 'Descending'}
         </button>
+        <label htmlFor="exclude-na" className="exclude-na-label">
+          <input
+            type="checkbox"
+            id="exclude-na"
+            checked={excludeNA}
+            onChange={(e) => setExcludeNA(e.target.checked)}
+          />
+          Exclude "N/A" Prices
+        </label>
       </div>
       <div className="games-grid">
         {sortedGames.map((game) => (
@@ -88,7 +100,7 @@ function GamesPage() {
             <div className="game-info">
               <div className="game-title">{game.name}</div>
               <div className="game-price">
-                  {game.priceOverview?.finalFormatted || (game.isFree ? 'Free' : 'N/A')}
+                {game.priceOverview?.finalFormatted || (game.isFree ? 'Free' : 'N/A')}
               </div>
             </div>
           </Link>

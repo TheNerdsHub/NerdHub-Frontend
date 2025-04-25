@@ -14,6 +14,12 @@ function GameDetailsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appid]);
 
+  useEffect(() => {
+    if (gameDetails?.name) {
+      document.title = `${gameDetails.name} | NerdHub`;
+    }
+  }, [gameDetails]);
+
   const fetchGameDetails = async () => {
     try {
       const response = await fetch(`${API_ROOT}/api/Games/${appid}`);
@@ -45,10 +51,6 @@ function GameDetailsPage() {
       alert('An error occurred while updating the game info.');
     }
   };
-
-  useEffect(() => {
-    console.log(gameDetails); // Debugging: Check if LastModifiedTime is present
-  }, [gameDetails]);
 
   if (loading) {
     return <div className="centered-container">Loading...</div>;
