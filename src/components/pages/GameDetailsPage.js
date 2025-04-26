@@ -8,10 +8,11 @@ function GameDetailsPage() {
   const { appid } = useParams();
   const [gameDetails, setGameDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [usernames, setUsernames] = useState({});
 
   useEffect(() => {
     fetchGameDetails();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appid]);
 
   useEffect(() => {
@@ -32,6 +33,38 @@ function GameDetailsPage() {
       setLoading(false);
     }
   };
+
+  const fetchUsernames = async (steamIds) => {
+    try {
+      const response = await fetch(`${API_ROOT}/api/Games/get-usernames`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(steamIds),
+      });
+      if (response.ok) {
+        return await response.json();
+      } else {
+        console.error('Failed to fetch usernames:', await response.text());
+        return {};
+      }
+    } catch (error) {
+      console.error('Error fetching usernames:', error);
+      return {};
+    }
+  };
+
+  useEffect(() => {
+    const fetchAndSetUsernames = async () => {
+      if (gameDetails?.ownedBy?.steamId) {
+        // Convert steamId values to strings
+        const steamIds = gameDetails.ownedBy.steamId.map(id => id.toString());
+        const usernames = await fetchUsernames(steamIds);
+        console.log('Fetched usernames:', usernames); // Debugging: Log the fetched usernames
+        setUsernames(usernames);
+      }
+    };
+    fetchAndSetUsernames();
+  }, [gameDetails]);
 
   const updateGameInfo = async () => {
     try {
@@ -122,7 +155,34 @@ function GameDetailsPage() {
             )}
           </p>
         )}
-        <p><strong>Owned By:</strong> {gameDetails.ownedBy?.map(owner => owner.steamId?.join(', ')).join('; ') || 'None'}</p>
+        <p>
+          <strong>Owned By:</strong><br />
+          <strong>Steam Users:</strong>
+          {gameDetails.ownedBy?.steamId?.length > 0 ? (
+            <ul>
+              {gameDetails.ownedBy.steamId.map((id, index) => {
+                const user = usernames[id]; // Get the user object for the current Steam ID
+                return (
+                  <li key={index}>
+                    {id} - {user?.nickname || user?.username || "Unknown User"}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            'None'
+          )}
+        </p>
+        {gameDetails.ownedBy?.epicId?.length > 0 && (
+          <p>
+            <strong>Epic Users: </strong>
+            <ul>
+              {gameDetails.ownedBy.epicId.map((id, index) => (
+                <li key={index}>{id}</li>
+              ))}
+            </ul>
+          </p>
+        )}
         <p>
           <strong>Last Modified:</strong>{' '}
           {gameDetails.LastModifiedTime
