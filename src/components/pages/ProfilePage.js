@@ -1,6 +1,9 @@
 import React from 'react';
+import useDocumentTitle from 'hooks/useDocumentTitle';
 
 const Profile = ({ keycloak }) => {
+  useDocumentTitle('Profile'); // Updated hook usage
+
   if (!keycloak.authenticated) {
     return <div>Loading...</div>;
   }

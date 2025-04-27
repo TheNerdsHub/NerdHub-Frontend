@@ -1,8 +1,8 @@
 import React from 'react';
-import useDocumentTitle from 'components/useDocumentTitle';
+import useDocumentTitle from 'hooks/useDocumentTitle';
 
 function TimelinePage() {
-  useDocumentTitle('Timeline');
+  useDocumentTitle('Timeline'); // Updated hook usage
   return (
     <div>
       <h1>Welcome to the timeline!</h1>

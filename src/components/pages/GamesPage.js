@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import useDocumentTitle from 'components/useDocumentTitle';
-import Footer from 'components/Footer';
+import useDocumentTitle from 'hooks/useDocumentTitle';
+import ScrollToTop from 'components/common/ScrollToTop'; // Import the new component
+import { getGames } from 'services/gameService';
 import 'styles/GamesPage.css';
-
-const API_ROOT = process.env.REACT_APP_API_ROOT;
 
 function GamesPage() {
   useDocumentTitle('Games');
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState(() => localStorage.getItem('sortBy') || 'owners'); // Default to 'owners'
-  const [sortDirection, setSortDirection] = useState(() => localStorage.getItem('sortDirection') || 'desc'); // Default to 'desc'
-  const [excludeNA, setExcludeNA] = useState(() => JSON.parse(localStorage.getItem('excludeNA')) ?? true); // Default to true
-  const [searchQuery, setSearchQuery] = useState(''); // State for search query
-  const [showTopButton, setShowTopButton] = useState(false); // State for "scroll to top" button
-  const [nearBottom, setNearBottom] = useState(false); // State for detecting proximity to the bottom
+  const [sortBy, setSortBy] = useState(() => localStorage.getItem('sortBy') || 'owners');
+  const [sortDirection, setSortDirection] = useState(() => localStorage.getItem('sortDirection') || 'desc');
+  const [excludeNA, setExcludeNA] = useState(() => JSON.parse(localStorage.getItem('excludeNA')) ?? true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    // Fetch all games from the backend
     const fetchGames = async () => {
       try {
-        const response = await fetch(`${API_ROOT}/api/games`);
-        const data = await response.json();
+        const data = await getGames();
         setGames(data);
       } catch (error) {
         console.error('Failed to fetch games:', error);
@@ -33,47 +28,26 @@ function GamesPage() {
 
     fetchGames();
   }, []);
-
-  // Save sortBy, sortDirection, and excludeNA to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('sortBy', sortBy);
-  }, [sortBy]);
-
-  useEffect(() => {
-    localStorage.setItem('sortDirection', sortDirection);
-  }, [sortDirection]);
-
-  useEffect(() => {
-    localStorage.setItem('excludeNA', excludeNA);
-  }, [excludeNA]);
-
-  // Handle scroll events for "scroll to top" button
-  useEffect(() => {
-    const handleScroll = () => {
-      const newScrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const fullHeight = document.documentElement.scrollHeight;
-
-      setShowTopButton(newScrollY > 300);
-      setNearBottom((newScrollY + windowHeight) >= (fullHeight - 150));
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Filter games based on the search query
+  
+    // Save sortBy, sortDirection, and excludeNA to localStorage whenever they change
+    useEffect(() => {
+      localStorage.setItem('sortBy', sortBy);
+    }, [sortBy]);
+  
+    useEffect(() => {
+      localStorage.setItem('sortDirection', sortDirection);
+    }, [sortDirection]);
+  
+    useEffect(() => {
+      localStorage.setItem('excludeNA', excludeNA);
+    }, [excludeNA]);
+  
   const filteredGames = games.filter((game) =>
     game.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Sort and filter games based on the selected criterion, direction, and excludeNA
   const sortedGames = [...filteredGames]
-    .filter((game) => !excludeNA || !(game.priceOverview?.finalFormatted == null && !game.isFree)) // Filter out "N/A" results if excludeNA is true
+    .filter((game) => !excludeNA || !(game.priceOverview?.finalFormatted == null && !game.isFree))
     .sort((a, b) => {
       let comparison = 0;
       if (sortBy === 'appid') {
@@ -151,14 +125,7 @@ function GamesPage() {
           </Link>
         ))}
       </div>
-      <Footer /> {/* Add Footer */}
-      <button
-        className={`scroll-to-top ${showTopButton ? 'visible' : ''}`}
-        onClick={scrollToTop}
-        style={{ bottom: nearBottom ? '100px' : '40px' }}
-      >
-        <span className="scroll-arrow">⬆</span>
-      </button>
+      <ScrollToTop /> {/* Add the ScrollToTop component */}
     </div>
   );
 }

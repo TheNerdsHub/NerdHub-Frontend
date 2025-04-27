@@ -1,32 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import useDocumentTitle from 'hooks/useDocumentTitle';
+import { getGameDetails, updateGameInfo, fetchUsernames } from 'services/gameService';
 import 'styles/GameDetailsPage.css';
 
-const API_ROOT = process.env.REACT_APP_API_ROOT;
-
 function GameDetailsPage() {
+  useDocumentTitle('Game Details');
   const { appid } = useParams();
   const [gameDetails, setGameDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [usernames, setUsernames] = useState({});
 
-  useEffect(() => {
-    fetchGameDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appid]);
-
-  useEffect(() => {
-    if (gameDetails?.name) {
-      document.title = `${gameDetails.name} | NerdHub`;
-    }
-  }, [gameDetails]);
-
   const fetchGameDetails = async () => {
     try {
-      const response = await fetch(`${API_ROOT}/api/Games/${appid}`);
-      const data = await response.json();
+      const data = await getGameDetails(appid);
       setGameDetails(data);
-      console.log(data); // Debugging: Check if LastModifiedTime is present
+
+      // Fetch usernames for Steam IDs if they exist
+      if (data.ownedBy?.steamId?.length > 0) {
+        const steamIds = data.ownedBy.steamId;
+        const fetchedUsernames = await fetchUsernames(steamIds);
+        setUsernames(fetchedUsernames);
+      }
     } catch (error) {
       console.error('Failed to fetch game details:', error);
     } finally {
@@ -34,56 +29,19 @@ function GameDetailsPage() {
     }
   };
 
-  const fetchUsernames = async (steamIds) => {
+  const handleUpdateGameInfo = async () => {
     try {
-      const response = await fetch(`${API_ROOT}/api/Games/get-usernames`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(steamIds),
-      });
-      if (response.ok) {
-        return await response.json();
-      } else {
-        console.error('Failed to fetch usernames:', await response.text());
-        return {};
-      }
+      await updateGameInfo(appid);
+      alert('Game info updated successfully.');
+      fetchGameDetails(); // Refresh game details after update
     } catch (error) {
-      console.error('Error fetching usernames:', error);
-      return {};
+      alert('Failed to update game info.');
     }
   };
 
   useEffect(() => {
-    const fetchAndSetUsernames = async () => {
-      if (gameDetails?.ownedBy?.steamId) {
-        // Convert steamId values to strings
-        const steamIds = gameDetails.ownedBy.steamId.map(id => id.toString());
-        const usernames = await fetchUsernames(steamIds);
-        console.log('Fetched usernames:', usernames); // Debugging: Log the fetched usernames
-        setUsernames(usernames);
-      }
-    };
-    fetchAndSetUsernames();
-  }, [gameDetails]);
-
-  const updateGameInfo = async () => {
-    try {
-      const response = await fetch(`${API_ROOT}/api/Games/update-game-info/${appid}`, {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        alert('Game info updated successfully.');
-        fetchGameDetails(); // Refresh game details after update
-      } else {
-        const errorText = await response.text();
-        alert(`Failed to update game info: ${errorText}`);
-      }
-    } catch (error) {
-      console.error('Failed to update game info:', error);
-      alert('An error occurred while updating the game info.');
-    }
-  };
+    fetchGameDetails();
+  }, [appid]);
 
   if (loading) {
     return <div className="centered-container">Loading...</div>;
@@ -107,7 +65,7 @@ function GameDetailsPage() {
           <img src={gameDetails.headerImage} alt={gameDetails.name} />
           <h1>{gameDetails.name}</h1>
         </div>
-        <button onClick={updateGameInfo}>Update Game Info</button>
+        <button onClick={handleUpdateGameInfo}>Update Game Info</button>
         <p><strong>Link to Steam:</strong> <a href={`https://store.steampowered.com/app/${gameDetails.appid}`} target="_blank" rel="noopener noreferrer">Steam Page</a></p>
         {gameDetails.priceOverview?.finalFormatted ? (
           <p><strong>Price:</strong> {gameDetails.priceOverview.finalFormatted}</p>
@@ -161,7 +119,7 @@ function GameDetailsPage() {
           {gameDetails.ownedBy?.steamId?.length > 0 ? (
             <ul>
               {gameDetails.ownedBy.steamId.map((id, index) => {
-                const user = usernames[id]; // Get the user object for the current Steam ID
+                const user = usernames[id];
                 return (
                   <li key={index}>
                     {id} - {user?.nickname || user?.username || "Unknown User"}

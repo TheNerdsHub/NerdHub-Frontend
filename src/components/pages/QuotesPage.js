@@ -1,8 +1,8 @@
 import React from 'react';
-import useDocumentTitle from 'components/useDocumentTitle';
+import useDocumentTitle from 'hooks/useDocumentTitle';
 
 function QuotesPage() {
-  useDocumentTitle('Quotes');
+  useDocumentTitle('Quotes'); // Updated hook usage
   return (
     <div>
       <h1>Welcome to the quotes page!</h1>
