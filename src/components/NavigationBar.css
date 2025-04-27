@@ -1,0 +1,168 @@
+@media (max-width: 991.98px) {
+  .navbar-nav .dropdown-menu {
+    margin-bottom: 1rem; /* Space after dropdown menu */
+  }
+}
+
+.navbar-link-white {
+    color: white !important;
+    transition: color 0.3s ease, font-weight 0.3s ease, transform 0.3s ease;
+  }
+
+  .navbar-link-white:hover {
+    color: #b3e5ff !important;
+    font-weight: bold;
+    transform: scale(1.02);
+  }
+
+  .navbar-link-white .dropdown-menu a {
+    color: white !important;
+    transition: color 0.3s ease, font-weight 0.3s ease, transform 0.3s ease;
+  }
+
+  .navbar-link-white .dropdown-menu a:hover {
+    color: #b3e5ff !important;
+    font-weight: bold;
+    transform: scale(1.02);
+  }
+
+#basic-nav-dropdown {
+    color: white !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Hide dropdown menu in mobile nav after collapse */
+.navbar-nav .dropdown-menu {
+  display: block;
+  background-color: rgba(7, 151, 255, 0.75); /* Slightly darker, but still transparent */
+  backdrop-filter: blur(12px); /* Increase blur strength */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+  border-radius: 0.5rem; /* Optional: slightly round edges */
+  max-height: 0;
+  overflow: hidden;
+  transition: backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+  opacity: 0;
+}
+
+/* Bonus: When hovering inside the dropdown, increase blur even more */
+.navbar-nav .dropdown-menu:hover {
+  backdrop-filter: blur(16px); /* Blur slightly more on hover */
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35); /* Slightly bigger shadow on hover */
+}
+
+/* When the dropdown is open */
+.navbar-nav .dropdown.show .dropdown-menu {
+  max-height: 500px; /* Enough space for multiple items */
+  opacity: 1;
+}
+
+.dropdown-menu {
+  background-color: #0797ff;
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  opacity: 0; /* Start hidden */
+  transform: translateY(10px); /* Start slightly lower */
+  transition: opacity 0.3s ease-out, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  display: block; /* Important to allow animation */
+  visibility: hidden; /* Hide from screen readers initially */
+}
+
+.show > .dropdown-menu {
+  opacity: 1;
+  transform: translateY(0px); /* Move to original position */
+  visibility: visible;
+}
+
+.dropdown-menu .dropdown-item {
+  color: white !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  transition: color 0.3s ease, font-weight 0.3s ease, transform 0.3s ease;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  color: #b3e5ff !important;
+  background-color: #057dd1; 
+  font-weight: bold;
+  transform: scale(1.02);
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  }
+
+#basic-navbar-nav {
+    color: white !important;
+}
+
+.custom-toggler {
+  border: none;
+  background: none;
+  padding: 0.5rem;
+  display: flex; /* <-- NEW: makes the button flexible */
+  align-items: center; /* center vertically */
+  justify-content: center; /* center horizontally */
+  width: 48px; /* set a good clickable size */
+  height: 48px;
+  transition: transform 0.4s ease, box-shadow 0.3s ease;
+  border-radius: 50%; /* makes the glow feel natural around a circle */
+  position: relative;
+}
+
+/* Hover glow effect */
+.custom-toggler:hover {
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6); /* Nice soft glow */
+}
+
+/* New hamburger bars */
+.custom-toggler-icon {
+  display: block;
+  position: relative;
+  width: 24px;
+  height: 2px;
+  background-color: white;
+  margin: 0 auto; /* <--- NEW: center horizontally */
+  transition: all 0.4s ease;
+}
+
+/* Create two more bars */
+.custom-toggler-icon::before,
+.custom-toggler-icon::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  left: 0;
+  background-color: white;
+  transition: all 0.4s ease;
+}
+
+/* Top and bottom bars position */
+.custom-toggler-icon::before {
+  top: -8px;
+}
+
+.custom-toggler-icon::after {
+  top: 8px;
+}
+
+/* When expanded (not collapsed) — animate into an X */
+.custom-toggler:not(.collapsed) .custom-toggler-icon {
+  background-color: transparent;
+}
+
+.custom-toggler:not(.collapsed) .custom-toggler-icon::before {
+  transform: rotate(45deg);
+  top: 0;
+}
+
+.custom-toggler:not(.collapsed) .custom-toggler-icon::after {
+  transform: rotate(-45deg);
+  top: 0;
+}
+
+/* No weird outline on click */
+.custom-toggler:focus {
+  outline: none;
+  box-shadow: none;
+}
