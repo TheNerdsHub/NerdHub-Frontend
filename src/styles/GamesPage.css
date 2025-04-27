@@ -80,7 +80,6 @@ body {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   animation: cardFadeIn 0.8s ease forwards;
   animation-delay: var(--animation-delay, 0s);
-  height: 150px; /* NEW: shorter card height */
 }
 
 .game-block:hover {
@@ -91,7 +90,6 @@ body {
 /* Game Image */
 .game-block img {
   width: 100%;
-  height: 100px; /* NEW: smaller banner */
   object-fit: cover;
 }
 
