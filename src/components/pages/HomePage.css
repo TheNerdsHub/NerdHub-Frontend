@@ -2,14 +2,45 @@
   font-family: 'Arial', sans-serif;
   color: #333;
   line-height: 1.6;
+  background-color: #e11837 !important;
 }
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(to right, #4facfe, #00f2fe);
+  background:
+  /* 1️⃣ translucent grey overlay – now counts as an image layer */
+  linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.35)),
+  /* 2️⃣ your GIF */
+  url("../assets/TheNerdsFloating.gif") center/300px no-repeat,
+  /* 3️⃣ the big orange-yellow gradient */
+  linear-gradient(
+    to right top,
+    #ffaf1b,
+    #ffb123,
+    #ffb429,
+    #ffb62f,
+    #ffb835,
+    #ffba3b,
+    #febc41,
+    #febe47,
+    #fec14f,
+    #fdc356,
+    #fdc65d,
+    #fdc864
+  );
   color: white;
   text-align: center;
   padding: 60px 20px;
+}
+
+.press-start-2p-regular {
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .hero-content h1 {
@@ -23,7 +54,7 @@
 }
 
 .cta-button {
-  background-color: #ff6f61;
+  background-color: #0399ff;
   color: white;
   padding: 10px 20px;
   text-decoration: none;
@@ -33,7 +64,7 @@
 }
 
 .cta-button:hover {
-  background-color: #ff3b2f;
+  background-color: #0157ca;
 }
 
 /* Features Section */
@@ -41,7 +72,7 @@
   display: flex;
   justify-content: space-around;
   padding: 40px 20px;
-  background-color: #f9f9f9;
+  background-color: #e11837;
 }
 
 .feature {
@@ -50,13 +81,16 @@
 }
 
 .feature h2 {
-  font-size: 1.5rem;
+  font-size: 2rem;
+  font-weight: bold;
   margin-bottom: 10px;
+  color: #092c5f;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.7);
 }
 
 .feature p {
   font-size: 1rem;
-  color: #666;
+  color: white;
 }
 
 /* Footer */

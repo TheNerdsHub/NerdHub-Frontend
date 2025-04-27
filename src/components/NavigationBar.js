@@ -4,18 +4,24 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
+import './NavigationBar.css';
 
 function NavigationBar({ keycloak, isAuthenticated }) {
   return (
-    <Navbar bg="dark" data-bs-theme="dark" expand="lg" className="bg-body-tertiary">
+    <Navbar expand="lg" style={{ backgroundColor: "#0797ff" }}>
       <Container>
-        <Navbar.Brand href="/">NerdHub</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Brand href="/" className="navbar-link-white text-shadow">NerdHub</Navbar.Brand>
+        <Navbar.Toggle 
+            className="navbar-link-white custom-toggler"
+        aria-controls="basic-navbar-nav"
+        >
+  <span className="custom-toggler-icon"></span>
+</Navbar.Toggle>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="/games">Games</Nav.Link>
-            <Nav.Link href="/timeline">Timeline</Nav.Link>
-            <NavDropdown title="Quotes" id="basic-nav-dropdown">
+            <Nav.Link href="/games" className="navbar-link-white text-shadow">Games</Nav.Link>
+            <Nav.Link href="/timeline" className="navbar-link-white text-shadow">Timeline</Nav.Link>
+            <NavDropdown title="Quotes" id="basic-nav-dropdown" className="navbar-link-white">
               <NavDropdown.Item href="/quotes">Table View</NavDropdown.Item>
               <NavDropdown.Item href="/quotes">List View</NavDropdown.Item>
               <NavDropdown.Item href="/quotes">KanBan View</NavDropdown.Item>
@@ -44,7 +50,7 @@ function NavigationBar({ keycloak, isAuthenticated }) {
                 <NavDropdown.Item onClick={() => keycloak.logout()}>Sign Out</NavDropdown.Item>
               </NavDropdown>
             ) : (
-              <Button variant="outline-light" onClick={() => keycloak.login()}>
+              <Button variant="outline-light" className="text-shadow" onClick={() => keycloak.login()}>
                 Sign In
               </Button>
             )}
