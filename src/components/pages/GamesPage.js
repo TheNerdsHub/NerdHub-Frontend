@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useDocumentTitle from 'hooks/useDocumentTitle';
-import ScrollToTop from 'components/common/ScrollToTop'; // Import the new component
+import ScrollToTop from 'components/common/ScrollToTop';
 import { getGames } from 'services/gameService';
 import 'styles/GamesPage.css';
 
@@ -28,20 +28,19 @@ function GamesPage() {
 
     fetchGames();
   }, []);
-  
-    // Save sortBy, sortDirection, and excludeNA to localStorage whenever they change
-    useEffect(() => {
-      localStorage.setItem('sortBy', sortBy);
-    }, [sortBy]);
-  
-    useEffect(() => {
-      localStorage.setItem('sortDirection', sortDirection);
-    }, [sortDirection]);
-  
-    useEffect(() => {
-      localStorage.setItem('excludeNA', excludeNA);
-    }, [excludeNA]);
-  
+
+  useEffect(() => {
+    localStorage.setItem('sortBy', sortBy);
+  }, [sortBy]);
+
+  useEffect(() => {
+    localStorage.setItem('sortDirection', sortDirection);
+  }, [sortDirection]);
+
+  useEffect(() => {
+    localStorage.setItem('excludeNA', excludeNA);
+  }, [excludeNA]);
+
   const filteredGames = games.filter((game) =>
     game.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -71,61 +70,77 @@ function GamesPage() {
   }
 
   return (
-    <div>
-      <div className="sort-container">
-        <label htmlFor="search">Search:</label>
-        <input
-          type="text"
-          id="search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search games..."
-        />
-        <label htmlFor="sort-by">Sort By:</label>
-        <select
-          id="sort-by"
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
-          <option value="appid">App ID</option>
-          <option value="name">Name</option>
-          <option value="price">Price</option>
-          <option value="owners">Owners</option>
-        </select>
-        <button
-          className="sort-direction-button"
-          onClick={() =>
-            setSortDirection((prevDirection) =>
-              prevDirection === 'asc' ? 'desc' : 'asc'
-            )
-          }
-        >
-          {sortDirection === 'asc' ? 'Ascending' : 'Descending'}
-        </button>
-        <label htmlFor="exclude-na" className="exclude-na-label">
+    <div className="games-page-wrapper">
+      {/* Floating Background Layers */}
+      <div className="background-dots background-dots-back"></div>
+      <div className="background-dots background-dots-front"></div>
+
+      {/* Main Content Wrapper */}
+      <div className="main-content">
+        <div className="sort-container">
+          <label htmlFor="search">Search:</label>
           <input
-            type="checkbox"
-            id="exclude-na"
-            checked={excludeNA}
-            onChange={(e) => setExcludeNA(e.target.checked)}
+            type="text"
+            id="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search games..."
           />
-          Exclude "N/A" Prices
-        </label>
-      </div>
-      <div className="games-grid">
-        {sortedGames.map((game) => (
-          <Link to={`/games/${game.appid}`} key={game.appid} className="game-block">
-            <img src={game.headerImage} alt={game.name} />
-            <div className="game-info">
-              <div className="game-title">{game.name}</div>
-              <div className="game-price">
-                {game.priceOverview?.finalFormatted || (game.isFree ? 'Free' : 'N/A')}
+          <label htmlFor="sort-by">Sort By:</label>
+          <select
+            id="sort-by"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="appid">App ID</option>
+            <option value="name">Name</option>
+            <option value="price">Price</option>
+            <option value="owners">Owners</option>
+          </select>
+          <button
+            className="sort-direction-button"
+            onClick={() =>
+              setSortDirection((prevDirection) =>
+                prevDirection === 'asc' ? 'desc' : 'asc'
+              )
+            }
+          >
+            {sortDirection === 'asc' ? 'Ascending' : 'Descending'}
+          </button>
+          <label htmlFor="exclude-na" className="exclude-na-label">
+            <input
+              type="checkbox"
+              id="exclude-na"
+              checked={excludeNA}
+              onChange={(e) => setExcludeNA(e.target.checked)}
+            />
+            Exclude "N/A" Prices
+          </label>
+        </div>
+
+        <div className="games-grid">
+          {sortedGames.map((game, index) => (
+            <Link
+              to={`/games/${game.appid}`}
+              key={game.appid}
+              className="game-block"
+              style={{ '--animation-delay': `${index * 0.05}s` }}
+            >
+              {game.isFree && <div className="ribbon">Free</div>}
+              <img src={game.headerImage} alt={game.name} />
+              <div className="game-info">
+                <div className="game-title">{game.name}</div>
+                <div
+                  className="game-price"
+                  data-price={game.priceOverview?.finalFormatted || (game.isFree ? 'Free' : 'N/A')}
+                ></div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
-      <ScrollToTop /> {/* Add the ScrollToTop component */}
+
+      <ScrollToTop />
     </div>
   );
 }

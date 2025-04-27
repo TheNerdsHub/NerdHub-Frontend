@@ -1,36 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import 'styles/ScrollToTop.css'; // Create a new CSS file for styling
+import React, { useState, useEffect } from 'react';
+import { FaArrowUp } from 'react-icons/fa'; // Using react-icons for consistency
+import 'styles/ScrollToTop.css'; // (separate css if needed)
 
 function ScrollToTop() {
-  const [showTopButton, setShowTopButton] = useState(false);
-  const [nearBottom, setNearBottom] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const newScrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const fullHeight = document.documentElement.scrollHeight;
-
-      setShowTopButton(newScrollY > 300);
-      setNearBottom((newScrollY + windowHeight) >= (fullHeight - 150));
+    const toggleVisibility = () => {
+      if (window.scrollY > 300) {
+        setVisible(true);
+      } else {
+        setVisible(false);
+      }
     };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', toggleVisibility);
+    return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   return (
-    <button
-      className={`scroll-to-top ${showTopButton ? 'visible' : ''}`}
+    <div
+      className={`scroll-to-top ${visible ? 'show' : ''}`}
       onClick={scrollToTop}
-      style={{ bottom: nearBottom ? '100px' : '40px' }}
     >
-      <span className="scroll-arrow">⬆</span>
-    </button>
+      <FaArrowUp />
+    </div>
   );
 }
 
