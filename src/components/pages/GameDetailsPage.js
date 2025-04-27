@@ -20,7 +20,6 @@ function GameDetailsPage() {
       const data = await getGameDetails(appid);
       setGameDetails(data);
 
-      // Fetch usernames for Steam IDs if they exist
       if (data.ownedBy?.steamId?.length > 0) {
         const steamIds = data.ownedBy.steamId;
         const fetchedUsernames = await fetchUsernames(steamIds);
@@ -37,7 +36,7 @@ function GameDetailsPage() {
     try {
       await updateGameInfo(appid);
       alert('Game info updated successfully.');
-      fetchGameDetails(); // Refresh game details after update
+      fetchGameDetails();
     } catch (error) {
       alert('Failed to update game info.');
     }
@@ -60,16 +59,19 @@ function GameDetailsPage() {
 
   return (
     <div className="centered-container">
+      {/* Background Dots */}
       <div className="background-dots background-dots-back"></div>
       <div className="background-dots background-dots-front"></div>
+
+      {/* Game Details Card */}
       <div className="game-details">
-        {/* Header Section */}
+        {/* Header */}
         <div className="game-header">
           <img src={gameDetails.headerImage} alt={gameDetails.name} />
           <h1>{gameDetails.name}</h1>
         </div>
 
-        {/* Action Buttons Section */}
+        {/* Action Buttons */}
         <div className="button-row">
           <button onClick={handleUpdateGameInfo}>Update Game Info</button>
           <a
@@ -81,11 +83,11 @@ function GameDetailsPage() {
           </a>
         </div>
 
-        {/* Main Game Info Section */}
-        <div className="game-info">
+        {/* Main Info Section */}
+        <div className="game-details-info">
 
           {/* General Information */}
-          <div className="info-block">
+          <div className="game-details-info-block">
             <h2>General Information</h2>
             {gameDetails.priceOverview?.finalFormatted ? (
               <p><strong>Price:</strong> {gameDetails.priceOverview.finalFormatted}</p>
@@ -103,20 +105,20 @@ function GameDetailsPage() {
           </div>
 
           {/* Description */}
-          <div className="info-block">
+          <div className="game-details-info-block">
             <h2>Description</h2>
             <p>{decodeHtml(gameDetails.shortDescription)}</p>
           </div>
 
-          {/* Platforms & Controller */}
-          <div className="info-block">
+          {/* Platforms */}
+          <div className="game-details-info-block">
             <h2>Platforms & Controller Support</h2>
             <p><strong>Platforms:</strong> {platforms.join(', ')}</p>
             <p><strong>Controller Support:</strong> {gameDetails.controllerSupport || 'None'}</p>
           </div>
 
           {/* System Requirements */}
-          <div className="info-block">
+          <div className="game-details-info-block">
             <h2>System Requirements</h2>
             <p><strong>PC Requirements:</strong>{' '}
               {gameDetails.pcRequirements?.minimum ? (
@@ -142,7 +144,7 @@ function GameDetailsPage() {
           </div>
 
           {/* Owned By */}
-          <div className="info-block">
+          <div className="game-details-info-block">
             <h2>Owned By</h2>
 
             {gameDetails.ownedBy?.steamId?.length > 0 ? (
@@ -173,7 +175,7 @@ function GameDetailsPage() {
           </div>
 
           {/* Last Modified */}
-          <div className="info-block">
+          <div className="game-details-info-block">
             <h2>Last Modified</h2>
             <p>
               {gameDetails.LastModifiedTime

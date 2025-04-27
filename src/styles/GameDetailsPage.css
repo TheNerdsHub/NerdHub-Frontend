@@ -1,4 +1,4 @@
-/* Background for the entire page */
+/* Base page background */
 .centered-container {
   display: flex;
   flex-direction: column;
@@ -6,11 +6,11 @@
   background: linear-gradient(135deg, #ffd27a, #ffb93b);
   padding: 40px 20px;
   box-sizing: border-box;
-  position: relative; /* Important: so dots can position absolutely inside */
-  min-height: 100vh; /* Keep minimum full screen — optional if you want */
+  position: relative;
+  min-height: 100vh;
 }
 
-/* Main game details card */
+/* Game Details Card */
 .game-details {
   max-width: 1000px;
   width: 100%;
@@ -24,7 +24,7 @@
   animation: fadeSlideIn 0.8s ease-out forwards;
 }
 
-/* Header: Image and Title */
+/* Game Header */
 .game-header {
   display: flex;
   flex-direction: column;
@@ -47,8 +47,17 @@
   margin: 0;
 }
 
-/* Update Button */
-.game-details button {
+/* Action Buttons */
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 30px;
+  justify-content: center;
+}
+
+.button-row button,
+.button-row a {
   display: inline-block;
   background-color: #0999f9;
   color: white;
@@ -58,105 +67,51 @@
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
+  text-decoration: none;
   transition: background-color 0.3s, transform 0.3s;
-  margin-bottom: 20px;
 }
 
-.game-details button:hover {
+.button-row button:hover,
+.button-row a:hover {
   background-color: #077ccc;
   transform: translateY(-3px);
 }
 
-/* Steam Link */
-.game-details a {
-  display: inline-block;
-  background-color: #4caf50;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-weight: bold;
-  text-decoration: none;
-  margin-bottom: 20px;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-.game-details a:hover {
-  background-color: #3b9740;
-  transform: translateY(-2px);
-}
-
-/* Paragraphs and labels */
-.game-details p {
-  margin-bottom: 12px;
-  color: #444;
-  line-height: 1.6;
-}
-
-.game-details strong {
-  color: #222;
-}
-
-/* Owned By List (Steam & Epic Users) */
-.game-details ul {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0 20px 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.game-details ul li {
-  background-color: #e0f7fa;
-  color: #00796b;
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: bold;
-}
-
-.button-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 30px;
-  justify-content: center;
-}
-
-.game-info {
+/* Info Blocks Section */
+.game-details-info {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* NEW: nice breathing room between info blocks */
+  gap: 20px;
   margin-top: 20px;
 }
 
-.info-block {
-  width: 100%; /* NEW: always stretch full width */
+.game-details-info-block {
+  width: 100%;
   background-color: #f9f9f9;
   border-radius: 12px;
   padding: 20px;
-  box-sizing: border-box; /* Prevent weird sizing */
+  box-sizing: border-box;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.info-block h2 {
+.game-details-info-block h2 {
   font-size: 1.5rem;
   margin-bottom: 15px;
   color: #333;
 }
 
-.info-block h3 {
+.game-details-info-block h3 {
   font-size: 1.2rem;
   margin-top: 15px;
   color: #555;
 }
 
-.info-block p {
+.game-details-info-block p {
   margin-bottom: 10px;
   color: #444;
 }
 
-.info-block ul {
+.game-details-info-block ul {
   list-style: none;
   padding: 0;
   margin-top: 10px;
@@ -165,7 +120,7 @@
   gap: 8px;
 }
 
-.info-block ul li {
+.game-details-info-block ul li {
   background-color: #e0f7fa;
   color: #00796b;
   padding: 6px 12px;
@@ -174,7 +129,7 @@
   font-weight: bold;
 }
 
-/* Background dots shared base */
+/* Background Dots */
 .background-dots {
   position: absolute;
   top: 0;
@@ -186,42 +141,36 @@
   animation: fadeInDots 2s ease-out forwards;
 }
 
-/* Back layer - larger slower dots */
 .background-dots-back {
   background-image: radial-gradient(#0999f9 3px, transparent 3px);
   background-size: 60px 60px;
   animation: floatDotsBack 90s linear infinite;
 }
 
-/* Front layer - smaller faster dots */
 .background-dots-front {
   background-image: radial-gradient(#0999f9 2px, transparent 2px);
   background-size: 40px 40px;
   animation: floatDotsFront 60s linear infinite;
 }
 
-/* Responsive layout tweaks */
-@media (min-width: 768px) {
-  .game-header {
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    text-align: left;
-  }
-
-  .game-header img {
-    margin-right: 30px;
-    margin-bottom: 0;
-  }
-
-  .game-header h1 {
-    font-size: 2.5rem;
-  }
+/* Dots Animations */
+@keyframes floatDotsBack {
+  0% { background-position: 0 0; }
+  25% { background-position: -30px 50px; }
+  50% { background-position: -60px 100px; }
+  75% { background-position: -90px 150px; }
+  100% { background-position: -120px 200px; }
 }
 
+@keyframes floatDotsFront {
+  0% { background-position: 0 0; }
+  25% { background-position: 50px -30px; }
+  50% { background-position: 100px 20px; }
+  75% { background-position: 150px -40px; }
+  100% { background-position: 200px 0; }
+}
 
-
-/* Fade In Animation for the entire details card */
+/* Fade In Animations */
 @keyframes fadeSlideIn {
   0% {
     opacity: 0;
@@ -233,49 +182,7 @@
   }
 }
 
-/* Animations for background movement */
-@keyframes floatDotsBack {
-  0% {
-    background-position: 0 0;
-  }
-  25% {
-    background-position: -30px 50px;
-  }
-  50% {
-    background-position: -60px 100px;
-  }
-  75% {
-    background-position: -90px 150px;
-  }
-  100% {
-    background-position: -120px 200px;
-  }
-}
-
-
-@keyframes floatDotsFront {
-  0% {
-    background-position: 0 0;
-  }
-  25% {
-    background-position: 50px -30px;
-  }
-  50% {
-    background-position: 100px 20px;
-  }
-  75% {
-    background-position: 150px -40px;
-  }
-  100% {
-    background-position: 200px 0;
-  }
-}
-
 @keyframes fadeInDots {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
