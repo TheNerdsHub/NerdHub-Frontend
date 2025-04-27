@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import './GameDetailsPage.css'; // Import the CSS file for styling
+import '../../styles/GameDetailsPage.css'; // Import the CSS file for styling
 
 const API_ROOT = process.env.REACT_APP_API_ROOT;
 
