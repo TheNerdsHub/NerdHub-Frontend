@@ -1,59 +1,286 @@
-.games-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid with a minimum column width */
-  grid-template-columns: repeat(6, 1fr); /* Ensure a maximum of 6 columns */
-  gap: 20px; /* Add spacing between grid items */
-  padding: 20px;
+/* Page Background */
+body {
+  background: linear-gradient(135deg, #ffc551, #ffb93b);
+  min-height: 100vh;
 }
 
+/* Sort and Search Container */
+.sort-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 10px 20px;
+  background-color: #ffffffcc;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sort-container label {
+  font-weight: bold;
+  color: #333;
+}
+
+.sort-container input,
+.sort-container select,
+.sort-container button {
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: 0.3s;
+}
+
+.sort-container input:focus,
+.sort-container select:focus {
+  border-color: #5bc0de;
+}
+
+.sort-container button {
+  background-color: #5bc0de;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.sort-container button:hover {
+  background-color: #31b0d5;
+}
+
+.exclude-na-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Games Grid */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+  padding: 20px 40px;
+  width: 100%;
+}
+
+/* Each Game Block */
 .game-block {
+  position: relative;
   display: flex;
   flex-direction: column;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: #ffffff;
+  border-radius: 16px;
   overflow: hidden;
   text-decoration: none;
   color: inherit;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  animation: cardFadeIn 0.8s ease forwards;
+  animation-delay: var(--animation-delay, 0s);
+  height: 150px; /* NEW: shorter card height */
 }
 
+.game-block:hover {
+  transform: translateY(-15px) scale(1.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Game Image */
 .game-block img {
   width: 100%;
-  height: auto;
+  height: 100px; /* NEW: smaller banner */
+  object-fit: cover;
 }
 
+/* Game Info Section */
 .game-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 12px;
+  gap: 10px;
 }
 
+/* Game Title */
 .game-title {
   font-size: 1rem;
   font-weight: bold;
   text-align: left;
-  flex: 1;
+  flex-grow: 1; /* Grow to fill available space */
+  min-width: 0; /* Allow shrinkage if needed */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* Game Price */
 .game-price {
   font-size: 0.9rem;
-  text-align: right;
-  color: #666;
-  margin-left: 10px;
-}
-
-.sort-container {
-  margin-bottom: 20px;
   text-align: center;
+  background-color: #f0f0f0;
+  color: #555;
+  padding: 4px 8px;
+  border-radius: 8px;
+  flex-shrink: 0; /* Don't allow price to shrink */
+  white-space: nowrap;
 }
 
-.sort-container label {
-  margin-right: 10px;
+/* Special styling for Free games */
+.game-price::after {
+  content: attr(data-price);
+}
+
+/* Loading Message */
+.loading {
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 50px;
+}
+
+/* Ribbon for Free Games */
+.ribbon {
+  position: absolute;
+  top: 9px; /* Pull it slightly down */
+  right: -28px; /* Pull it slightly into view */
+  width: 100px; /* Enough width for text + rotation */
+  background: #4caf50;
+  color: white;
   font-weight: bold;
+  font-size: 13px;
+  padding: 6px 0;
+  text-align: center;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  pointer-events: none;
+  letter-spacing: 1px;
 }
 
-.sort-container select {
-  padding: 5px;
-  font-size: 16px;
+.games-page-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* NEW: page always at least full screen */
+  overflow-x: hidden;
+}
+
+/* Shared base styles for both layers */
+.background-dots {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Back Layer (slower, bigger dots) */
+.background-dots-back {
+  background-image: radial-gradient(#0999f9 3px, transparent 3px);
+  background-size: 60px 60px;
+  animation: floatDotsBack 90s linear infinite;
+}
+
+/* Front Layer (smaller dots, faster) */
+.background-dots-front {
+  background-image: radial-gradient(#0999f9 2px, transparent 2px);
+  background-size: 40px 40px;
+  animation: floatDotsFront 60s linear infinite;
+}
+
+/* Make main content float above both layers */
+.sort-container,
+.games-grid,
+.loading {
+  position: relative;
+  z-index: 1;
+}
+
+.main-content {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes cardFadeIn {
+  0% {
+    opacity: 0;
+    /* REMOVE: transform: translateY(20px); */
+  }
+  100% {
+    opacity: 1;
+    /* REMOVE: transform: translateY(0); */
+  }
+}
+
+/* Keyframes for back layer (slower, deeper drift) */
+@keyframes floatDotsBack {
+  0% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: -30px 50px;
+  }
+  50% {
+    background-position: -60px 100px;
+  }
+  75% {
+    background-position: -90px 150px;
+  }
+  100% {
+    background-position: -120px 200px;
+  }
+}
+
+/* Keyframes for front layer (faster, lighter drift) */
+@keyframes floatDotsFront {
+  0% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: 50px -30px;
+  }
+  50% {
+    background-position: 100px 20px;
+  }
+  75% {
+    background-position: 150px -40px;
+  }
+  100% {
+    background-position: 200px 0;
+  }
+}
+
+@media (max-width: 1200px) {
+  .games-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .games-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .game-block {
+    height: 170px;
+  }
+  .game-block img {
+    height: 120px;
+  }
+}
+
+@media (max-width: 600px) {
+  .games-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .game-block {
+    height: 180px;
+  }
+  .game-block img {
+    height: 130px;
+  }
 }

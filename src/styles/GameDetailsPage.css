@@ -1,29 +1,188 @@
+/* Base page background */
 .centered-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  min-height: 100vh; /* Full viewport height */
-  text-align: center;
-  background-color: #f9f9f9; /* Optional: Add a background color */
-  padding: 20px;
+  background: linear-gradient(135deg, #ffd27a, #ffb93b);
+  padding: 40px 20px;
   box-sizing: border-box;
+  position: relative;
+  min-height: 100vh;
 }
 
+/* Game Details Card */
 .game-details {
-  max-width: 1000px; /* Limit the width of the content */
+  max-width: 1000px;
   width: 100%;
-  background: #fff; /* Optional: Add a white background */
-  padding: 20px;
-  border-radius: 8px; /* Optional: Add rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
-  text-align: left; /* Left-align the content inside the game-details container */
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  position: relative;
+  z-index: 1;
+  animation: fadeSlideIn 0.8s ease-out forwards;
 }
 
+/* Game Header */
 .game-header {
   display: flex;
-  flex-direction: column; /* Stack the image and title vertically */
-  align-items: center; /* Center the image and title horizontally */
-  justify-content: center; /* Center the content vertically (if needed) */
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.game-header img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 12px;
   margin-bottom: 20px;
-  text-align: center; /* Ensure the title is centered */
+}
+
+.game-header h1 {
+  font-size: 2rem;
+  color: #333;
+  margin: 0;
+}
+
+/* Action Buttons */
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 30px;
+  justify-content: center;
+}
+
+.button-row button,
+.button-row a {
+  display: inline-block;
+  background-color: #0999f9;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.button-row button:hover,
+.button-row a:hover {
+  background-color: #077ccc;
+  transform: translateY(-3px);
+}
+
+/* Info Blocks Section */
+.game-details-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.game-details-info-block {
+  width: 100%;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.game-details-info-block h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.game-details-info-block h3 {
+  font-size: 1.2rem;
+  margin-top: 15px;
+  color: #555;
+}
+
+.game-details-info-block p {
+  margin-bottom: 10px;
+  color: #444;
+}
+
+.game-details-info-block ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.game-details-info-block ul li {
+  background-color: #e0f7fa;
+  color: #00796b;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* Background Dots */
+.background-dots {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  animation: fadeInDots 2s ease-out forwards;
+}
+
+.background-dots-back {
+  background-image: radial-gradient(#0999f9 3px, transparent 3px);
+  background-size: 60px 60px;
+  animation: floatDotsBack 90s linear infinite;
+}
+
+.background-dots-front {
+  background-image: radial-gradient(#0999f9 2px, transparent 2px);
+  background-size: 40px 40px;
+  animation: floatDotsFront 60s linear infinite;
+}
+
+/* Dots Animations */
+@keyframes floatDotsBack {
+  0% { background-position: 0 0; }
+  25% { background-position: -30px 50px; }
+  50% { background-position: -60px 100px; }
+  75% { background-position: -90px 150px; }
+  100% { background-position: -120px 200px; }
+}
+
+@keyframes floatDotsFront {
+  0% { background-position: 0 0; }
+  25% { background-position: 50px -30px; }
+  50% { background-position: 100px 20px; }
+  75% { background-position: 150px -40px; }
+  100% { background-position: 200px 0; }
+}
+
+/* Fade In Animations */
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDots {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
