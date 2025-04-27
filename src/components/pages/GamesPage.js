@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import ScrollToTop from 'components/common/ScrollToTop';
@@ -13,6 +13,9 @@ function GamesPage() {
   const [sortDirection, setSortDirection] = useState(() => localStorage.getItem('sortDirection') || 'desc');
   const [excludeNA, setExcludeNA] = useState(() => JSON.parse(localStorage.getItem('excludeNA')) ?? true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [visibleGames, setVisibleGames] = useState(new Set());
+
+  const observer = useRef(null);
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -40,6 +43,21 @@ function GamesPage() {
   useEffect(() => {
     localStorage.setItem('excludeNA', excludeNA);
   }, [excludeNA]);
+
+  useEffect(() => {
+    observer.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleGames((prev) => new Set(prev).add(entry.target.dataset.appid));
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    return () => observer.current.disconnect();
+  }, []);
 
   const filteredGames = games.filter((game) =>
     game.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -123,8 +141,10 @@ function GamesPage() {
             <Link
               to={`/games/${game.appid}`}
               key={game.appid}
-              className="game-block"
+              className={`game-block ${visibleGames.has(game.appid.toString()) ? 'fade-in' : ''}`}
               style={{ '--animation-delay': `${index * 0.05}s` }}
+              data-appid={game.appid}
+              ref={(el) => el && observer.current.observe(el)}
             >
               {game.isFree && <div className="ribbon">Free</div>}
               <img src={game.headerImage} alt={game.name} />
