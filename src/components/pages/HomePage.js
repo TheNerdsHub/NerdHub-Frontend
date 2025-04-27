@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import useDocumentTitle from '../useDocumentTitle';
-import GameIcon from '../assets/GamingIcon.png';
-import QuotesIcon from '../assets/QuotesIcon.png';
-import TimelineIcon from '../assets/TimelineIcon.png';
-import Footer from '../Footer';
-import '../../styles/HomePage.css';
+import useDocumentTitle from 'components/useDocumentTitle';
+import GameIcon from 'assets/GamingIcon.png';
+import QuotesIcon from 'assets/QuotesIcon.png';
+import TimelineIcon from 'assets/TimelineIcon.png';
+import Footer from 'components/Footer';
+import 'styles/HomePage.css';
 
 function HomePage() {
   useDocumentTitle('Home');

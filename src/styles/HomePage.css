@@ -17,7 +17,7 @@
   position: relative; /* <-- important for fade positioning */
   background:
     linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.35)),
-    url("../components/assets/TheNerdsFloating.gif") center/300px no-repeat,
+    url("components/assets/TheNerdsFloating.gif") center/300px no-repeat,
     linear-gradient(to right top, #ffaf1b, #ffb123, #ffb429, #ffb62f, #ffb835, #ffba3b, #febc41, #febe47, #fec14f, #fdc356, #fdc65d, #fdc864);
   color: white;
   text-align: center;

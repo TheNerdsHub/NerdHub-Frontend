@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
-import NavigationBar from './components/NavigationBar';
+import NavigationBar from 'components/NavigationBar';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import HomePage from './components/pages/HomePage';
-import GamesPage from './components/pages/GamesPage';
-import GameDetailsPage from './components/pages/GameDetailsPage';
-import QuotePage from './components/pages/QuotesPage';
-import TimelinePage from './components/pages/TimelinePage';
-import Profile from './components/pages/ProfilePage';
-import keycloak from './keycloak';
+import HomePage from 'components/pages/HomePage';
+import GamesPage from 'components/pages/GamesPage';
+import GameDetailsPage from 'components/pages/GameDetailsPage';
+import QuotePage from 'components/pages/QuotesPage';
+import TimelinePage from 'components/pages/TimelinePage';
+import Profile from 'components/pages/ProfilePage';
+import keycloak from 'keycloak';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

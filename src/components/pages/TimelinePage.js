@@ -1,5 +1,5 @@
 import React from 'react';
-import useDocumentTitle from '../useDocumentTitle';
+import useDocumentTitle from 'components/useDocumentTitle';
 
 function TimelinePage() {
   useDocumentTitle('Timeline');

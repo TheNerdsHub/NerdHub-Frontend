@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import useDocumentTitle from '../useDocumentTitle';
-import Footer from '../Footer';
-import '../../styles/GamesPage.css';
+import useDocumentTitle from 'components/useDocumentTitle';
+import Footer from 'components/Footer';
+import 'styles/GamesPage.css';
 
 const API_ROOT = process.env.REACT_APP_API_ROOT;
 
