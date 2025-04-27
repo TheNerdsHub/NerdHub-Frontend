@@ -30,6 +30,11 @@ function NavigationBar({ keycloak, isAuthenticated }) {
                 Legacy Trello
               </NavDropdown.Item>
             </NavDropdown>
+            <NavDropdown title="Nerds Tools" id="basic-nav-dropdown" className="navbar-link-white">
+              <NavDropdown.Item href="URLTOCALENDAR">TheNerds Calendar</NavDropdown.Item>
+              <NavDropdown.Item href="URLTOFILESHARE">File Sharing</NavDropdown.Item>
+              <NavDropdown.Item href="URLTOKB">Knowledge Base</NavDropdown.Item>
+            </NavDropdown>
           </Nav>
           <Nav className="ms-auto">
             {isAuthenticated ? (
