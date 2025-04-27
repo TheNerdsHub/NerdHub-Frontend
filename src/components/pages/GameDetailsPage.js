@@ -157,7 +157,7 @@ function GameDetailsPage() {
         )}
         <p>
           <strong>Owned By:</strong><br />
-          <strong>Steam Users:</strong>
+          <strong>Steam Users: </strong>
           {gameDetails.ownedBy?.steamId?.length > 0 ? (
             <ul>
               {gameDetails.ownedBy.steamId.map((id, index) => {

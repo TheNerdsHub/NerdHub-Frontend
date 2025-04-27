@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useDocumentTitle from '../useDocumentTitle';
+import Footer from '../Footer'; // Import Footer component
 import './GamesPage.css'; // Add CSS for grid styling
 
 const API_ROOT = process.env.REACT_APP_API_ROOT;
@@ -9,9 +10,12 @@ function GamesPage() {
   useDocumentTitle('Games');
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState(() => localStorage.getItem('sortBy') || 'appid'); // Load from localStorage or default to 'appid'
-  const [sortDirection, setSortDirection] = useState(() => localStorage.getItem('sortDirection') || 'asc'); // Load from localStorage or default to 'asc'
-  const [excludeNA, setExcludeNA] = useState(false); // New state for excluding "N/A" results
+  const [sortBy, setSortBy] = useState(() => localStorage.getItem('sortBy') || 'owners'); // Default to 'owners'
+  const [sortDirection, setSortDirection] = useState(() => localStorage.getItem('sortDirection') || 'desc'); // Default to 'desc'
+  const [excludeNA, setExcludeNA] = useState(() => JSON.parse(localStorage.getItem('excludeNA')) ?? true); // Default to true
+  const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const [showTopButton, setShowTopButton] = useState(false); // State for "scroll to top" button
+  const [nearBottom, setNearBottom] = useState(false); // State for detecting proximity to the bottom
 
   useEffect(() => {
     // Fetch all games from the backend
@@ -30,7 +34,7 @@ function GamesPage() {
     fetchGames();
   }, []);
 
-  // Save sortBy and sortDirection to localStorage whenever they change
+  // Save sortBy, sortDirection, and excludeNA to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('sortBy', sortBy);
   }, [sortBy]);
@@ -39,8 +43,36 @@ function GamesPage() {
     localStorage.setItem('sortDirection', sortDirection);
   }, [sortDirection]);
 
+  useEffect(() => {
+    localStorage.setItem('excludeNA', excludeNA);
+  }, [excludeNA]);
+
+  // Handle scroll events for "scroll to top" button
+  useEffect(() => {
+    const handleScroll = () => {
+      const newScrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.documentElement.scrollHeight;
+
+      setShowTopButton(newScrollY > 300);
+      setNearBottom((newScrollY + windowHeight) >= (fullHeight - 150));
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Filter games based on the search query
+  const filteredGames = games.filter((game) =>
+    game.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // Sort and filter games based on the selected criterion, direction, and excludeNA
-  const sortedGames = [...games]
+  const sortedGames = [...filteredGames]
     .filter((game) => !excludeNA || !(game.priceOverview?.finalFormatted == null && !game.isFree)) // Filter out "N/A" results if excludeNA is true
     .sort((a, b) => {
       let comparison = 0;
@@ -52,6 +84,10 @@ function GamesPage() {
         const priceA = a.priceOverview?.final || 0;
         const priceB = b.priceOverview?.final || 0;
         comparison = priceA - priceB;
+      } else if (sortBy === 'owners') {
+        const ownersA = a.ownedBy?.steamId?.length || 0;
+        const ownersB = b.ownedBy?.steamId?.length || 0;
+        comparison = ownersA - ownersB;
       }
       return sortDirection === 'asc' ? comparison : -comparison;
     });
@@ -63,6 +99,14 @@ function GamesPage() {
   return (
     <div>
       <div className="sort-container">
+        <label htmlFor="search">Search:</label>
+        <input
+          type="text"
+          id="search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search games..."
+        />
         <label htmlFor="sort-by">Sort By:</label>
         <select
           id="sort-by"
@@ -72,6 +116,7 @@ function GamesPage() {
           <option value="appid">App ID</option>
           <option value="name">Name</option>
           <option value="price">Price</option>
+          <option value="owners">Owners</option>
         </select>
         <button
           className="sort-direction-button"
@@ -106,6 +151,14 @@ function GamesPage() {
           </Link>
         ))}
       </div>
+      <Footer /> {/* Add Footer */}
+      <button
+        className={`scroll-to-top ${showTopButton ? 'visible' : ''}`}
+        onClick={scrollToTop}
+        style={{ bottom: nearBottom ? '100px' : '40px' }}
+      >
+        <span className="scroll-arrow">⬆</span>
+      </button>
     </div>
   );
 }
