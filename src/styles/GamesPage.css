@@ -263,22 +263,10 @@ body {
   .games-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .game-block {
-    height: 170px;
-  }
-  .game-block img {
-    height: 120px;
-  }
 }
 
 @media (max-width: 600px) {
   .games-grid {
     grid-template-columns: repeat(1, 1fr);
-  }
-  .game-block {
-    height: 180px;
-  }
-  .game-block img {
-    height: 130px;
   }
 }
