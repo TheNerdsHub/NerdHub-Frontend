@@ -34,6 +34,7 @@ function NavigationBar({ keycloak, isAuthenticated }) {
               <NavDropdown.Item href="URLTOCALENDAR">TheNerds Calendar</NavDropdown.Item>
               <NavDropdown.Item href="URLTOFILESHARE">File Sharing</NavDropdown.Item>
               <NavDropdown.Item href="URLTOKB">Knowledge Base</NavDropdown.Item>
+              <NavDropdown.Item href="URLTOBRACKETMAKER">Bracket Maker</NavDropdown.Item>
             </NavDropdown>
           </Nav>
           <Nav className="ms-auto">
