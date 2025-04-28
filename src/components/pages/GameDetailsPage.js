@@ -178,8 +178,8 @@ function GameDetailsPage() {
           <div className="game-details-info-block">
             <h2>Last Modified</h2>
             <p>
-              {gameDetails.LastModifiedTime
-                ? new Date(gameDetails.LastModifiedTime).toLocaleString()
+              {gameDetails.lastModifiedTime
+                ? new Date(gameDetails.lastModifiedTime).toLocaleString()
                 : 'Not available'}
             </p>
           </div>
