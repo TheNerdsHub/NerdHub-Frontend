@@ -81,6 +81,20 @@ function GameDetailsPage() {
           >
             View on Steam
           </a>
+          <a
+            href={`https://steamdb.info/app/${gameDetails.appid}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View on SteamDB
+          </a>
+          <a
+            href={`https://www.protondb.com/app/${gameDetails.appid}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View on ProtonDB
+          </a>
         </div>
 
         {/* Main Info Section */}
