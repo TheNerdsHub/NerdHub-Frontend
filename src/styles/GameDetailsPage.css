@@ -10,6 +10,40 @@
   min-height: 100vh;
 }
 
+/* Back Button Styling */
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: inline-block;
+  padding: 8px 0;
+  color: #666;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+  z-index: 2;
+}
+
+.back-button:hover {
+  color: #666;
+}
+
+.back-button::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #666;
+  transition: width 0.3s;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.back-button:hover::after {
+  width: 100%;
+}
+
 /* Game Details Card */
 .game-details {
   max-width: 1000px;
@@ -127,6 +161,118 @@
   border-radius: 10px;
   font-size: 0.9rem;
   font-weight: bold;
+}
+
+/* Owners List */
+.owners-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.owner-item {
+  position: relative;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  cursor: help; /* Shows the help cursor on hover */
+  transition: background-color 0.2s ease;
+  user-select: none; /* Prevent text selection on rapid clicks */
+}
+
+.owner-item:hover {
+  background-color: #f0f7ff;
+  cursor: pointer;
+}
+
+.owner-item:hover .user-tooltip {
+  display: block;
+}
+
+/* Detailed user tooltip */
+.user-tooltip {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  width: 220px;
+  z-index: 100;
+  margin-bottom: 8px;
+  pointer-events: none;
+}
+
+.user-tooltip:after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -8px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: #fff transparent transparent transparent;
+}
+
+.tooltip-row {
+  margin-bottom: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tooltip-row span {
+  font-weight: 600;
+  color: #555;
+}
+
+/* Context Menu Styles */
+.context-menu {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  padding: 8px 0;
+  min-width: 180px;
+}
+
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.context-menu li {
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.context-menu li:hover {
+  background-color: #f0f7ff;
+}
+
+/* Context menu divider */
+.menu-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 5px 0;
+  padding: 0 !important;
+  pointer-events: none;
+}
+
+/* Make sure the divider doesn't respond to hover */
+.menu-divider:hover {
+  background-color: #e0e0e0 !important;
+  cursor: default !important;
 }
 
 /* Background Dots */

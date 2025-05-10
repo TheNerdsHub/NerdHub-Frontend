@@ -246,6 +246,24 @@ body {
   letter-spacing: 1px;
 }
 
+/* Games counter styling */
+.games-counter {
+  background-color: #4caf50;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-right: 10px;
+}
+
+.games-counter span {
+  font-size: 0.9rem;
+}
+
 .games-page-wrapper {
   position: relative;
   display: flex;

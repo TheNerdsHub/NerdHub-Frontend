@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import { getGameDetails, updateGameInfo, fetchUsernames } from 'services/gameService';
 import 'styles/GameDetailsPage.css';
@@ -7,9 +7,11 @@ import 'styles/GameDetailsPage.css';
 function GameDetailsPage() {
   useDocumentTitle('Game Details');
   const { appid } = useParams();
+  const navigate = useNavigate();
   const [gameDetails, setGameDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [usernames, setUsernames] = useState({});
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, userId: null });
 
   const fetchGameDetails = useCallback(async () => {
     try {
@@ -42,6 +44,48 @@ function GameDetailsPage() {
     }
   };
 
+  const handleContextMenu = (e, userId) => {
+    e.preventDefault();
+    setContextMenu({ 
+      visible: true, 
+      x: e.clientX, 
+      y: e.clientY, 
+      userId: userId,
+      displayName: usernames[userId]?.nickname || usernames[userId]?.username || "Unknown User"
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu({ visible: false, x: 0, y: 0, userId: null });
+  };
+
+  const handleCopyToClipboard = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        console.log('Copied to clipboard:', text);
+      })
+      .catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    closeContextMenu();
+  };
+
+  const handleOpenGamesSearch = (userId) => {
+    navigate(`/games?owner=${userId}`);
+    closeContextMenu();
+  };
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      closeContextMenu();
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   if (loading) {
     return <div className="centered-container">Loading...</div>;
   }
@@ -65,6 +109,11 @@ function GameDetailsPage() {
 
       {/* Game Details Card */}
       <div className="game-details">
+        {/* Back Button */}
+        <Link to="/games" className="back-button">
+          &larr; Back to Games
+        </Link>
+        
         {/* Header */}
         <div className="game-header">
           <img src={gameDetails.headerImage} alt={gameDetails.name} />
@@ -160,32 +209,66 @@ function GameDetailsPage() {
           {/* Owned By */}
           <div className="game-details-info-block">
             <h2>Owned By</h2>
-
+            
+            {/* Steam Users */}
             {gameDetails.ownedBy?.steamId?.length > 0 ? (
-              <ul>
-                {gameDetails.ownedBy.steamId.map((id, index) => {
-                  const user = usernames[id];
-                  return (
-                    <li key={index}>
-                      {id} - {user?.nickname || user?.username || "Unknown User"}
-                    </li>
-                  );
-                })}
-              </ul>
+              <>
+                <p>
+                  <strong>Steam Users ({gameDetails.ownedBy.steamId.length}):</strong>
+                </p>
+                <ul className="owners-list">
+                  {gameDetails.ownedBy.steamId
+                    .map(id => ({
+                      id,
+                      displayName: usernames[id]?.nickname || usernames[id]?.username || "Unknown User",
+                      username: usernames[id]?.username || "Unknown",
+                      nickname: usernames[id]?.nickname || ""
+                    }))
+                    .sort((a, b) => a.displayName.localeCompare(b.displayName)) // Sort alphabetically by display name
+                    .map((user, index) => (
+                      <li 
+                        key={index} 
+                        className="owner-item"
+                        onClick={() => handleOpenGamesSearch(user.id)}
+                        onContextMenu={(e) => handleContextMenu(e, user.id)}
+                        data-tooltip-id={`user-tooltip-${user.id}`}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {user.displayName}
+                        <div className="user-tooltip" id={`user-tooltip-${user.id}`}>
+                          {user.nickname && <div className="tooltip-row"><span>Nickname:</span> {user.nickname}</div>}
+                          <div className="tooltip-row"><span>Username:</span> {user.username}</div>
+                          <div className="tooltip-row"><span>SteamID:</span> {user.id}</div>
+                        </div>
+                      </li>
+                    ))}
+                </ul>
+              </>
             ) : (
               <p>No Steam users</p>
             )}
 
+            {/* Epic Users */}
             {gameDetails.ownedBy?.epicId?.length > 0 && (
               <>
-                <h3>Epic Users:</h3>
-                <ul>
+                <p>
+                  <strong>Epic Users ({gameDetails.ownedBy.epicId.length}):</strong>
+                </p>
+                <ul className="owners-list">
                   {gameDetails.ownedBy.epicId.map((id, index) => (
-                    <li key={index}>{id}</li>
+                    <li key={index} className="owner-item">{id}</li>
                   ))}
                 </ul>
               </>
             )}
+            
+            {/* Total Count */}
+            <p className="total-owners">
+              <strong>Total Owners:</strong> {
+                (gameDetails.ownedBy?.steamId?.length || 0) + 
+                (gameDetails.ownedBy?.epicId?.length || 0)
+              }
+            </p>
           </div>
 
           {/* Last Modified */}
@@ -200,6 +283,35 @@ function GameDetailsPage() {
 
         </div>
       </div>
+
+      {/* Context Menu */}
+      {contextMenu.visible && (
+        <div 
+          className="context-menu"
+          style={{ 
+            position: 'fixed', 
+            top: `${contextMenu.y}px`, 
+            left: `${contextMenu.x}px`,
+            zIndex: 1000 
+          }}
+        >
+          <ul>
+            <li onClick={() => handleCopyToClipboard(contextMenu.userId)}>
+              Copy SteamID
+            </li>
+            <li onClick={() => handleCopyToClipboard(usernames[contextMenu.userId]?.username || "Unknown User")}>
+              Copy Username
+            </li>
+            <li onClick={() => handleCopyToClipboard(contextMenu.displayName)}>
+              Copy Name
+            </li>
+            <li className="menu-divider"></li>
+            <li onClick={() => handleOpenGamesSearch(contextMenu.userId)}>
+              Open Games Search
+            </li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 

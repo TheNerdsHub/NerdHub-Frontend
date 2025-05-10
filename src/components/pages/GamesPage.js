@@ -100,19 +100,56 @@ function GamesPage() {
     .filter((game) => !excludeNA || !(game.priceOverview?.finalFormatted == null && !game.isFree))
     .sort((a, b) => {
       let comparison = 0;
+      
+      // Define price comparison function for reuse as fallback
+      const comparePrices = (gameA, gameB) => {
+        const aIsNA = gameA.priceOverview?.finalFormatted == null && !gameA.isFree;
+        const bIsNA = gameB.priceOverview?.finalFormatted == null && !gameB.isFree;
+        const aIsFree = gameA.isFree;
+        const bIsFree = gameB.isFree;
+        
+        // Handle special cases first
+        if (aIsNA && !bIsNA) {
+          return -1; // N/A comes first in ascending
+        } else if (!aIsNA && bIsNA) {
+          return 1; // N/A comes first in ascending
+        } else if (aIsFree && !bIsFree && !bIsNA) {
+          return -1; // Free comes before priced games
+        } else if (!aIsFree && !aIsNA && bIsFree) {
+          return 1; // Free comes before priced games
+        } else {
+          // Both have prices or both are free or both are N/A
+          const priceA = gameA.priceOverview?.final || 0;
+          const priceB = gameB.priceOverview?.final || 0;
+          return priceA - priceB;
+        }
+      };
+
+      // Primary sort
       if (sortBy === 'appid') {
         comparison = a.appid - b.appid;
       } else if (sortBy === 'name') {
         comparison = a.name.localeCompare(b.name);
       } else if (sortBy === 'price') {
-        const priceA = a.priceOverview?.final || 0;
-        const priceB = b.priceOverview?.final || 0;
-        comparison = priceA - priceB;
+        comparison = comparePrices(a, b);
       } else if (sortBy === 'owners') {
         const ownersA = a.ownedBy?.steamId?.length || 0;
         const ownersB = b.ownedBy?.steamId?.length || 0;
         comparison = ownersA - ownersB;
+        // If owner counts are identical, fall back to price
+        if (comparison === 0) {
+          comparison = comparePrices(a, b);
+        }
+      } else if (sortBy === 'lastModified') {
+        const timeA = a.lastModifiedTime ? new Date(a.lastModifiedTime).getTime() : 0;
+        const timeB = b.lastModifiedTime ? new Date(b.lastModifiedTime).getTime() : 0;
+        comparison = timeA - timeB;
+        // If modification times are identical, fall back to price
+        if (comparison === 0) {
+          comparison = comparePrices(a, b);
+        }
       }
+      
       return sortDirection === 'asc' ? comparison : -comparison;
     });
 
@@ -178,6 +215,7 @@ function GamesPage() {
             <option value="name">Name</option>
             <option value="price">Price</option>
             <option value="owners">Owners</option>
+            <option value="lastModified">Last Updated</option>
           </select>
           <button
             className="sort-direction-button"
@@ -266,6 +304,13 @@ function GamesPage() {
                 })
               }}
             />
+          </div>
+          <div className="games-counter">
+            <span>
+              {filteredGames.length !== games.length 
+                ? `${sortedGames.length} / ${games.length} Games`
+                : `${games.length} Games`}
+            </span>
           </div>
         </div>
 
