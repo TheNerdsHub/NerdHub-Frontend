@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import { getGameDetails, updateGameInfo, fetchUsernames } from 'services/gameService';
@@ -11,11 +11,7 @@ function GameDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [usernames, setUsernames] = useState({});
 
-  useEffect(() => {
-    fetchGameDetails();
-  }, [appid]);
-
-  const fetchGameDetails = async () => {
+  const fetchGameDetails = useCallback(async () => {
     try {
       const data = await getGameDetails(appid);
       setGameDetails(data);
@@ -30,7 +26,11 @@ function GameDetailsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [appid]);
+
+  useEffect(() => {
+    fetchGameDetails();
+  }, [fetchGameDetails]);
 
   const handleUpdateGameInfo = async () => {
     try {
