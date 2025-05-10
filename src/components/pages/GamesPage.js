@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import Select from 'react-select'; // Import react-select
 import { Link } from 'react-router-dom';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import ScrollToTop from 'components/common/ScrollToTop';
@@ -14,6 +15,9 @@ function GamesPage() {
   const [excludeNA, setExcludeNA] = useState(() => JSON.parse(localStorage.getItem('excludeNA')) ?? true);
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleGames, setVisibleGames] = useState(new Set());
+  const [selectedOwners, setSelectedOwners] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [portalTarget, setPortalTarget] = useState(null);
 
   const observer = useRef(null);
 
@@ -59,9 +63,22 @@ function GamesPage() {
     return () => observer.current.disconnect();
   }, []);
 
-  const filteredGames = games.filter((game) =>
-    game.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    setPortalTarget(document.body);
+  }, []);
+
+  const filteredGames = games
+    .filter((game) =>
+      game.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .filter((game) =>
+      selectedOwners.length === 0 ||
+      (game.ownedBy?.steamId?.some((owner) => selectedOwners.includes(owner)))
+    )
+    .filter((game) =>
+      selectedCategories.length === 0 ||
+      (game.categories?.some((category) => selectedCategories.includes(category.description)))
+    );
 
   const sortedGames = [...filteredGames]
     .filter((game) => !excludeNA || !(game.priceOverview?.finalFormatted == null && !game.isFree))
@@ -86,6 +103,14 @@ function GamesPage() {
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  const uniqueOwners = Array.from(
+    new Set(games.flatMap((game) => game.ownedBy?.steamId || []))
+  ).map((owner) => ({ value: owner, label: owner }));
+
+  const uniqueCategories = Array.from(
+    new Set(games.flatMap((game) => game.categories?.map((category) => category.description) || []))
+  ).map((category) => ({ value: category, label: category }));
 
   return (
     <div className="games-page-wrapper">
@@ -134,6 +159,46 @@ function GamesPage() {
             />
             Exclude "N/A" Prices
           </label>
+          <div className="owners-filter">
+            <label>Filter by Owners:</label>
+            <Select
+              isMulti
+              options={uniqueOwners}
+              value={uniqueOwners.filter((owner) =>
+                selectedOwners.includes(owner.value)
+              )}
+              onChange={(selectedOptions) =>
+                setSelectedOwners(selectedOptions.map((option) => option.value))
+              }
+              menuPortalTarget={portalTarget}
+              styles={{
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 9999
+                })
+              }}
+            />
+          </div>
+          <div className="categories-filter">
+            <label>Filter by Categories:</label>
+            <Select
+              isMulti
+              options={uniqueCategories}
+              value={uniqueCategories.filter((category) =>
+                selectedCategories.includes(category.value)
+              )}
+              onChange={(selectedOptions) =>
+                setSelectedCategories(selectedOptions.map((option) => option.value))
+              }
+              menuPortalTarget={portalTarget}
+              styles={{
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 9999
+                })
+              }}
+            />
+          </div>
         </div>
 
         <div className="games-grid">

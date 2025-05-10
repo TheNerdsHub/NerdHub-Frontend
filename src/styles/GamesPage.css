@@ -16,6 +16,8 @@ body {
   background-color: #ffffffcc;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 5;
 }
 
 .sort-container label {
@@ -57,6 +59,62 @@ body {
   gap: 5px;
 }
 
+/* React-Select Styling */
+.owners-filter,
+.categories-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 250px;
+}
+
+.owners-filter label,
+.categories-filter label {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Control (main input container) */
+.css-13cymwt-control {
+  padding: 2px;
+  border-radius: 10px !important;
+  border: 1px solid #ccc !important;
+  box-shadow: none !important;
+  transition: 0.3s !important;
+}
+
+/* Focused control */
+.css-t3ipsp-control {
+  padding: 2px;
+  border-radius: 10px !important;
+  border-color: #5bc0de !important;
+  box-shadow: 0 0 0 1px #5bc0de !important;
+}
+
+/* Selected option pill */
+.css-1p3m7a8-multiValue {
+  background-color: #e6f7ff !important;
+  border-radius: 8px !important;
+}
+
+/* Option hover state */
+.css-d7l1ni-option:hover {
+  background-color: #f0f0f0 !important;
+}
+
+/* Selected option */
+.css-tr4s17-option {
+  background-color: #5bc0de !important;
+}
+
+/* Media queries for filter responsiveness */
+@media (max-width: 900px) {
+  .owners-filter,
+  .categories-filter {
+    width: 100%;
+  }
+}
+
 /* Games Grid */
 .games-grid {
   display: grid;
@@ -64,6 +122,8 @@ body {
   gap: 20px;
   padding: 20px 40px;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 /* Each Game Block */
@@ -107,8 +167,8 @@ body {
   font-size: 1rem;
   font-weight: bold;
   text-align: left;
-  flex-grow: 1; /* Grow to fill available space */
-  min-width: 0; /* Allow shrinkage if needed */
+  flex-grow: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -122,7 +182,7 @@ body {
   color: #555;
   padding: 4px 8px;
   border-radius: 8px;
-  flex-shrink: 0; /* Don't allow price to shrink */
+  flex-shrink: 0;
   white-space: nowrap;
 }
 
@@ -141,9 +201,9 @@ body {
 /* Ribbon for Free Games */
 .ribbon {
   position: absolute;
-  top: 9px; /* Pull it slightly down */
-  right: -28px; /* Pull it slightly into view */
-  width: 100px; /* Enough width for text + rotation */
+  top: 9px;
+  right: -28px;
+  width: 100px;
   background: #4caf50;
   color: white;
   font-weight: bold;
@@ -161,7 +221,7 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* NEW: page always at least full screen */
+  min-height: 100vh;
   overflow-x: hidden;
 }
 
@@ -207,11 +267,9 @@ body {
 @keyframes cardFadeIn {
   0% {
     opacity: 0;
-    /* REMOVE: transform: translateY(20px); */
   }
   100% {
     opacity: 1;
-    /* REMOVE: transform: translateY(0); */
   }
 }
 
