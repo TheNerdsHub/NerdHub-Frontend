@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import Select from 'react-select'; // Import react-select
+import Select from 'react-select';
 import { Link } from 'react-router-dom';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import ScrollToTop from 'components/common/ScrollToTop';
 import { getGames } from 'services/gameService';
+import api from 'utils/api';
 import 'styles/GamesPage.css';
 
 function GamesPage() {
@@ -18,22 +19,29 @@ function GamesPage() {
   const [selectedOwners, setSelectedOwners] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [portalTarget, setPortalTarget] = useState(null);
+  const [userMappings, setUserMappings] = useState([]);
 
   const observer = useRef(null);
 
   useEffect(() => {
-    const fetchGames = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getGames();
-        setGames(data);
+        // Fetch games and usernames in parallel
+        const [gamesData, userMappingsData] = await Promise.all([
+          getGames(),
+          api.get('/api/Games/get-all-usernames')
+        ]);
+        
+        setGames(gamesData);
+        setUserMappings(userMappingsData);
       } catch (error) {
-        console.error('Failed to fetch games:', error);
+        console.error('Failed to fetch data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchGames();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -73,11 +81,19 @@ function GamesPage() {
     )
     .filter((game) =>
       selectedOwners.length === 0 ||
-      (game.ownedBy?.steamId?.some((owner) => selectedOwners.includes(owner)))
+      (selectedOwners.every((owner) => 
+        game.ownedBy?.steamId?.some((gameOwner) => 
+          gameOwner === owner
+        )
+      ))
     )
     .filter((game) =>
       selectedCategories.length === 0 ||
-      (game.categories?.some((category) => selectedCategories.includes(category.description)))
+      (selectedCategories.every((category) => 
+        game.categories?.some((gameCategory) => 
+          gameCategory.description === category
+        )
+      ))
     );
 
   const sortedGames = [...filteredGames]
@@ -106,11 +122,34 @@ function GamesPage() {
 
   const uniqueOwners = Array.from(
     new Set(games.flatMap((game) => game.ownedBy?.steamId || []))
-  ).map((owner) => ({ value: owner, label: owner }));
+  )
+    .map((steamId) => {
+      const user = userMappings.find(u => u.steamId === steamId);
+      return {
+        value: steamId, // Keep the value as steamId for filtering
+        label: user ? (user.nickname || user.username) : steamId // Show nickname or username if available
+      };
+    })
+    .sort((a, b) => a.label.localeCompare(b.label)); // Sort alphabetically by label
 
   const uniqueCategories = Array.from(
     new Set(games.flatMap((game) => game.categories?.map((category) => category.description) || []))
-  ).map((category) => ({ value: category, label: category }));
+  )
+    .map((category) => ({ value: category, label: category }))
+    //.sort((a, b) => a.label.localeCompare(b.label)); // Sort alphabetically by label if wanted
+
+  // Add these functions to handle select all and clear
+  const selectAllOwners = () => {
+    setSelectedOwners(uniqueOwners.map(owner => owner.value));
+  };
+
+  const clearOwners = () => {
+    setSelectedOwners([]);
+  };
+
+  const clearCategories = () => {
+    setSelectedCategories([]);
+  };
 
   return (
     <div className="games-page-wrapper">
@@ -160,7 +199,25 @@ function GamesPage() {
             Exclude "N/A" Prices
           </label>
           <div className="owners-filter">
-            <label>Filter by Owners:</label>
+            <div className="filter-header">
+              <label>Filter by Owners:</label>
+              <div className="filter-buttons">
+                <button 
+                  className="filter-button" 
+                  onClick={selectAllOwners}
+                  type="button"
+                >
+                  Select All
+                </button>
+                <button 
+                  className="filter-button" 
+                  onClick={clearOwners}
+                  type="button"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
             <Select
               isMulti
               options={uniqueOwners}
@@ -180,7 +237,18 @@ function GamesPage() {
             />
           </div>
           <div className="categories-filter">
-            <label>Filter by Categories:</label>
+            <div className="filter-header">
+              <label>Filter by Categories:</label>
+              <div className="filter-buttons">
+                <button 
+                  className="filter-button" 
+                  onClick={clearCategories}
+                  type="button"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
             <Select
               isMulti
               options={uniqueCategories}
