@@ -333,7 +333,7 @@ function AdminPage() {
                 placeholder="76561198000000000, 76561198000000001"
                 required
               />
-              <div className="button-group" style={{ display: 'flex', gap: '10px' }}>
+              <div className="button-group">
                 <button
                   type="button"
                   onClick={handleSelectAllSteamIds}
@@ -359,7 +359,7 @@ function AdminPage() {
                 onChange={handleAppIdsChange}
                 placeholder="220,440,570"
               />
-              <div className="button-group" style={{ display: 'flex', gap: '10px' }}>
+              <div className="button-group">
                 <button
                   type="button"
                   onClick={handleClearAppIds}

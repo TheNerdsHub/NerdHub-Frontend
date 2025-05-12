@@ -324,3 +324,9 @@ button.small-button {
 .result-value.info {
   color: #60a5fa;
 }
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  padding-top: 10px;
+}
