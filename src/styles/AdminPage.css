@@ -1,0 +1,226 @@
+.admin-page {
+  min-height: 100vh;
+  position: relative;
+  padding: 2rem 0;
+}
+
+.admin-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background-color: rgba(25, 25, 35, 0.9);
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+.admin-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.admin-page h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #fff;
+  font-size: 2rem;
+}
+
+.admin-page h2 {
+  color: #4aa5f0;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(74, 165, 240, 0.3);
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #ddd;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #222;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-group.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-group.checkbox label {
+  margin-bottom: 0;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.3rem;
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.admin-page button {
+  background-color: #4aa5f0;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-page button:hover {
+  background-color: #3990e0;
+}
+
+.admin-page button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #ff6b6b;
+}
+
+.result-container {
+  margin-top: 1.5rem;
+  background-color: rgba(35, 35, 45, 0.8);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.result-container h3 {
+  color: #4aa5f0;
+  margin-bottom: 0.5rem;
+}
+
+.result-container pre {
+  background-color: #1a1a20;
+  color: #ddd;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow: auto;
+  font-family: monospace;
+  max-height: 400px;
+}
+
+.mappings-table-container {
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.mappings-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.mappings-table th {
+  background-color: rgba(35, 35, 45, 0.8);
+  padding: 0.8rem;
+  color: #4aa5f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.mappings-table td {
+  padding: 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mappings-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mappings-table tbody tr:hover {
+  background-color: rgba(74, 165, 240, 0.1);
+}
+
+.user-mapping-select {
+  margin-bottom: 1.5rem;
+}
+
+.select-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.select-container > div {
+  flex-grow: 1;
+}
+
+button.small-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+/* Style for react-select */
+.css-1s2u09g-control,
+.css-1pahdxg-control {
+  background-color: #222 !important;
+  border-color: #444 !important;
+}
+
+.css-14el2xx-placeholder,
+.css-tlfecz-indicatorContainer,
+.css-1gtu0rj-indicatorContainer {
+  color: #aaa !important;
+}
+
+.css-1pndypt-Input > input,
+.css-qc6sy-singleValue {
+  color: white !important;
+}
+
+.css-26l3qy-menu {
+  background-color: #333 !important;
+  z-index: 100;
+}
+
+.css-1n7v3ny-option {
+  background-color: #4aa5f0 !important;
+}
+
+.css-9gakcf-option {
+  background-color: rgba(74, 165, 240, 0.2) !important;
+}
+
+.css-9gakcf-option:active {
+  background-color: rgba(74, 165, 240, 0.4) !important;
+}

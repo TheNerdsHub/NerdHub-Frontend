@@ -36,6 +36,9 @@ function NavigationBar({ keycloak, isAuthenticated }) {
               <NavDropdown.Item href="URLTOKB">Knowledge Base</NavDropdown.Item>
               <NavDropdown.Item href="URLTOBRACKETMAKER">Bracket Maker</NavDropdown.Item>
             </NavDropdown>
+            {isAuthenticated && (
+              <Nav.Link href="/admin" className="navbar-link-white text-shadow">Admin</Nav.Link>
+            )}
           </Nav>
           <Nav className="ms-auto">
             {isAuthenticated ? (

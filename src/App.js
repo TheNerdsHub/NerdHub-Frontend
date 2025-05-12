@@ -8,6 +8,7 @@ import GameDetailsPage from 'components/pages/GameDetailsPage';
 import QuotePage from 'components/pages/QuotesPage';
 import TimelinePage from 'components/pages/TimelinePage';
 import Profile from 'components/pages/ProfilePage';
+import AdminPage from 'components/pages/AdminPage'; // Add this import
 import keycloak from 'keycloak';
 
 function App() {
@@ -66,6 +67,16 @@ function App() {
                 <div>Please sign in to view your profile.</div>
               )
             }
+          />
+          <Route
+            path="/admin"
+            element={<AdminPage />}/*{
+              isAuthenticated ? (
+                <AdminPage />
+              ) : (
+                <div>Please sign in to access the admin page.</div>
+              )
+            }*/
           />
         </Routes>
       </div>
