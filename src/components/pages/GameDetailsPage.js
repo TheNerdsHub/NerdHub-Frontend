@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import { getGameDetails, updateGameInfo, fetchUsernames } from 'services/gameService';
+import ContextMenu from 'components/common/ContextMenu';
+import { handleCopyToClipboard } from 'utils/clipboard';
 import 'styles/GameDetailsPage.css';
 
 function GameDetailsPage() {
@@ -49,28 +51,17 @@ function GameDetailsPage() {
 
   const handleContextMenu = (e, userId) => {
     e.preventDefault();
-    setContextMenu({ 
-      visible: true, 
-      x: e.clientX, 
-      y: e.clientY, 
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
       userId: userId,
-      displayName: usernames[userId]?.nickname || usernames[userId]?.username || "Unknown User"
+      displayName: usernames[userId]?.nickname || usernames[userId]?.username || "Unknown User",
     });
   };
 
   const closeContextMenu = () => {
     setContextMenu({ visible: false, x: 0, y: 0, userId: null });
-  };
-
-  const handleCopyToClipboard = (text) => {
-    navigator.clipboard.writeText(text)
-      .then(() => {
-        console.log('Copied to clipboard:', text);
-      })
-      .catch(err => {
-        console.error('Failed to copy:', err);
-      });
-    closeContextMenu();
   };
 
   const handleOpenGamesSearch = (userId) => {
@@ -103,6 +94,26 @@ function GameDetailsPage() {
 
   const hasMac = platforms.includes('Mac');
   const hasLinux = platforms.includes('Linux');
+
+  const contextMenuOptions = [
+    {
+      label: 'Copy SteamID',
+      onClick: () => handleCopyToClipboard(contextMenu.userId),
+    },
+    {
+      label: 'Copy Username',
+      onClick: () =>
+        handleCopyToClipboard(usernames[contextMenu.userId]?.username || 'Unknown User'),
+    },
+    {
+      label: 'Copy Name',
+      onClick: () => handleCopyToClipboard(contextMenu.displayName),
+    },
+    {
+      label: 'Open Games Search',
+      onClick: () => handleOpenGamesSearch(contextMenu.userId),
+    },
+  ];
 
   return (
     <div className="centered-container">
@@ -298,33 +309,13 @@ function GameDetailsPage() {
       </div>
 
       {/* Context Menu */}
-      {contextMenu.visible && (
-        <div 
-          className="context-menu"
-          style={{ 
-            position: 'fixed', 
-            top: `${contextMenu.y}px`, 
-            left: `${contextMenu.x}px`,
-            zIndex: 1000 
-          }}
-        >
-          <ul>
-            <li onClick={() => handleCopyToClipboard(contextMenu.userId)}>
-              Copy SteamID
-            </li>
-            <li onClick={() => handleCopyToClipboard(usernames[contextMenu.userId]?.username || "Unknown User")}>
-              Copy Username
-            </li>
-            <li onClick={() => handleCopyToClipboard(contextMenu.displayName)}>
-              Copy Name
-            </li>
-            <li className="menu-divider"></li>
-            <li onClick={() => handleOpenGamesSearch(contextMenu.userId)}>
-              Open Games Search
-            </li>
-          </ul>
-        </div>
-      )}
+      <ContextMenu
+        visible={contextMenu.visible}
+        x={contextMenu.x}
+        y={contextMenu.y}
+        options={contextMenuOptions}
+        onClose={closeContextMenu}
+      />
     </div>
   );
 

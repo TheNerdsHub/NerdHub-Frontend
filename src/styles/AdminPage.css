@@ -150,7 +150,7 @@
 }
 
 .mappings-table th {
-  background-color: rgba(35, 35, 45, 0.8);
+  background-color: rgba(35, 35, 45, 1);
   padding: 0.8rem;
   color: #4aa5f0;
   position: sticky;
@@ -161,6 +161,7 @@
 .mappings-table td {
   padding: 0.8rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .mappings-table tbody tr {
@@ -223,4 +224,103 @@ button.small-button {
 
 .css-9gakcf-option:active {
   background-color: rgba(74, 165, 240, 0.4) !important;
+}
+
+/* Add these styles for the progress bar */
+.progress-container {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: rgba(35, 35, 45, 0.8);
+  border-radius: 4px;
+  border-left: 4px solid #4aa5f0;
+}
+
+.progress-header {
+  margin-bottom: 10px;
+}
+
+.progress-header h4 {
+  margin: 0 0 5px 0;
+  color: #4aa5f0;
+  font-size: 1.1rem;
+}
+
+.progress-header p {
+  margin: 0;
+  color: #ddd;
+  font-size: 0.9rem;
+}
+
+.progress-bar-container {
+  height: 20px;
+  background-color: #1a1a20;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  margin: 10px 0;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #2c88d9 0%, #4aa5f0 100%);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-bar::after {
+  content: attr(data-progress);
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+.progress-note {
+  color: #aaa;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Style for the result summary */
+.result-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 15px;
+  background-color: rgba(15, 15, 20, 0.5);
+  padding: 15px;
+  border-radius: 4px;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 100px;
+}
+
+.result-label {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.result-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.result-value.success {
+  color: #4ade80;
+}
+
+.result-value.error {
+  color: #f87171;
+}
+
+.result-value.info {
+  color: #60a5fa;
 }

@@ -3,7 +3,10 @@ const API_ROOT = process.env.REACT_APP_API_ROOT;
 const api = {
   get: async (endpoint) => {
     try {
-      const response = await fetch(`${API_ROOT}${endpoint}`);
+      const response = await fetch(`${API_ROOT}${endpoint}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
       if (!response.ok) {
         throw new Error(`GET ${endpoint} failed: ${response.statusText}`);
       }
