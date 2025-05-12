@@ -12,6 +12,7 @@ function GameDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [usernames, setUsernames] = useState({});
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, userId: null });
+  const [updateCount, setUpdateCount] = useState(0);
 
   const fetchGameDetails = useCallback(async () => {
     try {
@@ -23,6 +24,8 @@ function GameDetailsPage() {
         const fetchedUsernames = await fetchUsernames(steamIds);
         setUsernames(fetchedUsernames);
       }
+      // Increment update count to trigger animation replay
+      setUpdateCount(prev => prev + 1);
     } catch (error) {
       console.error('Failed to fetch game details:', error);
     } finally {
@@ -104,11 +107,11 @@ function GameDetailsPage() {
   return (
     <div className="centered-container">
       {/* Background Dots */}
-      <div className="background-dots background-dots-back"></div>
-      <div className="background-dots background-dots-front"></div>
+      <div key={`dots-back-${updateCount}`} className="background-dots background-dots-back"></div>
+      <div key={`dots-front-${updateCount}`} className="background-dots background-dots-front"></div>
 
       {/* Game Details Card */}
-      <div className="game-details">
+      <div key={`game-details-${updateCount}`} className="game-details">
         {/* Back Button */}
         <Link to="/games" className="back-button">
           &larr; Back to Games
@@ -153,7 +156,17 @@ function GameDetailsPage() {
           <div className="game-details-info-block">
             <h2>General Information</h2>
             {gameDetails.priceOverview?.finalFormatted ? (
-              <p><strong>Price:</strong> {gameDetails.priceOverview.finalFormatted}</p>
+              <p><strong>Price: </strong> 
+                {gameDetails.priceOverview.finalFormatted !== gameDetails.priceOverview.initialFormatted && gameDetails.priceOverview.initialFormatted !== "" ? (
+                  <>
+                    <span className="discounted-price"> {gameDetails.priceOverview.finalFormatted}</span>
+                    <span className="original-price">{gameDetails.priceOverview.initialFormatted}</span>
+                    <span className="discount-percent">-{gameDetails.priceOverview.discountPercent}%</span>
+                  </>
+                ) : (
+                  gameDetails.priceOverview.finalFormatted
+                )}
+              </p>
             ) : gameDetails.isFree ? (
               <p><strong>Price:</strong> Free</p>
             ) : (

@@ -132,6 +132,14 @@ function GamesPage() {
         comparison = a.name.localeCompare(b.name);
       } else if (sortBy === 'price') {
         comparison = comparePrices(a, b);
+      } else if (sortBy === 'discount') {
+        const discountA = a.priceOverview?.discountPercent || 0;
+        const discountB = b.priceOverview?.discountPercent || 0;
+        comparison = discountA - discountB;
+        // If discount percentages are identical, fall back to price
+        if (comparison === 0) {
+          comparison = comparePrices(a, b);
+        }
       } else if (sortBy === 'owners') {
         const ownersA = a.ownedBy?.steamId?.length || 0;
         const ownersB = b.ownedBy?.steamId?.length || 0;
@@ -212,10 +220,11 @@ function GamesPage() {
             onChange={(e) => setSortBy(e.target.value)}
           >
             <option value="appid">App ID</option>
-            <option value="name">Name</option>
-            <option value="price">Price</option>
-            <option value="owners">Owners</option>
+            <option value="discount">Discount</option>
             <option value="lastModified">Last Updated</option>
+            <option value="name">Name</option>
+            <option value="owners">Owners</option>
+            <option value="price">Price</option>
           </select>
           <button
             className="sort-direction-button"
@@ -328,10 +337,21 @@ function GamesPage() {
               <img src={game.headerImage} alt={game.name} />
               <div className="game-info">
                 <div className="game-title">{game.name}</div>
-                <div
-                  className="game-price"
-                  data-price={game.priceOverview?.finalFormatted || (game.isFree ? 'Free' : 'N/A')}
-                ></div>
+                <div className="game-price">
+                  {game.priceOverview ? (
+                    game.priceOverview.finalFormatted !== game.priceOverview.initialFormatted && game.priceOverview.initialFormatted !== "" ? (
+                      <>
+                        <span className="discounted-price">{game.priceOverview.finalFormatted}</span>
+                        <span className="original-price">{game.priceOverview.initialFormatted}</span>
+                        <span className="discount-percent">-{game.priceOverview.discountPercent}%</span>
+                      </>
+                    ) : (
+                      game.priceOverview.finalFormatted
+                    )
+                  ) : (
+                    game.isFree ? 'Free' : 'N/A'
+                  )}
+                </div>
               </div>
             </Link>
           ))}

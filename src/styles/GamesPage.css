@@ -220,6 +220,29 @@ body {
   content: attr(data-price);
 }
 
+/* Discounted Price */
+.discounted-price {
+  color: #66c0f4;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+/* Original Price */
+.original-price {
+  text-decoration: line-through;
+  color: #888;
+  margin-right: 8px;
+}
+
+/* Discount Percent */
+.discount-percent {
+  background-color: #4c6b22;
+  color: #a4d007;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
 /* Loading Message */
 .loading {
   font-size: 1.5rem;
