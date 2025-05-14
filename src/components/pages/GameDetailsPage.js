@@ -7,7 +7,6 @@ import { handleCopyToClipboard } from 'utils/clipboard';
 import 'styles/GameDetailsPage.css';
 
 function GameDetailsPage() {
-  useDocumentTitle('Game Details');
   const { appid } = useParams();
   const navigate = useNavigate();
   const [gameDetails, setGameDetails] = useState(null);
@@ -15,6 +14,8 @@ function GameDetailsPage() {
   const [usernames, setUsernames] = useState({});
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, userId: null });
   const [updateCount, setUpdateCount] = useState(0);
+  
+  useDocumentTitle(gameDetails ? `${gameDetails.name}` : 'Game Details');
 
   const fetchGameDetails = useCallback(async () => {
     try {
