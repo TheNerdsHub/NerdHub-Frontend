@@ -17,7 +17,7 @@ jobs:
         id: gen_ts
         run: |
           TS="v$(TZ='America/Chicago' date +'%Y.%m.%d.%H%M%S')"
-          echo "::set-output name=timestamp::$TS"
+          echo "timestamp=$TS" >> $GITHUB_OUTPUT
 
       - name: Create & push Git tag
         run: |
