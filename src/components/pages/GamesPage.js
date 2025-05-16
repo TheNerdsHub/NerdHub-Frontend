@@ -20,13 +20,13 @@ function GamesPage() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [portalTarget, setPortalTarget] = useState(null);
   const [userMappings, setUserMappings] = useState([]);
+  const [onlyOnSale, setOnlyOnSale] = useState(false);
 
   const observer = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch games and usernames in parallel
         const [gamesData, userMappingsData] = await Promise.all([
           getGames(),
           api.get('/api/Games/get-all-usernames')
@@ -94,6 +94,9 @@ function GamesPage() {
           gameCategory.description === category
         )
       ))
+    )
+    .filter((game) =>
+      !onlyOnSale || (game.priceOverview?.discountPercent != null && game.priceOverview.discountPercent > 0)
     );
 
   const sortedGames = [...filteredGames]
@@ -171,11 +174,11 @@ function GamesPage() {
     .map((steamId) => {
       const user = userMappings.find(u => u.steamId === steamId);
       return {
-        value: steamId, // Keep the value as steamId for filtering
-        label: user ? (user.nickname || user.username) : steamId // Show nickname or username if available
+        value: steamId,
+        label: user ? (user.nickname || user.username) : steamId
       };
     })
-    .sort((a, b) => a.label.localeCompare(b.label)); // Sort alphabetically by label
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   const uniqueCategories = Array.from(
     new Set(games.flatMap((game) => game.categories?.map((category) => category.description) || []))
@@ -183,7 +186,6 @@ function GamesPage() {
     .map((category) => ({ value: category, label: category }))
     //.sort((a, b) => a.label.localeCompare(b.label)); // Sort alphabetically by label if wanted
 
-  // Add these functions to handle select all and clear
   const selectAllOwners = () => {
     setSelectedOwners(uniqueOwners.map(owner => owner.value));
   };
@@ -198,11 +200,9 @@ function GamesPage() {
 
   return (
     <div className="games-page-wrapper">
-      {/* Floating Background Layers */}
       <div className="background-dots background-dots-back"></div>
       <div className="background-dots background-dots-front"></div>
 
-      {/* Main Content Wrapper */}
       <div className="main-content">
         <div className="sort-container">
           <label htmlFor="search">Search:</label>
@@ -236,7 +236,7 @@ function GamesPage() {
           >
             {sortDirection === 'asc' ? 'Ascending' : 'Descending'}
           </button>
-          <label htmlFor="exclude-na" className="exclude-na-label">
+          <label htmlFor="exclude-na" className="checkbox-label">
             <input
               type="checkbox"
               id="exclude-na"
@@ -244,6 +244,15 @@ function GamesPage() {
               onChange={(e) => setExcludeNA(e.target.checked)}
             />
             Exclude "N/A" Prices
+          </label>
+          <label htmlFor="only-on-sale" className="checkbox-label">
+            <input
+              type="checkbox"
+              id="only-on-sale"
+              checked={onlyOnSale}
+              onChange={(e) => setOnlyOnSale(e.target.checked)}
+            />
+            Only On Sale
           </label>
           <div className="owners-filter">
             <div className="filter-header">
