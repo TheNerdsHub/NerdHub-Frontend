@@ -44,7 +44,7 @@ jobs:
           platforms: linux/amd64
           push: true
           build-args: |
-            API_URL=http://backend:80 # Change here if the backend URL changes
+            API_URL=http://backend:80 
           tags: |
             ghcr.io/thenerdshub/nerdhub-frontend:${{ steps.gen_ts.outputs.timestamp }}
             ghcr.io/thenerdshub/nerdhub-frontend:latest
