@@ -435,10 +435,11 @@ function AdminPage() {
           {priceUpdateResult && (
             <div className="result-container">
               <h3>Price Update Results:</h3>
+              <pre>{JSON.stringify(priceUpdateResult, null, 2)}</pre>
               <div className="result-summary">
                 <div className="result-item">
                   <span className="result-label">Total Games:</span>
-                  <span className="result-value">{priceUpdateResult.totalGamesCount || 0}</span>
+                  <span className="result-value info">{priceUpdateResult.totalGamesCount || 0}</span>
                 </div>
                 <div className="result-item">
                   <span className="result-label">Updated:</span>
