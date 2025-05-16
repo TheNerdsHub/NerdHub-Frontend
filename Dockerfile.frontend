@@ -8,6 +8,10 @@ RUN npm ci
 
 # Copy app source and build
 COPY . .
+
+ARG API_URL
+ENV REACT_APP_API_ROOT=$API_URL
+
 RUN npm run build
 
 # Runtime stage
