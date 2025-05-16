@@ -71,32 +71,45 @@ function AdminPage() {
   // Poll the backend for progress
   const pollProgress = (operationId) => {
     setShowProgress(true);
-    
-    const interval = setInterval(async () => {
+
+    let nextDelay = 1000;
+
+    const poll = async () => {
       try {
         const response = await api.get(`/api/Games/update-progress/${operationId}`);
-
-        const { progress, phase, message } = response;
+        const { progress, phase, message, retryAfterSeconds } = response;
 
         setProgress(progress);
         setProgressPhase(phase);
         setProgressMessage(message);
 
         if (progress >= 100) {
-          clearInterval(interval);
           setProgressPhase('Update completed!');
           setProgressMessage('');
           setLoading(false);
+
+          // Fetch the final result and display it
+          try {
+            const resultResponse = await api.get(`/api/Games/update-result/${operationId}`);
+            setResult(resultResponse);
+          } catch (err) {
+            setError('Failed to fetch update result');
+          }
+          return;
         }
+
+        // Use backend-provided delay if present
+        nextDelay = retryAfterSeconds ? retryAfterSeconds * 1000 : 1000;
       } catch (error) {
         console.error('Error fetching progress:', error);
-        clearInterval(interval);
         setError('Failed to fetch progress');
         setLoading(false);
+        return;
       }
-    }, 1000);
-    
-    progressIntervalRef.current = interval;
+      progressIntervalRef.current = setTimeout(poll, nextDelay);
+    };
+
+    poll();
   };
 
   useEffect(() => {
@@ -410,6 +423,10 @@ function AdminPage() {
               <h3>Update Results:</h3>
               <pre>{JSON.stringify(result, null, 2)}</pre>
               <div className="result-summary">
+                <div className="result-item">
+                  <span className="result-label">Total Games:</span>
+                  <span className="result-value">{result.totalGamesCount || 0}</span>
+                </div>
                 <div className="result-item">
                   <span className="result-label">Updated:</span>
                   <span className="result-value success">{result.updatedGamesCount || 0}</span>
