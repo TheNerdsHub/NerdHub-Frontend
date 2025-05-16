@@ -36,6 +36,15 @@ function AdminPage() {
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, mapping: null });
   const contextMenuRef = useRef(null);
 
+  const [priceUpdateLoading, setPriceUpdateLoading] = useState(false);
+  const [priceUpdateShowProgress, setPriceUpdateShowProgress] = useState(false);
+  const [priceUpdateProgress, setPriceUpdateProgress] = useState(0);
+  const [priceUpdatePhase, setPriceUpdatePhase] = useState('');
+  const [priceUpdateMessage, setPriceUpdateMessage] = useState('');
+  const [priceUpdateResult, setPriceUpdateResult] = useState(null);
+  const [priceUpdateError, setPriceUpdateError] = useState(null);
+  const priceUpdateProgressIntervalRef = useRef(null);
+
   const autoResizeTextarea = (e) => {
     const textarea = e.target;
     textarea.style.height = 'auto';
@@ -107,6 +116,50 @@ function AdminPage() {
         return;
       }
       progressIntervalRef.current = setTimeout(poll, nextDelay);
+    };
+
+    poll();
+  };
+
+  // Poll the backend for price update progress
+  const pollPriceUpdateProgress = (operationId) => {
+    setPriceUpdateShowProgress(true);
+
+    let nextDelay = 1000;
+
+    const poll = async () => {
+      try {
+        const response = await api.get(`/api/Games/update-progress/${operationId}`);
+        const { progress, phase, message, retryAfterSeconds } = response;
+
+        setPriceUpdateProgress(progress);
+        setPriceUpdatePhase(phase);
+        setPriceUpdateMessage(message);
+
+        if (progress >= 100) {
+          setPriceUpdatePhase('Price update completed!');
+          setPriceUpdateMessage('');
+          setPriceUpdateLoading(false);
+
+          // Fetch the final result and display it
+          try {
+            const resultResponse = await api.get(`/api/Games/update-result/${operationId}`);
+            setPriceUpdateResult(resultResponse);
+          } catch (err) {
+            setPriceUpdateError('Failed to fetch price update result');
+          }
+          return;
+        }
+
+        // Use backend-provided delay if present
+        nextDelay = retryAfterSeconds ? retryAfterSeconds * 1000 : 1000;
+      } catch (error) {
+        console.error('Error fetching price update progress:', error);
+        setPriceUpdateError('Failed to fetch price update progress');
+        setPriceUpdateLoading(false);
+        return;
+      }
+      priceUpdateProgressIntervalRef.current = setTimeout(poll, nextDelay);
     };
 
     poll();
@@ -189,6 +242,22 @@ function AdminPage() {
       console.error('Error starting update:', error);
       setError(error.message || 'Failed to start update');
       setLoading(false);
+    }
+  };
+
+  const handleStartPriceUpdate = async () => {
+    setPriceUpdateLoading(true);
+    setPriceUpdateError(null);
+    setPriceUpdateResult(null);
+
+    try {
+      const response = await api.post('/api/Games/start-price-update');
+      const { operationId } = response;
+      pollPriceUpdateProgress(operationId);
+    } catch (error) {
+      console.error('Error starting price update:', error);
+      setPriceUpdateError(error.message || 'Failed to start price update');
+      setPriceUpdateLoading(false);
     }
   };
 
@@ -333,6 +402,74 @@ function AdminPage() {
         <h1>Admin Dashboard</h1>
 
         {error && <div className="error-message">{error}</div>}
+
+        <div className="admin-section">
+          <h2>Update Game Prices</h2>
+          <button
+            onClick={handleStartPriceUpdate}
+            disabled={priceUpdateLoading}
+            className="small-button"
+          >
+            {priceUpdateLoading ? 'Processing...' : 'Start Price Update'}
+          </button>
+
+          {priceUpdateShowProgress && (
+            <div className="progress-container">
+              <div className="progress-header">
+                <h4>{priceUpdatePhase}</h4>
+                <p>{priceUpdateMessage}</p>
+              </div>
+              <div className="progress-bar-container">
+                <div
+                  className="progress-bar"
+                  style={{ width: `${priceUpdateProgress}%` }}
+                  data-progress={`${priceUpdateProgress}%`}
+                ></div>
+              </div>
+              <div className="progress-note">
+                <small>This operation may take several minutes depending on the number of games.</small>
+              </div>
+            </div>
+          )}
+
+          {priceUpdateResult && (
+            <div className="result-container">
+              <h3>Price Update Results:</h3>
+              <div className="result-summary">
+                <div className="result-item">
+                  <span className="result-label">Total Games:</span>
+                  <span className="result-value">{priceUpdateResult.totalGamesCount || 0}</span>
+                </div>
+                <div className="result-item">
+                  <span className="result-label">Updated:</span>
+                  <span className="result-value success">{priceUpdateResult.updatedGamesCount || 0}</span>
+                </div>
+                <div className="result-item">
+                  <span className="result-label">Skipped:</span>
+                  <span className="result-value info">{priceUpdateResult.skippedGamesCount || 0}</span>
+                </div>
+                <div className="result-item">
+                  <span className="result-label">Failed:</span>
+                  <span className="result-value error">{priceUpdateResult.failedGamesCount || 0}</span>
+                </div>
+              </div>
+              <details>
+                <summary>Show Updated AppIDs</summary>
+                <pre>{JSON.stringify(priceUpdateResult.updatedAppIds, null, 2)}</pre>
+              </details>
+              <details>
+                <summary>Show Skipped AppIDs</summary>
+                <pre>{JSON.stringify(priceUpdateResult.skippedAppIds, null, 2)}</pre>
+              </details>
+              <details>
+                <summary>Show Failed AppIDs</summary>
+                <pre>{JSON.stringify(priceUpdateResult.failedAppIds, null, 2)}</pre>
+              </details>
+            </div>
+          )}
+
+          {priceUpdateError && <div className="error-message">{priceUpdateError}</div>}
+        </div>
 
         <div className="admin-section">
           <h2>Update Owned Games</h2>
@@ -541,6 +678,8 @@ function AdminPage() {
             </div>
           )}
         </div>
+
+        
       </div>
 
       <ContextMenu
