@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import Select from 'react-select';
 import { Link } from 'react-router-dom';
 import useDocumentTitle from 'hooks/useDocumentTitle';
-import ScrollToTop from 'components/common/ScrollToTop';
 import { getGames } from 'services/gameService';
 import api from 'utils/api';
 import 'styles/GamesPage.css';
@@ -366,8 +365,6 @@ function GamesPage() {
           ))}
         </div>
       </div>
-
-      <ScrollToTop />
     </div>
   );
 }

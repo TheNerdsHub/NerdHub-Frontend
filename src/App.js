@@ -10,6 +10,7 @@ import TimelinePage from 'components/pages/TimelinePage';
 import Profile from 'components/pages/ProfilePage';
 import AdminPage from 'components/pages/AdminPage'; // Add this import
 import keycloak from 'keycloak';
+import ScrollToTop from 'components/common/ScrollToTop';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -80,6 +81,7 @@ function App() {
           />
         </Routes>
       </div>
+      <ScrollToTop />
       <Footer />
     </Router>
   );

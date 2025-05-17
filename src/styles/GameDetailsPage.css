@@ -65,6 +65,7 @@
   align-items: center;
   margin-bottom: 30px;
   text-align: center;
+  padding-top: 25px;
 }
 
 .game-header img {
@@ -190,6 +191,24 @@
 
 .owner-item:hover .user-tooltip {
   display: block;
+}
+
+.tag-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-list li {
+  background-color: #e0f7fa;
+  color: #00796b;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
 }
 
 /* Detailed user tooltip */

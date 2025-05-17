@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import useDocumentTitle from 'hooks/useDocumentTitle';
-import ScrollToTop from 'components/common/ScrollToTop'; // Import the new component
 import GameIcon from 'assets/GamingIcon.png';
 import QuotesIcon from 'assets/QuotesIcon.png';
 import TimelineIcon from 'assets/TimelineIcon.png';
@@ -77,7 +76,6 @@ function HomePage() {
           </div>
         </section>
       </div>
-      <ScrollToTop /> {/* Add the ScrollToTop component */}
     </div>
   );
 }
