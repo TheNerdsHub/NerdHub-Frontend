@@ -9,6 +9,10 @@ RUN npm ci
 # Copy app source and build
 COPY . .
 
+# Copy buildtime arguments to environment variables
+ARG VERSION
+ENV REACT_APP_VERSION=$VERSION
+
 ARG API_URL
 ENV REACT_APP_API_ROOT=$API_URL
 

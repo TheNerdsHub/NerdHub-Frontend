@@ -45,6 +45,7 @@ jobs:
           push: true
           build-args: |
             API_URL=http://10.2.0.10:9003
+            VERSION=${{ steps.gen_ts.outputs.timestamp }}
           tags: |
             ghcr.io/thenerdshub/nerdhub-frontend:${{ steps.gen_ts.outputs.timestamp }}
             ghcr.io/thenerdshub/nerdhub-frontend:latest
