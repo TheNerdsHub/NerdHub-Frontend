@@ -5,6 +5,7 @@ import useDocumentTitle from 'hooks/useDocumentTitle';
 import { getGames } from 'services/gameService';
 import api from 'utils/api';
 import 'styles/GamesPage.css';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 function GamesPage() {
   useDocumentTitle('Games');
@@ -20,6 +21,8 @@ function GamesPage() {
   const [portalTarget, setPortalTarget] = useState(null);
   const [userMappings, setUserMappings] = useState([]);
   const [onlyOnSale, setOnlyOnSale] = useState(false);
+  const [sortOpen, setSortOpen] = useState(true);
+  const [excludeLowOwners, setExcludeLowOwners] = useState(() => JSON.parse(localStorage.getItem('excludeLowOwners')) ?? false);
 
   const observer = useRef(null);
 
@@ -56,6 +59,10 @@ function GamesPage() {
   }, [excludeNA]);
 
   useEffect(() => {
+    localStorage.setItem('excludeLowOwners', excludeLowOwners);
+  }, [excludeLowOwners]);
+
+  useEffect(() => {
     observer.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -78,7 +85,7 @@ function GamesPage() {
     // Force a re-render by updating the state or triggering a layout recalculation
     const dropdownElement = document.querySelector('.owners-filter .css-13cymwt-control');
     if (dropdownElement) {
-      dropdownElement.style.height = 'auto'; // Reset height to auto
+      dropdownElement.style.height = 'auto';
     }
   }, [selectedOwners]);
 
@@ -105,7 +112,8 @@ function GamesPage() {
     .filter((game) =>
       !onlyOnSale || (game.priceOverview?.discountPercent != null && game.priceOverview.discountPercent > 0)
     )
-    .filter((game) => !excludeNA || !(game.priceOverview?.finalFormatted == null && !game.isFree));
+    .filter((game) => !excludeNA || !(game.priceOverview?.finalFormatted == null && !game.isFree))
+    .filter((game) => !excludeLowOwners || (game.ownedBy?.steamId?.length ?? 0) >= 2);
 
   const sortedGames = [...filteredGames]
     .sort((a, b) => {
@@ -205,15 +213,37 @@ function GamesPage() {
     setSelectedCategories([]);
   };
 
+  const sortOptions = [
+    { value: 'appid', label: 'App ID' },
+    { value: 'discount', label: 'Discount' },
+    { value: 'lastModified', label: 'Last Updated' },
+    { value: 'name', label: 'Name' },
+    { value: 'owners', label: 'Owners' },
+    { value: 'price', label: 'Price' }
+  ];
+
   return (
     <div className="games-page-wrapper">
       <div className="background-dots background-dots-back"></div>
       <div className="background-dots background-dots-front"></div>
-  
+
       <div className="main-content">
-        <div className="sort-container">
-          <div className="sort-container-inner">
-  
+        {/* Collapsible Sort Container */}
+        <div className={`sort-container-vertical${sortOpen ? ' open' : ''}`}>
+          <button
+            className="sort-toggle-btn"
+            onClick={() => setSortOpen((open) => !open)}
+            aria-expanded={sortOpen}
+            aria-controls="sort-controls"
+          >
+            {sortOpen ? <FaChevronUp /> : <FaChevronDown />}
+            {sortOpen ? 'Hide Filters & Sorting' : 'Show Filters & Sorting'}
+          </button>
+          <div
+            id="sort-controls"
+            className="sort-container-inner"
+            style={{ display: sortOpen ? 'flex' : 'none' }}
+          >
             {/* 🔹 Column Layout Row: Search & Sort above Filters */}
             <div className="sort-top-row dual-column-stack">
               {/* 🔸 Column 1: Search + Owners */}
@@ -276,15 +306,8 @@ function GamesPage() {
                   <div className="sort-inline">
                     <div className="flex-fill same-height-select">
                       <Select
-                        options={[
-                          { value: 'appid', label: 'App ID' },
-                          { value: 'discount', label: 'Discount' },
-                          { value: 'lastModified', label: 'Last Updated' },
-                          { value: 'name', label: 'Name' },
-                          { value: 'owners', label: 'Owners' },
-                          { value: 'price', label: 'Price' }
-                        ]}
-                        value={{ value: sortBy, label: sortBy.charAt(0).toUpperCase() + sortBy.slice(1) }}
+                        options={sortOptions}
+                        value={sortOptions.find(option => option.value === sortBy)}
                         onChange={(selectedOption) => setSortBy(selectedOption.value)}
                         menuPortalTarget={portalTarget}
                         styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
@@ -350,6 +373,15 @@ function GamesPage() {
                   />
                   Only On Sale
                 </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    id="exclude-low-owners"
+                    checked={excludeLowOwners}
+                    onChange={(e) => setExcludeLowOwners(e.target.checked)}
+                  />
+                  Only Games Owned By 2+ People
+                </label>
               </div>
             </div>
   
@@ -363,10 +395,9 @@ function GamesPage() {
                 </span>
               </div>
             </div>
-  
           </div>
         </div>
-  
+
         <div className="games-grid">
           {sortedGames.map((game, index) => (
             <Link
