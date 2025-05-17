@@ -187,8 +187,28 @@ function GameDetailsPage() {
                 <p><strong>Free to Play?</strong> {gameDetails.isFree ? 'Yes' : 'No'}</p>
               </>
             )}
-            <p><strong>Categories:</strong> {gameDetails.categories?.map(category => category.description).join(', ')}</p>
-            <p><strong>Genres:</strong> {gameDetails.genres?.map(genre => genre.description).join(', ')}</p>
+            {/* Categories */}
+            {gameDetails.categories?.length > 0 && (
+              <div>
+                <strong>Categories:</strong>
+                <ul className="tag-list">
+                  {gameDetails.categories.map((category, index) => (
+                    <li key={index}>{category.description}</li>
+                ))}
+                </ul>
+              </div>
+            )}
+            {/* Genres */}
+            {gameDetails.genres?.length > 0 && (
+              <div>
+                <strong>Genres:</strong>
+                <ul className="tag-list">
+                  {gameDetails.genres.map((genre, index) => (
+                    <li key={index}>{genre.description}</li>
+                  ))}
+                </ul>
+              </div>
+              )}
             <p><strong>Release Date:</strong> {gameDetails.releaseDate?.date}</p>
           </div>
 

@@ -5,7 +5,6 @@ import api from 'utils/api';
 import 'styles/AdminPage.css';
 import ContextMenu from 'components/common/ContextMenu';
 import { handleCopyToClipboard } from 'utils/clipboard';
-import ScrollToTop from 'components/common/ScrollToTop';
 
 function AdminPage() {
   useDocumentTitle('Admin');
@@ -691,8 +690,6 @@ function AdminPage() {
         options={contextMenuOptions}
         onClose={() => setContextMenu({ visible: false, x: 0, y: 0, mapping: null })}
       />
-      
-      <ScrollToTop />
     </div>
   );
 }

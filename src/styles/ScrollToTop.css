@@ -29,3 +29,7 @@
   background-color: #077ccc;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
+
+.scroll-to-top.avoid-footer {
+  bottom: 100px; /* raise it ~70px higher than normal */
+}

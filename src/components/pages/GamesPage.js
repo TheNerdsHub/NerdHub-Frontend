@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import Select from 'react-select';
 import { Link } from 'react-router-dom';
 import useDocumentTitle from 'hooks/useDocumentTitle';
-import ScrollToTop from 'components/common/ScrollToTop';
 import { getGames } from 'services/gameService';
 import api from 'utils/api';
 import 'styles/GamesPage.css';
@@ -74,6 +73,14 @@ function GamesPage() {
   useEffect(() => {
     setPortalTarget(document.body);
   }, []);
+
+  useEffect(() => {
+    // Force a re-render by updating the state or triggering a layout recalculation
+    const dropdownElement = document.querySelector('.owners-filter .css-13cymwt-control');
+    if (dropdownElement) {
+      dropdownElement.style.height = 'auto'; // Reset height to auto
+    }
+  }, [selectedOwners]);
 
   const filteredGames = games
     .filter((game) =>
@@ -202,136 +209,164 @@ function GamesPage() {
     <div className="games-page-wrapper">
       <div className="background-dots background-dots-back"></div>
       <div className="background-dots background-dots-front"></div>
-
+  
       <div className="main-content">
         <div className="sort-container">
-          <label htmlFor="search">Search:</label>
-          <input
-            type="text"
-            id="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search games..."
-          />
-          <label htmlFor="sort-by">Sort By:</label>
-          <select
-            id="sort-by"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-          >
-            <option value="appid">App ID</option>
-            <option value="discount">Discount</option>
-            <option value="lastModified">Last Updated</option>
-            <option value="name">Name</option>
-            <option value="owners">Owners</option>
-            <option value="price">Price</option>
-          </select>
-          <button
-            className="sort-direction-button"
-            onClick={() =>
-              setSortDirection((prevDirection) =>
-                prevDirection === 'asc' ? 'desc' : 'asc'
-              )
-            }
-          >
-            {sortDirection === 'asc' ? 'Ascending' : 'Descending'}
-          </button>
-          <label htmlFor="exclude-na" className="checkbox-label">
-            <input
-              type="checkbox"
-              id="exclude-na"
-              checked={excludeNA}
-              onChange={(e) => setExcludeNA(e.target.checked)}
-            />
-            Exclude "N/A" Prices
-          </label>
-          <label htmlFor="only-on-sale" className="checkbox-label">
-            <input
-              type="checkbox"
-              id="only-on-sale"
-              checked={onlyOnSale}
-              onChange={(e) => setOnlyOnSale(e.target.checked)}
-            />
-            Only On Sale
-          </label>
-          <div className="owners-filter">
-            <div className="filter-header">
-              <label>Filter by Owners:</label>
-              <div className="filter-buttons">
-                <button 
-                  className="filter-button" 
-                  onClick={selectAllOwners}
-                  type="button"
-                >
-                  Select All
-                </button>
-                <button 
-                  className="filter-button" 
-                  onClick={clearOwners}
-                  type="button"
-                >
-                  Clear
-                </button>
+          <div className="sort-container-inner">
+  
+            {/* 🔹 Column Layout Row: Search & Sort above Filters */}
+            <div className="sort-top-row dual-column-stack">
+              {/* 🔸 Column 1: Search + Owners */}
+              <div className="column-stack">
+                <div className="field-group">
+                  <label htmlFor="search">Search</label>
+                  <input
+                    type="text"
+                    id="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search games..."
+                  />
+                </div>
+  
+                <div className="field-group owners-filter-group">
+                  <label>Filter by Owners</label>
+                  <div className="sort-inline">
+                    <div className="flex-fill same-height-select">
+                      <Select
+                        isMulti
+                        options={uniqueOwners}
+                        value={uniqueOwners.filter((owner) =>
+                          selectedOwners.includes(owner.value)
+                        )}
+                        onChange={(selectedOptions) => {
+                          setSelectedOwners(selectedOptions.map((option) => option.value));
+                        }}
+                        onMenuOpen={() => {
+                          // Trigger a layout recalculation when the menu opens
+                          const dropdownElement = document.querySelector('.owners-filter .css-13cymwt-control');
+                          if (dropdownElement) {
+                            dropdownElement.style.height = 'auto';
+                          }
+                        }}
+                        menuPortalTarget={portalTarget}
+                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                      />
+                    </div>
+                    <button
+                      className="mini-button"
+                      onClick={selectAllOwners}
+                    >
+                      Select All
+                    </button>
+                    <button
+                      className="mini-button"
+                      onClick={clearOwners}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              </div>
+  
+              {/* 🔸 Column 2: Sort + Categories */}
+              <div className="column-stack">
+                <div className="field-group sort-field">
+                  <label htmlFor="sort-by">Sort By</label>
+                  <div className="sort-inline">
+                    <div className="flex-fill same-height-select">
+                      <Select
+                        options={[
+                          { value: 'appid', label: 'App ID' },
+                          { value: 'discount', label: 'Discount' },
+                          { value: 'lastModified', label: 'Last Updated' },
+                          { value: 'name', label: 'Name' },
+                          { value: 'owners', label: 'Owners' },
+                          { value: 'price', label: 'Price' }
+                        ]}
+                        value={{ value: sortBy, label: sortBy.charAt(0).toUpperCase() + sortBy.slice(1) }}
+                        onChange={(selectedOption) => setSortBy(selectedOption.value)}
+                        menuPortalTarget={portalTarget}
+                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                      />
+                    </div>
+                    <button
+                      className="sort-direction-button"
+                      onClick={() =>
+                        setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                      }
+                    >
+                      {sortDirection === 'asc' ? '↑ Asc' : '↓ Desc'}
+                    </button>
+                  </div>
+                </div>
+  
+                <div className="field-group categories-filter">
+                  <label>Filter by Categories</label>
+                  <div className="sort-inline">
+                    <div className="flex-fill same-height-select">
+                      <Select
+                        isMulti
+                        options={uniqueCategories}
+                        value={uniqueCategories.filter((category) =>
+                          selectedCategories.includes(category.value)
+                        )}
+                        onChange={(selectedOptions) =>
+                          setSelectedCategories(selectedOptions.map((option) => option.value))
+                        }
+                        menuPortalTarget={portalTarget}
+                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                      />
+                    </div>
+                    <button
+                      className="mini-button full-height-button"
+                      onClick={clearCategories}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-            <Select
-              isMulti
-              options={uniqueOwners}
-              value={uniqueOwners.filter((owner) =>
-                selectedOwners.includes(owner.value)
-              )}
-              onChange={(selectedOptions) =>
-                setSelectedOwners(selectedOptions.map((option) => option.value))
-              }
-              menuPortalTarget={portalTarget}
-              styles={{
-                menuPortal: (base) => ({
-                  ...base,
-                  zIndex: 9999
-                })
-              }}
-            />
-          </div>
-          <div className="categories-filter">
-            <div className="filter-header">
-              <label>Filter by Categories:</label>
-              <div className="filter-buttons">
-                <button 
-                  className="filter-button" 
-                  onClick={clearCategories}
-                  type="button"
-                >
-                  Clear
-                </button>
+  
+            {/* 🔹 Checkbox Filters Row */}
+            <div className="sort-middle-row">
+              <div className="checkbox-stack">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    id="exclude-na"
+                    checked={excludeNA}
+                    onChange={(e) => setExcludeNA(e.target.checked)}
+                  />
+                  Exclude "N/A" Prices
+                </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    id="only-on-sale"
+                    checked={onlyOnSale}
+                    onChange={(e) => setOnlyOnSale(e.target.checked)}
+                  />
+                  Only On Sale
+                </label>
               </div>
             </div>
-            <Select
-              isMulti
-              options={uniqueCategories}
-              value={uniqueCategories.filter((category) =>
-                selectedCategories.includes(category.value)
-              )}
-              onChange={(selectedOptions) =>
-                setSelectedCategories(selectedOptions.map((option) => option.value))
-              }
-              menuPortalTarget={portalTarget}
-              styles={{
-                menuPortal: (base) => ({
-                  ...base,
-                  zIndex: 9999
-                })
-              }}
-            />
-          </div>
-          <div className="games-counter">
-            <span>
-              {filteredGames.length !== games.length 
-                ? `${sortedGames.length} / ${games.length} Games`
-                : `${games.length} Games`}
-            </span>
+  
+            {/* 🔹 Game Count */}
+            <div className="sort-bottom-row">
+              <div className="games-counter">
+                <span>
+                  {filteredGames.length !== games.length
+                    ? `${sortedGames.length} / ${games.length} Games`
+                    : `${games.length} Games`}
+                </span>
+              </div>
+            </div>
+  
           </div>
         </div>
-
+  
         <div className="games-grid">
           {sortedGames.map((game, index) => (
             <Link
@@ -366,8 +401,6 @@ function GamesPage() {
           ))}
         </div>
       </div>
-
-      <ScrollToTop />
     </div>
   );
 }

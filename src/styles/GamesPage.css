@@ -4,20 +4,52 @@ body {
   min-height: 100vh;
 }
 
+.field-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+}
+
+.field-group label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+  .sort-top-row,
+  .sort-bottom-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .field-group,
+  .owners-filter,
+  .categories-filter {
+    width: 100%;
+  }
+}
+
 /* Sort and Search Container */
 .sort-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin: 20px 0;
-  padding: 10px 20px;
+  width: 100%;
+  padding: 30px 20px;
   background-color: #ffffffcc;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
-  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center internal content */
+  box-sizing: border-box;
+  margin-top: 15px;
+}
+
+.sort-container-inner {
+  width: 100%;
+  max-width: 1200px; /* Limits content width */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .sort-container label {
@@ -53,10 +85,208 @@ body {
   background-color: #31b0d5;
 }
 
+/* Ensure consistent size for buttons */
+.sort-container button,
+.categories-filter button {
+  width: 100px; /* Set a fixed width */
+  height: 40px; /* Set a fixed height */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.dual-column-stack {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  width: 100%;
+}
+
+.column-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 250px;
+  flex: 1;
+  max-width: 400px;
+}
+
+.column-stack .field-group {
+  width: 100%;
+}
+
 .checkbox-label {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+.sort-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  width: 100%;
+  justify-content: center; /* ✅ Center items horizontally */
+}
+
+.sort-top-row,
+.sort-middle-row,
+.sort-bottom-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  width: 100%;
+}
+
+.sort-bottom-row .games-counter {
+  margin: 0 auto;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.sort-inline {
+  display: flex;
+  align-items: center; /* Keep everything same height */
+  gap: 10px;
+}
+
+.sort-inline > * {
+  height: 40px;
+}
+
+.sort-inline select {
+  flex: 1;
+}
+
+.flex-fill {
+  flex: 1;
+}
+
+/* Fix alignment and sizing */
+.same-height-select select,
+.same-height-select .css-13cymwt-control,
+.same-height-select .css-t3ipsp-control {
+  height: 40px !important;
+  min-height: 40px !important;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+/* Adjust the height of the dropdown to grow with selected options */
+.same-height-select .css-13cymwt-control {
+  min-height: auto !important; /* Allow height to adjust dynamically */
+  height: auto !important;
+  display: flex;
+  flex-wrap: wrap; /* Enable wrapping for selected options */
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+
+.same-width-select,
+.same-width-select .css-13cymwt-control,
+.same-width-select .css-t3ipsp-control {
+  width: 100% !important;
+  min-width: 100% !important;
+}
+
+.full-height-button {
+  padding: 6px 12px;
+  height: 100%;
+  align-self: stretch;
+  font-size: 13px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #eee;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.full-height-button:hover {
+  background-color: #ddd;
+}
+
+.checkbox-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+
+.filters-row {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center; /* ✅ Centered like the top row */
+}
+
+.owners-filter-group {
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.owners-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.mini-button-row {
+  display: flex;
+  gap: 5px;
+}
+
+.mini-button {
+  background-color: #eee;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mini-button-row.full-width {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.mini-button:hover {
+  background-color: #ddd;
+}
+
+.full-width-button {
+  flex: 1;
+  padding: 6px 0;
+  text-align: center;
+  background-color: #eee;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.full-width-button:hover {
+  background-color: #ddd;
 }
 
 /* React-Select Styling */
@@ -72,6 +302,13 @@ body {
 .categories-filter label {
   font-weight: bold;
   color: #333;
+}
+
+.categories-filter,
+.owners-filter-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 /* Control (main input container) */
@@ -393,8 +630,53 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  .dual-column-stack {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .column-stack {
+    width: 100%;
+  }
+}
+
 @media (max-width: 600px) {
   .games-grid {
     grid-template-columns: repeat(1, 1fr);
   }
+}
+
+/* Add a shared class for consistent width */
+.same-width-dropdown {
+  width: 100%;
+  min-width: 100%;
+}
+
+/* Apply the class to both dropdowns */
+.sort-container select,
+.categories-filter select {
+  width: 250px; /* Set a fixed width */
+  min-width: 250px; /* Ensure minimum width */
+}
+
+/* Update button styling to match the blue color */
+.sort-container button,
+.categories-filter button,
+.owners-filter-group .button-row button {
+  background-color: #5bc0de; /* Blue color */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.sort-container button:hover,
+.categories-filter button:hover,
+.owners-filter-group .button-row button:hover {
+  background-color: #31b0d5; /* Slightly darker blue on hover */
 }
