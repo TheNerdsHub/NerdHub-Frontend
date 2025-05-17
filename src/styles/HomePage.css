@@ -61,20 +61,6 @@
   margin-bottom: 30px;
 }
 
-.cta-button {
-  background-color: #0399ff;
-  color: white;
-  padding: 10px 20px;
-  text-decoration: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
-}
-
-.cta-button:hover {
-  background-color: #0157ca;
-}
-
 /* Features Section */
 .features {
   display: flex;
