@@ -1,0 +1,42 @@
+.about-page {
+  max-width: 600px;
+  margin: 2rem auto;
+  background: rgba(25, 25, 35, 0.9);
+  border-radius: 8px;
+  padding: 2rem;
+}
+
+.about-page h1 {
+  color: #fff;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.about-page p {
+  color: #e0e0e0;
+}
+
+.about-page h3 {
+  color: #4aa5f0;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.about-page code {
+  background: #222;
+  color: #4aa5f0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.version-status.up-to-date {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.version-status.out-of-date {
+  color: #d73a49;
+  font-weight: bold;
+  margin-left: 0.5em;
+}

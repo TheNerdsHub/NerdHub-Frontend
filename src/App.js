@@ -8,7 +8,9 @@ import GameDetailsPage from 'components/pages/GameDetailsPage';
 import QuotePage from 'components/pages/QuotesPage';
 import TimelinePage from 'components/pages/TimelinePage';
 import Profile from 'components/pages/ProfilePage';
-import AdminPage from 'components/pages/AdminPage'; // Add this import
+import AdminPage from 'components/pages/AdminPage';
+import AboutPage from 'components/pages/AboutPage';
+import NotFoundPage from 'components/pages/NotFoundPage';
 import keycloak from 'keycloak';
 import ScrollToTop from 'components/common/ScrollToTop';
 
@@ -37,6 +39,7 @@ function App() {
       <div className="content">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/games" element={<GamesPage />} />
           <Route path="/games/:appid" element={<GameDetailsPage />} />
           <Route
@@ -79,6 +82,7 @@ function App() {
               )
             }*/
           />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
       <ScrollToTop />

@@ -11,12 +11,9 @@ function NavigationBar({ keycloak, isAuthenticated }) {
     <Navbar expand="lg" style={{ backgroundColor: "#0797ff" }}>
       <Container>
         <Navbar.Brand href="/" className="navbar-link-white text-shadow">NerdHub</Navbar.Brand>
-        <Navbar.Toggle 
-            className="navbar-link-white custom-toggler"
-        aria-controls="basic-navbar-nav"
-        >
-  <span className="custom-toggler-icon"></span>
-</Navbar.Toggle>
+        <Navbar.Toggle className="navbar-link-white custom-toggler" aria-controls="basic-navbar-nav">
+          <span className="custom-toggler-icon"></span>
+        </Navbar.Toggle>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link href="/games" className="navbar-link-white text-shadow">Games</Nav.Link>
@@ -36,6 +33,7 @@ function NavigationBar({ keycloak, isAuthenticated }) {
               <NavDropdown.Item href="URLTOKB">Knowledge Base</NavDropdown.Item>
               <NavDropdown.Item href="URLTOBRACKETMAKER">Bracket Maker</NavDropdown.Item>
             </NavDropdown>
+            <Nav.Link href="/about" className="navbar-link-white text-shadow">About</Nav.Link>
             {isAuthenticated && (
               <Nav.Link href="/admin" className="navbar-link-white text-shadow">Admin</Nav.Link>
             )}
