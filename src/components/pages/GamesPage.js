@@ -104,10 +104,10 @@ function GamesPage() {
     )
     .filter((game) =>
       !onlyOnSale || (game.priceOverview?.discountPercent != null && game.priceOverview.discountPercent > 0)
-    );
+    )
+    .filter((game) => !excludeNA || !(game.priceOverview?.finalFormatted == null && !game.isFree));
 
   const sortedGames = [...filteredGames]
-    .filter((game) => !excludeNA || !(game.priceOverview?.finalFormatted == null && !game.isFree))
     .sort((a, b) => {
       let comparison = 0;
       
