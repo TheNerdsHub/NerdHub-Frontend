@@ -205,14 +205,6 @@ function GamesPage() {
     setSelectedOwners(uniqueOwners.map(owner => owner.value));
   };
 
-  const clearOwners = () => {
-    setSelectedOwners([]);
-  };
-
-  const clearCategories = () => {
-    setSelectedCategories([]);
-  };
-
   const sortOptions = [
     { value: 'appid', label: 'App ID' },
     { value: 'discount', label: 'Discount' },
@@ -283,17 +275,8 @@ function GamesPage() {
                         styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                       />
                     </div>
-                    <button
-                      className="mini-button"
-                      onClick={selectAllOwners}
-                    >
+                    <button className="mini-button" onClick={selectAllOwners}>
                       Select All
-                    </button>
-                    <button
-                      className="mini-button"
-                      onClick={clearOwners}
-                    >
-                      Clear
                     </button>
                   </div>
                 </div>
@@ -341,12 +324,7 @@ function GamesPage() {
                         styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                       />
                     </div>
-                    <button
-                      className="mini-button full-height-button"
-                      onClick={clearCategories}
-                    >
-                      Clear
-                    </button>
+                    {/* Removed Clear button for categories */}
                   </div>
                 </div>
               </div>
