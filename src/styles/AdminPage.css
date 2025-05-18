@@ -191,7 +191,6 @@ button.small-button {
   font-size: 0.9rem;
 }
 
-/* Style for react-select */
 .css-1s2u09g-control,
 .css-1pahdxg-control {
   background-color: #222 !important;
@@ -226,7 +225,6 @@ button.small-button {
   background-color: rgba(74, 165, 240, 0.4) !important;
 }
 
-/* Add these styles for the progress bar */
 .progress-container {
   margin-top: 20px;
   padding: 15px;
@@ -286,7 +284,6 @@ button.small-button {
   font-style: italic;
 }
 
-/* Style for the result summary */
 .result-summary {
   display: flex;
   flex-wrap: wrap;

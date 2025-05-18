@@ -4,7 +4,7 @@
   right: 30px;
   width: 50px;
   height: 50px;
-  background-color: #0999f9; /* Bright NerdHub blue */
+  background-color: #0999f9; 
   color: white;
   border-radius: 50%;
   display: flex;
@@ -16,7 +16,7 @@
   visibility: hidden;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 10; /* Higher than background dots and content */
+  z-index: 10; 
 }
 
 .scroll-to-top.show {
@@ -31,5 +31,5 @@
 }
 
 .scroll-to-top.avoid-footer {
-  bottom: 100px; /* raise it ~70px higher than normal */
+  bottom: 100px; 
 }

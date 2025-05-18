@@ -1,12 +1,12 @@
 @media (max-width: 991.98px) {
   .navbar-nav .dropdown-menu {
-    margin-bottom: 1rem; /* Space after dropdown menu */
+    margin-bottom: 1rem; 
   }
 }
 
 .navbar {
-  position: relative; /* Create a new stacking context */
-  z-index: 1050; /* High enough to be above hero section */
+  position: relative; 
+  z-index: 1050; 
 }
 
 .navbar-link-white {
@@ -36,28 +36,27 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
-/* Hide dropdown menu in mobile nav after collapse */
+
 .navbar-nav .dropdown-menu {
   display: block;
-  background-color: rgba(7, 151, 255, 0.75); /* Slightly darker, but still transparent */
-  backdrop-filter: blur(12px); /* Increase blur strength */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); /* Stronger shadow */
-  border-radius: 0.5rem; /* Optional: slightly round edges */
+  background-color: rgba(7, 151, 255, 0.75); 
+  backdrop-filter: blur(12px); 
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); 
+  border-radius: 0.5rem; 
   max-height: 0;
   overflow: hidden;
   transition: backdrop-filter 0.3s ease, box-shadow 0.3s ease;
   opacity: 0;
 }
 
-/* Bonus: When hovering inside the dropdown, increase blur even more */
+
 .navbar-nav .dropdown-menu:hover {
-  backdrop-filter: blur(16px); /* Blur slightly more on hover */
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35); /* Slightly bigger shadow on hover */
+  backdrop-filter: blur(16px); 
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35); 
 }
 
-/* When the dropdown is open */
 .navbar-nav .dropdown.show .dropdown-menu {
-  max-height: 500px; /* Enough space for multiple items */
+  max-height: 500px; 
   opacity: 1;
 }
 
@@ -66,16 +65,16 @@
   border: none;
   border-radius: 0.5rem;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-  opacity: 0; /* Start hidden */
-  transform: translateY(10px); /* Start slightly lower */
+  opacity: 0; 
+  transform: translateY(10px); 
   transition: opacity 0.3s ease-out, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  display: block; /* Important to allow animation */
-  visibility: hidden; /* Hide from screen readers initially */
+  display: block; 
+  visibility: hidden; 
 }
 
 .show > .dropdown-menu {
   opacity: 1;
-  transform: translateY(0px); /* Move to original position */
+  transform: translateY(0px); 
   visibility: visible;
 }
 
@@ -104,33 +103,30 @@
   border: none;
   background: none;
   padding: 0.5rem;
-  display: flex; /* <-- NEW: makes the button flexible */
-  align-items: center; /* center vertically */
-  justify-content: center; /* center horizontally */
-  width: 48px; /* set a good clickable size */
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  width: 48px; 
   height: 48px;
   transition: transform 0.4s ease, box-shadow 0.3s ease;
-  border-radius: 50%; /* makes the glow feel natural around a circle */
+  border-radius: 50%; 
   position: relative;
 }
 
-/* Hover glow effect */
 .custom-toggler:hover {
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6); /* Nice soft glow */
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6); 
 }
 
-/* New hamburger bars */
 .custom-toggler-icon {
   display: block;
   position: relative;
   width: 24px;
   height: 2px;
   background-color: white;
-  margin: 0 auto; /* <--- NEW: center horizontally */
+  margin: 0 auto; 
   transition: all 0.4s ease;
 }
 
-/* Create two more bars */
 .custom-toggler-icon::before,
 .custom-toggler-icon::after {
   content: '';
@@ -142,7 +138,6 @@
   transition: all 0.4s ease;
 }
 
-/* Top and bottom bars position */
 .custom-toggler-icon::before {
   top: -8px;
 }
@@ -151,7 +146,6 @@
   top: 8px;
 }
 
-/* When expanded (not collapsed) — animate into an X */
 .custom-toggler:not(.collapsed) .custom-toggler-icon {
   background-color: transparent;
 }
@@ -166,7 +160,6 @@
   top: 0;
 }
 
-/* No weird outline on click */
 .custom-toggler:focus {
   outline: none;
   box-shadow: none;
