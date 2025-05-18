@@ -27,7 +27,8 @@ function AdminPage() {
   const [mappingFormState, setMappingFormState] = useState({
     steamId: '',
     username: '',
-    nickname: ''
+    nickname: '',
+    discordId: ''
   });
   const [selectedMapping, setSelectedMapping] = useState(null);
 
@@ -269,15 +270,17 @@ function AdminPage() {
       await api.post('/api/Games/add-or-update-user-mapping', {
         steamId: mappingFormState.steamId,
         username: mappingFormState.username,
-        nickname: mappingFormState.nickname || null
+        nickname: mappingFormState.nickname || null,
+        discordId: mappingFormState.discordId || null
       });
-      
+
       setMappingFormState({
         steamId: '',
         username: '',
-        nickname: ''
+        nickname: '',
+        discordId: ''
       });
-      
+
       await fetchUserMappings();
     } catch (error) {
       console.error('Error updating user mapping:', error);
@@ -289,15 +292,16 @@ function AdminPage() {
 
   const handleMappingSelect = (option) => {
     setSelectedMapping(option);
-    
+
     if (option) {
       const mapping = userMappings.find(m => m.steamId === option.value);
-      
+
       if (mapping) {
         setMappingFormState({
           steamId: mapping.steamId,
           username: mapping.username,
-          nickname: mapping.nickname || ''
+          nickname: mapping.nickname || '',
+          discordId: mapping.discordId || ''
         });
       }
     } else {
@@ -310,7 +314,8 @@ function AdminPage() {
     setMappingFormState({
       steamId: '',
       username: '',
-      nickname: ''
+      nickname: '',
+      discordId: ''
     });
   };
 
@@ -351,7 +356,8 @@ function AdminPage() {
     setMappingFormState({
       steamId: mapping.steamId,
       username: mapping.username,
-      nickname: mapping.nickname || ''
+      nickname: mapping.nickname || '',
+      discordId: mapping.discordId || ''
     });
   };
 
@@ -610,7 +616,6 @@ function AdminPage() {
                 placeholder="76561198000000000"
               />
             </div>
-            
             <div className="form-group">
               <label htmlFor="username">Username:</label>
               <input
@@ -622,7 +627,6 @@ function AdminPage() {
                 placeholder="SteamUsername"
               />
             </div>
-            
             <div className="form-group">
               <label htmlFor="nickname">Nickname (optional):</label>
               <input
@@ -633,7 +637,16 @@ function AdminPage() {
                 placeholder="User's preferred name"
               />
             </div>
-            
+            <div className="form-group">
+              <label htmlFor="discordId">Discord ID (optional):</label>
+              <input
+                type="text"
+                id="discordId"
+                value={mappingFormState.discordId}
+                onChange={(e) => setMappingFormState({...mappingFormState, discordId: e.target.value})}
+                placeholder="10000000000000000"
+              />
+            </div>
             <button type="submit" disabled={loading}>
               {loading ? 'Saving...' : (selectedMapping ? 'Update User' : 'Add User')}
             </button>
@@ -658,6 +671,9 @@ function AdminPage() {
                     <th onClick={() => handleSort('steamId')}>
                       Steam ID {sortConfig.key === 'steamId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </th>
+                    <th onClick={() => handleSort('discordId')}>
+                      Discord ID {sortConfig.key === 'discordId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -671,6 +687,7 @@ function AdminPage() {
                       <td>{mapping.nickname || '—'}</td>
                       <td>{mapping.username}</td>
                       <td>{mapping.steamId}</td>
+                      <td>{mapping.discordId || '—'}</td>
                     </tr>
                   ))}
                 </tbody>
