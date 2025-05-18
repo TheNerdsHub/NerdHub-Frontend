@@ -178,8 +178,6 @@ body {
   width: 100%;
   padding: 8px 0;
   opacity: 0; 
-  transform: translateX(-20px); 
-  transition: opacity 0.2s ease-in-out, transform 0.3s ease-in-out; 
 }
 
 .sidebar-icon {
@@ -227,17 +225,6 @@ body {
 
 .games-sidebar.collapsed .sidebar-toggle-btn {
   right: -15px; 
-}
-
-.games-sidebar.collapsed .sidebar-icons-vertical {
-  opacity: 1;
-  transform: translateX(0);
-  transition-delay: 0.15s; 
-}
-
-.games-sidebar.collapsed .sidebar-controls {
-  opacity: 0;
-  pointer-events: none; 
 }
 
 .sidebar-toggle-btn:focus {
@@ -460,6 +447,19 @@ body {
     margin-left: 340px;
     transition: margin-left 0.3s;
   }
+
+  .sidebar-icons-vertical {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.2s ease-in-out, transform 0.3s ease-in-out;
+  }
+
+  .games-sidebar.collapsed .sidebar-icons-vertical {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.15s;
+  }
+
   .games-sidebar.collapsed ~ .games-grid,
   .games-sidebar.collapsed + .games-grid {
     margin-left: 60px;
@@ -471,14 +471,14 @@ body {
     gap: 0;
     padding-left: 10px;
     padding-right: 10px;
-    padding-top: 10px;
+    padding-top: 20px;
   }
   .games-sidebar,
   .games-sidebar.collapsed {
     width: calc(100% - 20px);
     min-width: 0;
     max-width: none;
-    margin-top: unset;
+    margin-top: 60px;
     top: unset;
     left: unset;
     margin-bottom: 10px;
@@ -506,12 +506,16 @@ body {
     gap: 12px; 
     width: 100%;
     height: 100%; 
-    opacity: 1; 
-    transition: opacity 0.3s ease-in-out; 
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transition-delay: 0s;
   }
 
   .games-sidebar.collapsed .sidebar-icons-vertical {
-    opacity: 1; 
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.15s;
   }
 
   .sidebar-icon {
@@ -556,7 +560,7 @@ body {
   .games-grid {
     margin-left: 0;
     padding-left: 0;
-    margin-top: 80px;
+    margin-top: 135px;
   }
 }
 @media (max-width: 900px) {
@@ -578,10 +582,7 @@ body {
 @media (max-width: 600px) {
   .games-grid {
     grid-template-columns: repeat(1, 1fr);
-  }
-  .games-sidebar,
-  .games-sidebar.collapsed {
-    margin-top: unset;
+    margin-top: 140px;
   }
   .sidebar-toggle-btn {
     width: 26px;
