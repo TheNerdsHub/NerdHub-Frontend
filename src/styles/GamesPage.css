@@ -48,9 +48,9 @@ body {
 /* === Sidebar Styles === */
 .games-sidebar {
   width: 340px;
-  min-width: 60px;
+  min-width: 340px;
   max-width: 400px;
-  transition: width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+  transition: all 0.3s ease-in-out;
   background: rgba(255,255,255,0.85);
   display: flex;
   flex-direction: column;
@@ -61,16 +61,31 @@ body {
   margin-right: 0;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  padding: 24px 16px 16px 16px;
+  padding: 0; /* Remove padding here */
   position: relative;
+  overflow: visible; /* Change from 'hidden' to 'visible' */
 }
+
+/* Add this new class for the inner content */
+.sidebar-inner-content {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: 24px 16px 16px 16px; /* Move padding here */
+}
+
 .games-sidebar.collapsed {
   width: 60px;
   min-width: 60px;
   max-width: 60px;
-  padding: 12px 0;
+  padding: 0; /* Remove padding */
   background: rgba(255,255,255,0.85);
   border-radius: 12px;
+  overflow: visible; /* Keep visible */
+}
+
+.games-sidebar.collapsed .sidebar-inner-content {
+  padding: 12px 8px; /* Add padding here */
 }
 
 /* Sidebar Controls */
@@ -78,7 +93,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  width: 100%;
+  opacity: 1; /* Added this */
+  transition: opacity 0.2s ease-in-out; /* Added this */
+  transition-delay: 0.1s; /* Added this */
 }
+
 .sidebar-row {
   display: flex;
   align-items: center;
@@ -159,7 +179,11 @@ body {
   gap: 28px;
   width: 100%;
   padding: 8px 0;
+  opacity: 0; /* Added this */
+  transform: translateX(-20px); /* Added this */
+  transition: opacity 0.2s ease-in-out, transform 0.3s ease-in-out; /* Added this */
 }
+
 .sidebar-icon {
   font-size: 1.5rem;
   color: #5bc0de;
@@ -178,9 +202,10 @@ body {
 }
 
 /* === Sidebar Toggle Button === */
+/* Ensure the sidebar toggle button is always visible and properly positioned */
 .sidebar-toggle-btn {
   position: absolute;
-  right: -15px;
+  right: 10px; /* Adjusted to ensure visibility */
   top: 50%;
   transform: translateY(-50%);
   width: 30px;
@@ -197,10 +222,27 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: background-color 0.2s, transform 0.2s;
 }
+
 .sidebar-toggle-btn:hover {
   background: #31b0d5;
   transform: translateY(-50%) scale(1.1);
 }
+
+.games-sidebar.collapsed .sidebar-toggle-btn {
+  right: -15px; /* Keep this the same */
+}
+
+.games-sidebar.collapsed .sidebar-icons-vertical {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.15s; /* Show icons after sidebar collapses */
+}
+
+.games-sidebar.collapsed .sidebar-controls {
+  opacity: 0;
+  pointer-events: none; /* Prevent interaction while invisible */
+}
+
 .sidebar-toggle-btn:focus {
   outline: none;
 }
@@ -388,6 +430,128 @@ body {
     gap: 0;
     padding-left: 10px;
     padding-right: 10px;
+    padding-top: 10px;
+  }
+  .games-sidebar,
+  .games-sidebar.collapsed {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    position: static;
+    top: unset;
+    margin-bottom: 10px;
+    border-radius: 12px;
+  }
+  .games-sidebar {
+    transition: transform 0.3s ease-in-out; /* Smooth animation for expand/collapse */
+    transform-origin: top; /* Ensure animation starts from the top */
+    position: fixed; /* Keep it fixed for mobile view */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    overflow: visible; /* Ensure the button is not clipped by the sidebar */
+  }
+
+  .games-sidebar.open {
+    transform: translateY(0); /* Slide down when open */
+  }
+
+  .games-sidebar.collapsed {
+    transform: translateY(0); /* Ensure the bar is fully visible when collapsed */
+    height: 60px; /* Set a fixed height for the collapsed state */
+  }
+
+  .sidebar-icons-vertical {
+    display: flex; /* Ensure icons are displayed */
+    flex-direction: row; /* Align icons horizontally */
+    align-items: center;
+    justify-content: center;
+    gap: 12px; /* Add spacing between icons */
+    width: 100%;
+    height: 100%; /* Ensure icons are centered vertically */
+    opacity: 1; /* Ensure icons are visible */
+    transition: opacity 0.3s ease-in-out; /* Smooth fade-in/out for icons */
+  }
+
+  .games-sidebar.collapsed .sidebar-icons-vertical {
+    opacity: 1; /* Keep icons visible when collapsed */
+  }
+
+  .sidebar-icon {
+    font-size: 1.5rem;
+    color: #5bc0de;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%; /* Make icons circular */
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .sidebar-icon:hover {
+    background: rgba(91, 192, 222, 0.2);
+    transform: scale(1.1); /* Slightly enlarge on hover */
+  }
+
+  .sidebar-toggle-btn-mobile {
+    position: absolute; /* Ensure it stays relative to the sidebar */
+    bottom: -20px; /* Move it halfway off the sidebar */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust for centering */
+    z-index: 1001; /* Ensure visibility */
+    background: #5bc0de; /* Add background color */
+    color: white; /* Set icon color */
+    border: none; /* Remove border */
+    border-radius: 50%; /* Make it circular */
+    width: 35px; /* Set width */
+    height: 35px; /* Set height */
+    display: flex; /* Center icon */
+    align-items: center; /* Center icon vertically */
+    justify-content: center; /* Center icon horizontally */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Add shadow for better visibility */
+    cursor: pointer; /* Add pointer cursor */
+    overflow: visible; /* Ensure it is not clipped */
+  }
+
+  .sidebar-toggle-btn-mobile svg {
+    font-size: 20px; /* Adjust icon size */
+  }
+}
+@media (min-width: 1101px) {
+  .sidebar-toggle-btn-mobile {
+    display: none; /* Hide mobile button in desktop view */
+  }
+
+  .sidebar-toggle-btn-desktop {
+    display: block; /* Show desktop button in desktop view */
+  }
+
+  .sidebar-toggle-btn {
+    position: absolute;
+    right: -15px; /* Adjusted to ensure it is split halfway on and halfway off the sidebar */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #5bc0de;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s, transform 0.2s;
+  }
+
+  .sidebar-toggle-btn:hover {
+    background: #31b0d5;
+    transform: translateY(-50%) scale(1.1);
   }
 }
 @media (max-width: 900px) {
