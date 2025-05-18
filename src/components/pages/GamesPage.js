@@ -5,7 +5,7 @@ import useDocumentTitle from 'hooks/useDocumentTitle';
 import { getGames } from 'services/gameService';
 import api from 'utils/api';
 import 'styles/GamesPage.css';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaSearch, FaUserFriends, FaTags, FaSortAmountDown, FaFilter, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 
 function GamesPage() {
   useDocumentTitle('Games');
@@ -21,8 +21,9 @@ function GamesPage() {
   const [portalTarget, setPortalTarget] = useState(null);
   const [userMappings, setUserMappings] = useState([]);
   const [onlyOnSale, setOnlyOnSale] = useState(false);
-  const [sortOpen, setSortOpen] = useState(true);
   const [excludeLowOwners, setExcludeLowOwners] = useState(() => JSON.parse(localStorage.getItem('excludeLowOwners')) ?? false);
+
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const observer = useRef(null);
 
@@ -220,149 +221,142 @@ function GamesPage() {
       <div className="background-dots background-dots-front"></div>
 
       <div className="main-content">
-        {/* Collapsible Sort Container */}
-        <div className={`sort-container-vertical${sortOpen ? ' open' : ''}`}>
-          <button
-            className="sort-toggle-btn"
-            onClick={() => setSortOpen((open) => !open)}
-            aria-expanded={sortOpen}
-            aria-controls="sort-controls"
+        <aside className={`games-sidebar${sidebarOpen ? ' open' : ' collapsed'}`}>
+          {/* Toggle button that's always visible */}
+          <button 
+            className="sidebar-toggle-btn"
+            onClick={() => setSidebarOpen(!sidebarOpen)} 
+            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
-            {sortOpen ? <FaChevronUp /> : <FaChevronDown />}
-            {sortOpen ? 'Hide Filters & Sorting' : 'Show Filters & Sorting'}
+            {sidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
           </button>
-          <div
-            id="sort-controls"
-            className="sort-container-inner"
-            style={{ display: sortOpen ? 'flex' : 'none' }}
-          >
-            {/* 🔹 Column Layout Row: Search & Sort above Filters */}
-            <div className="sort-top-row dual-column-stack">
-              {/* 🔸 Column 1: Search + Owners */}
-              <div className="column-stack">
-                <div className="field-group">
-                  <label htmlFor="search">Search</label>
-                  <input
-                    type="text"
-                    id="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search games..."
-                  />
-                </div>
-  
-                <div className="field-group owners-filter-group">
-                  <label>Filter by Owners</label>
-                  <div className="sort-inline">
-                    <div className="flex-fill same-height-select">
-                      <Select
-                        isMulti
-                        options={uniqueOwners}
-                        value={uniqueOwners.filter((owner) =>
-                          selectedOwners.includes(owner.value)
-                        )}
-                        onChange={(selectedOptions) => {
-                          setSelectedOwners(selectedOptions.map((option) => option.value));
-                        }}
-                        onMenuOpen={() => {
-                          const dropdownElement = document.querySelector('.owners-filter .css-13cymwt-control');
-                          if (dropdownElement) {
-                            dropdownElement.style.height = 'auto';
-                          }
-                        }}
-                        menuPortalTarget={portalTarget}
-                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      />
-                    </div>
-                    <button className="mini-button" onClick={selectAllOwners}>
-                      Select All
-                    </button>
-                  </div>
-                </div>
-              </div>
-  
-              {/* 🔸 Column 2: Sort + Categories */}
-              <div className="column-stack">
-                <div className="field-group sort-field">
-                  <label htmlFor="sort-by">Sort By</label>
-                  <div className="sort-inline">
-                    <div className="flex-fill same-height-select">
-                      <Select
-                        options={sortOptions}
-                        value={sortOptions.find(option => option.value === sortBy)}
-                        onChange={(selectedOption) => setSortBy(selectedOption.value)}
-                        menuPortalTarget={portalTarget}
-                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      />
-                    </div>
-                    <button
-                      className="sort-direction-button"
-                      onClick={() =>
-                        setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-                      }
-                    >
-                      {sortDirection === 'asc' ? '↑ Asc' : '↓ Desc'}
-                    </button>
-                  </div>
-                </div>
-  
-                <div className="field-group categories-filter">
-                  <label>Filter by Categories</label>
-                  <div className="sort-inline">
-                    <div className="flex-fill same-height-select">
-                      <Select
-                        isMulti
-                        options={uniqueCategories}
-                        value={uniqueCategories.filter((category) =>
-                          selectedCategories.includes(category.value)
-                        )}
-                        onChange={(selectedOptions) =>
-                          setSelectedCategories(selectedOptions.map((option) => option.value))
-                        }
-                        menuPortalTarget={portalTarget}
-                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+
+          {/* Collapsed: vertical icons */}
+          {!sidebarOpen && (
+            <div className="sidebar-icons-vertical">
+              <div className="sidebar-icon" title="Search"><FaSearch /></div>
+              <div className="sidebar-icon" title="Filter by owners"><FaUserFriends /></div>
+              <div className="sidebar-icon" title="Categories"><FaTags /></div>
+              <div className="sidebar-icon" title="Sort options"><FaSortAmountDown /></div>
+              <div className="sidebar-icon" title="Additional filters"><FaFilter /></div>
             </div>
-  
-            {/* 🔹 Checkbox Filters Row */}
-            <div className="sort-middle-row">
-              <div className="checkbox-stack">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    id="exclude-na"
-                    checked={excludeNA}
-                    onChange={(e) => setExcludeNA(e.target.checked)}
-                  />
-                  Exclude "N/A" Prices
-                </label>
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    id="only-on-sale"
-                    checked={onlyOnSale}
-                    onChange={(e) => setOnlyOnSale(e.target.checked)}
-                  />
-                  Only On Sale
-                </label>
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    id="exclude-low-owners"
-                    checked={excludeLowOwners}
-                    onChange={(e) => setExcludeLowOwners(e.target.checked)}
-                  />
-                  Only Games Owned By 2+ People
-                </label>
+          )}
+
+          {/* Expanded: icon + control rows */}
+          {sidebarOpen && (
+            <div className="sidebar-controls">
+              {/* Search */}
+              <div className="sidebar-row">
+                <FaSearch className="sidebar-row-icon" />
+                <input
+                  type="text"
+                  id="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search games..."
+                  className="sidebar-input"
+                />
               </div>
-            </div>
-  
-            {/* 🔹 Game Count */}
-            <div className="sort-bottom-row">
+
+              {/* Owners */}
+              <div className="sidebar-row">
+                <FaUserFriends className="sidebar-row-icon" />
+                <div className="sidebar-row-flex">
+                  <Select
+                    isMulti
+                    options={uniqueOwners}
+                    value={uniqueOwners.filter((owner) =>
+                      selectedOwners.includes(owner.value)
+                    )}
+                    onChange={(selectedOptions) => {
+                      setSelectedOwners(selectedOptions.map((option) => option.value));
+                    }}
+                    menuPortalTarget={portalTarget}
+                    styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                    className="sidebar-select"
+                  />
+                  <button className="mini-button" onClick={selectAllOwners}>
+                    Select All
+                  </button>
+                </div>
+              </div>
+
+              {/* Sort By */}
+              <div className="sidebar-row">
+                <FaTags className="sidebar-row-icon" />
+                <div className="sidebar-row-flex">
+                  <Select
+                    options={sortOptions}
+                    value={sortOptions.find(option => option.value === sortBy)}
+                    onChange={(selectedOption) => setSortBy(selectedOption.value)}
+                    menuPortalTarget={portalTarget}
+                    styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                    className="sidebar-select"
+                  />
+                  <button
+                    className="sort-direction-button"
+                    onClick={() =>
+                      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                    }
+                  >
+                    {sortDirection === 'asc' ? '↑ Asc' : '↓ Desc'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Categories */}
+              <div className="sidebar-row">
+                <FaSortAmountDown className="sidebar-row-icon" />
+                <Select
+                  isMulti
+                  options={uniqueCategories}
+                  value={uniqueCategories.filter((category) =>
+                    selectedCategories.includes(category.value)
+                  )}
+                  onChange={(selectedOptions) =>
+                    setSelectedCategories(selectedOptions.map((option) => option.value))
+                  }
+                  menuPortalTarget={portalTarget}
+                  styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                  className="sidebar-select"
+                />
+              </div>
+
+              {/* Filters */}
+              <div className="sidebar-row">
+                <FaFilter className="sidebar-row-icon" />
+                <div className="sidebar-checkboxes">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      id="exclude-na"
+                      checked={excludeNA}
+                      onChange={(e) => setExcludeNA(e.target.checked)}
+                    />
+                    Exclude "N/A" Prices
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      id="only-on-sale"
+                      checked={onlyOnSale}
+                      onChange={(e) => setOnlyOnSale(e.target.checked)}
+                    />
+                    Only On Sale
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      id="exclude-low-owners"
+                      checked={excludeLowOwners}
+                      onChange={(e) => setExcludeLowOwners(e.target.checked)}
+                    />
+                    Only Games Owned By 2+ People
+                  </label>
+                </div>
+              </div>
+
+              {/* Games Counter */}
               <div className="games-counter">
                 <span>
                   {filteredGames.length !== games.length
@@ -371,9 +365,10 @@ function GamesPage() {
                 </span>
               </div>
             </div>
-          </div>
-        </div>
+          )}
+        </aside>
 
+        {/* Games grid */}
         <div className="games-grid">
           {sortedGames.map((game, index) => (
             <Link
