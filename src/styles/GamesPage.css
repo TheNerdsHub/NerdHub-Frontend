@@ -39,22 +39,86 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center internal content */
+  align-items: center;
   box-sizing: border-box;
   margin-top: 15px;
 }
 
 .sort-container-inner {
   width: 100%;
-  max-width: 1200px; /* Limits content width */
+  max-width: 1200px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  align-items: stretch;
 }
 
 .sort-container label {
   font-weight: bold;
   color: #333;
+}
+
+.sort-container input,
+.sort-container select,
+.sort-container button,
+.sort-container-vertical input,
+.sort-container-vertical select,
+.sort-container-vertical button {
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: 0.3s;
+}
+
+.sort-container input:focus,
+.sort-container select:focus,
+.sort-container-vertical input:focus,
+.sort-container-vertical select:focus {
+  border-color: #5bc0de;
+}
+
+.sort-container button,
+.categories-filter button,
+.sort-container-vertical button,
+.sort-container-vertical .categories-filter button {
+  background-color: #5bc0de;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.sort-container button:hover,
+.categories-filter button:hover,
+.sort-container-vertical button:hover,
+.sort-container-vertical .categories-filter button:hover {
+  background-color: #31b0d5;
+}
+
+/* Mini buttons (Select All, Clear, etc.) */
+.mini-button,
+.sort-direction-button {
+  background-color: #5bc0de;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-button:hover,
+.sort-direction-button:hover {
+  background-color: #31b0d5;
 }
 
 .sort-container input,
@@ -85,11 +149,10 @@ body {
   background-color: #31b0d5;
 }
 
-/* Ensure consistent size for buttons */
 .sort-container button,
 .categories-filter button {
-  width: 100px; /* Set a fixed width */
-  height: 40px; /* Set a fixed height */
+  width: 100px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -121,6 +184,7 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
+  font-weight: bold;
 }
 
 .sort-grid {
@@ -128,7 +192,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   width: 100%;
-  justify-content: center; /* ✅ Center items horizontally */
+  justify-content: center;
 }
 
 .sort-top-row,
@@ -154,12 +218,55 @@ body {
 
 .sort-inline {
   display: flex;
-  align-items: center; /* Keep everything same height */
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 10px;
+  width: 100%;
 }
 
-.sort-inline > * {
+.flex-fill,
+.same-height-select {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 1px;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+.mini-button {
+  min-width: 90px;
   height: 40px;
+  align-self: flex-start;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .sort-inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mini-button {
+    margin-left: 0;
+    margin-top: 8px;
+    width: 100%;
+  }
+}
+
+.sort-inline.vertical {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flex-fill,
+.same-height-select {
+  flex: 1 1 0;
+  min-width: 200px;
+  width: 1px;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
 }
 
 .sort-inline select {
@@ -170,7 +277,6 @@ body {
   flex: 1;
 }
 
-/* Fix alignment and sizing */
 .same-height-select select,
 .same-height-select .css-13cymwt-control,
 .same-height-select .css-t3ipsp-control {
@@ -181,14 +287,14 @@ body {
   align-items: center;
 }
 
-/* Adjust the height of the dropdown to grow with selected options */
-.same-height-select .css-13cymwt-control {
-  min-height: auto !important; /* Allow height to adjust dynamically */
-  height: auto !important;
-  display: flex;
-  flex-wrap: wrap; /* Enable wrapping for selected options */
-  align-items: flex-start;
+.same-height-select .css-13cymwt-control,
+.same-height-select .css-t3ipsp-control {
+  min-height: 40px !important;
+  height: auto !important; /* Allow height to grow */
   box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .same-width-select,
@@ -228,7 +334,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  justify-content: center; /* ✅ Centered like the top row */
+  justify-content: center;
 }
 
 .owners-filter-group {
@@ -344,7 +450,6 @@ body {
   background-color: #5bc0de !important;
 }
 
-/* Media queries for filter responsiveness */
 @media (max-width: 900px) {
   .owners-filter,
   .categories-filter {
@@ -352,7 +457,6 @@ body {
   }
 }
 
-/* Filter header styling */
 .filter-header {
   display: flex;
   justify-content: space-between;
@@ -381,7 +485,6 @@ body {
   background-color: #e0e0e0;
 }
 
-/* Games Grid */
 .games-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -392,7 +495,6 @@ body {
   z-index: 1;
 }
 
-/* Each Game Block */
 .game-block {
   position: relative;
   display: flex;
@@ -413,13 +515,11 @@ body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
 }
 
-/* Game Image */
 .game-block img {
   width: 100%;
   object-fit: cover;
 }
 
-/* Game Info Section */
 .game-info {
   display: flex;
   justify-content: space-between;
@@ -428,7 +528,6 @@ body {
   gap: 10px;
 }
 
-/* Game Title */
 .game-title {
   font-size: 1rem;
   font-weight: bold;
@@ -440,7 +539,6 @@ body {
   white-space: nowrap;
 }
 
-/* Game Price */
 .game-price {
   font-size: 0.9rem;
   text-align: center;
@@ -452,26 +550,22 @@ body {
   white-space: nowrap;
 }
 
-/* Special styling for Free games */
 .game-price::after {
   content: attr(data-price);
 }
 
-/* Discounted Price */
 .discounted-price {
   color: #66c0f4;
   margin-right: 8px;
   font-weight: bold;
 }
 
-/* Original Price */
 .original-price {
   text-decoration: line-through;
   color: #888;
   margin-right: 8px;
 }
 
-/* Discount Percent */
 .discount-percent {
   background-color: #4c6b22;
   color: #a4d007;
@@ -480,7 +574,6 @@ body {
   font-size: 0.9em;
 }
 
-/* Loading Message */
 .loading {
   font-size: 1.5rem;
   text-align: center;
@@ -506,7 +599,6 @@ body {
   letter-spacing: 1px;
 }
 
-/* Games counter styling */
 .games-counter {
   background-color: #4caf50;
   color: white;
@@ -532,7 +624,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Shared base styles for both layers */
 .background-dots {
   position: absolute;
   top: 0;
@@ -568,7 +659,69 @@ body {
 .main-content {
   flex: 1 0 auto;
   display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 32px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  box-sizing: border-box;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+@media (max-width: 1100px) {
+  .main-content {
+    flex-direction: column;
+    gap: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+.sort-container-vertical {
+  width: 340px;
+  min-width: 260px;
+  max-width: 400px;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  margin-top: 15px;
+  margin-left: 0;
+  display: flex;
   flex-direction: column;
+  align-items: stretch;
+  position: sticky;
+  top: 24px;
+  z-index: 2;
+}
+
+.games-grid {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+  padding: 20px 0;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 1100px) {
+  .sort-container-vertical {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    position: static;
+    top: unset;
+    margin-bottom: 10px;
+    margin-left: 0;
+  }
+  .games-grid {
+    padding: 10px 0;
+  }
 }
 
 @keyframes cardFadeIn {
@@ -647,24 +800,21 @@ body {
   }
 }
 
-/* Add a shared class for consistent width */
 .same-width-dropdown {
   width: 100%;
   min-width: 100%;
 }
 
-/* Apply the class to both dropdowns */
 .sort-container select,
 .categories-filter select {
-  width: 250px; /* Set a fixed width */
-  min-width: 250px; /* Ensure minimum width */
+  width: 250px;
+  min-width: 250px;
 }
 
-/* Update button styling to match the blue color */
 .sort-container button,
 .categories-filter button,
 .owners-filter-group .button-row button {
-  background-color: #5bc0de; /* Blue color */
+  background-color: #5bc0de;
   color: white;
   border: none;
   border-radius: 6px;
@@ -678,5 +828,73 @@ body {
 .sort-container button:hover,
 .categories-filter button:hover,
 .owners-filter-group .button-row button:hover {
-  background-color: #31b0d5; /* Slightly darker blue on hover */
+  background-color: #31b0d5;
+}
+
+.sort-container-vertical {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.sort-toggle-btn {
+  background: #5bc0de;
+  color: #fff;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.2s;
+  width: 100%;
+  justify-content: center;
+}
+
+.sort-toggle-btn:hover {
+  background: #31b0d5;
+}
+
+.sort-container-vertical .sort-container-inner {
+  background: #ffffffcc;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  transition: max-height 0.3s, opacity 0.3s;
+}
+
+.sort-container-vertical:not(.open) .sort-container-inner {
+  display: none;
+}
+
+.dual-column-stack {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 20px;
+}
+
+.column-stack {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .sort-container-vertical .sort-container-inner {
+    padding: 20px 5px;
+  }
 }

@@ -265,7 +265,6 @@ function GamesPage() {
                           setSelectedOwners(selectedOptions.map((option) => option.value));
                         }}
                         onMenuOpen={() => {
-                          // Trigger a layout recalculation when the menu opens
                           const dropdownElement = document.querySelector('.owners-filter .css-13cymwt-control');
                           if (dropdownElement) {
                             dropdownElement.style.height = 'auto';
@@ -324,7 +323,6 @@ function GamesPage() {
                         styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                       />
                     </div>
-                    {/* Removed Clear button for categories */}
                   </div>
                 </div>
               </div>
