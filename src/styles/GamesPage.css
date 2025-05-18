@@ -60,8 +60,9 @@ body {
   margin-right: 0;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  padding: 0; 
-  position: relative;
+  padding: 0;
+  margin-top: 48px;
+  position: fixed;
   overflow: visible; 
 }
 
@@ -255,6 +256,7 @@ body {
   grid-template-columns: repeat(6, 1fr);
   gap: 20px;
   padding: 20px 0;
+  padding-left: 20px;
   width: 100%;
   position: relative;
   z-index: 1;
@@ -420,6 +422,49 @@ body {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+@media (min-width: 1101px) {
+  .sidebar-toggle-btn-mobile {
+    display: none; 
+  }
+
+  .sidebar-toggle-btn-desktop {
+    display: block; 
+  }
+
+  .sidebar-toggle-btn {
+    position: absolute;
+    right: -15px; 
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #5bc0de;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s, transform 0.2s;
+  }
+
+  .sidebar-toggle-btn:hover {
+    background: #31b0d5;
+    transform: translateY(-50%) scale(1.1);
+  }
+  
+  .games-grid {
+    margin-left: 340px;
+    transition: margin-left 0.3s;
+  }
+  .games-sidebar.collapsed ~ .games-grid,
+  .games-sidebar.collapsed + .games-grid {
+    margin-left: 60px;
+  }
+}
 @media (max-width: 1100px) {
   .main-content {
     flex-direction: column;
@@ -430,25 +475,18 @@ body {
   }
   .games-sidebar,
   .games-sidebar.collapsed {
-    width: 100%;
+    width: calc(100% - 20px);
     min-width: 0;
     max-width: none;
-    position: static;
+    margin-top: unset;
     top: unset;
+    left: unset;
     margin-bottom: 10px;
     border-radius: 12px;
-  }
-  .games-sidebar {
-    transition: transform 0.3s ease-in-out; 
-    transform-origin: top; 
-    position: fixed; 
-    top: 0;
-    left: 0;
-    width: 100%;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.95);
-    overflow-y: auto; 
-    overflow: visible; 
+    background: rgba(255,255,255,0.95);
+    overflow-y: auto;
+    overflow: visible;
   }
 
   .games-sidebar.open {
@@ -515,51 +553,20 @@ body {
   .sidebar-toggle-btn-mobile svg {
     font-size: 20px; 
   }
-}
-@media (min-width: 1101px) {
-  .sidebar-toggle-btn-mobile {
-    display: none; 
-  }
-
-  .sidebar-toggle-btn-desktop {
-    display: block; 
-  }
-
-  .sidebar-toggle-btn {
-    position: absolute;
-    right: -15px; 
-    top: 50%;
-    transform: translateY(-50%);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: #5bc0de;
-    border: none;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.2s, transform 0.2s;
-  }
-
-  .sidebar-toggle-btn:hover {
-    background: #31b0d5;
-    transform: translateY(-50%) scale(1.1);
+  .games-grid {
+    margin-left: 0;
+    padding-left: 0;
+    margin-top: 80px;
   }
 }
 @media (max-width: 900px) {
+  .games-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 10px 0;
+  }
   .games-sidebar,
   .games-sidebar.collapsed {
-    width: 100%;
-    min-width: 0;
-    max-width: none;
-    position: static;
-    top: unset;
-    margin-bottom: 10px;
-    border-radius: 12px;
+    margin-bottom: 20px;
   }
   .sidebar-icons-vertical {
     flex-direction: row;
@@ -567,22 +574,14 @@ body {
     gap: 18px;
     padding: 10px 0;
   }
-  .games-grid {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 10px 0;
-  }
-  .sidebar-toggle-btn {
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-  }
-  .sidebar-toggle-btn:hover {
-    transform: translateY(-50%) scale(1.1);
-  }
 }
 @media (max-width: 600px) {
   .games-grid {
     grid-template-columns: repeat(1, 1fr);
+  }
+  .games-sidebar,
+  .games-sidebar.collapsed {
+    margin-top: unset;
   }
   .sidebar-toggle-btn {
     width: 26px;
