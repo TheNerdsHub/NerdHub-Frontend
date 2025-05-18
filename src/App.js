@@ -35,58 +35,51 @@ function App() {
 
   return (
     <Router>
-      <NavigationBar keycloak={keycloak} isAuthenticated={isAuthenticated} />
-      <div className="content">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/games" element={<GamesPage />} />
-          <Route path="/games/:appid" element={<GameDetailsPage />} />
-          <Route
-            path="/quotes"
-            element={
-              isAuthenticated ? (
-                <QuotePage />
-              ) : (
-                <div>Please sign in to view the quotes page.</div>
-              )
-            }
-          />
-          <Route
-            path="/timeline"
-            element={
-              isAuthenticated ? (
-                <TimelinePage />
-              ) : (
-                <div>Please sign in to view the timeline page.</div>
-              )
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              isAuthenticated ? (
-                <Profile keycloak={keycloak} />
-              ) : (
-                <div>Please sign in to view your profile.</div>
-              )
-            }
-          />
-          <Route
-            path="/admin"
-            element={<AdminPage />}/*{
-              isAuthenticated ? (
-                <AdminPage />
-              ) : (
-                <div>Please sign in to access the admin page.</div>
-              )
-            }*/
-          />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+      <div className="page-container">
+        <NavigationBar keycloak={keycloak} isAuthenticated={isAuthenticated} />
+        <main className="content-wrap">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/games" element={<GamesPage />} />
+            <Route path="/games/:appid" element={<GameDetailsPage />} />
+            <Route
+              path="/quotes"
+              element={
+                isAuthenticated ? (
+                  <QuotePage />
+                ) : (
+                  <div>Please sign in to view the quotes page.</div>
+                )
+              }
+            />
+            <Route
+              path="/timeline"
+              element={
+                isAuthenticated ? (
+                  <TimelinePage />
+                ) : (
+                  <div>Please sign in to view the timeline page.</div>
+                )
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                isAuthenticated ? (
+                  <Profile keycloak={keycloak} />
+                ) : (
+                  <div>Please sign in to view your profile.</div>
+                )
+              }
+            />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
+        <ScrollToTop />
+        <Footer />
       </div>
-      <ScrollToTop />
-      <Footer />
     </Router>
   );
 }

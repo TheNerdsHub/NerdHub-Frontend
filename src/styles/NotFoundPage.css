@@ -1,78 +1,108 @@
+/* === Ensure the 404 page content fills the viewport minus header/footer === */
 .centered-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 70vh;
+  min-height: calc(100vh - 120px); /* subtract header + footer height */
+  width: 100%;
   text-align: center;
-}
-
-.cute-ghost {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 24px;
   position: relative;
-  animation: float 2.5s ease-in-out infinite;
+  padding: 20px;
+  overflow: hidden; /* hide overflowing slice to prevent scroll */
+  z-index: 1;
 }
 
-.cute-ghost-body {
-  width: 100%;
-  height: 80%;
-  background: #fff;
-  border-radius: 60% 60% 40% 40% / 50% 50% 60% 60%;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+/* === Sliced Logo Wrapper === */
+.logo-slice-container {
+  position: relative; /* establishes positioning context */
+  width: 300px;
+  margin-bottom: 24px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* === Logo Slices: absolutely overlap === */
+.logo-slice {
   position: absolute;
-  bottom: 0;
-  left: 0;
-}
-
-.cute-ghost-face {
-  position: absolute;
-  top: 38%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 60px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.cute-ghost-eye {
-  width: 12px;
-  height: 12px;
-  background: #222;
-  border-radius: 50%;
-}
-
-.cute-ghost-mouth {
-  width: 18px;
-  height: 8px;
-  border-radius: 0 0 18px 18px;
-  border-bottom: 3px solid #222;
-  margin: 0 auto;
-  margin-top: 8px;
-}
-
-.cute-ghost-bottom {
-  position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   width: 100%;
-  height: 24px;
-  display: flex;
-  justify-content: space-between;
 }
 
-.cute-ghost-bottom span {
+.logo-slice img {
+  width: 100%;
   display: block;
-  width: 18px;
-  height: 18px;
-  background: #fff;
-  border-radius: 50%;
-  margin: 0 2px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0);}
-  50% { transform: translateY(-24px);}
+/* — TOP HALF (will slice then slide off and rotate smoothly) — */
+.top-slice {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  z-index: 4;
+}
+
+/* — BOTTOM HALF (static) — */
+.bottom-slice {
+  clip-path: polygon(100% 100%, 0 100%, 100% 0);
+  position: relative;
+  z-index: 2;
+}
+
+/* === Knife Slash: drawn then wiped from top to bottom === */
+.knife-slash {
+  position: absolute;
+  top: -5px;
+  right: 0;
+  width: 425px; /* diagonal length */
+  height: 4px;
+  background: white;
+  box-shadow: 0 0 10px 4px rgba(255,255,255,0.7);
+  transform-origin: top right; /* wipe starts from top end */
+  transform: rotate(-45deg) scaleX(0);
+  z-index: 5;
+}
+
+/* === Trigger animations with .animate === */
+.logo-slice-container.animate .knife-slash {
+  animation: drawSlash 1s ease-in-out forwards;
+}
+.logo-slice-container.animate .top-slice {
+  animation: slideOffDiagonal 2s ease-in-out 0.4s forwards;
+}
+
+/* === drawSlash: draw then wipe from top along diagonal === */
+@keyframes drawSlash {
+  0% {
+    transform: rotate(-45deg) scaleX(0);
+  }
+  20% {
+    transform: rotate(-45deg) scaleX(1);
+  }
+  80% {
+    transform: rotate(-45deg) scaleX(1);
+  }
+  100% {
+    transform: rotate(-45deg) scaleX(0);
+  }
+}
+
+/* === slideOffDiagonal: smooth slide and rotation simultaneously === */
+@keyframes slideOffDiagonal {
+  from {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  to {
+    transform: translate(-490px, 490px) rotate(45deg);
+  }
+}
+
+/* === Responsive tweak === */
+@media (max-width: 480px) {
+  .logo-slice-container {
+    width: 200px;
+    margin-bottom: 16px;
+  }
+  .centered-container {
+    min-height: calc(100vh - 140px); /* adjust if nav/footer taller on mobile */
+  }
 }
