@@ -5,8 +5,10 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
 import 'styles/NavigationBar.css';
+import { useAuth } from 'contexts/AuthContext';
 
-function NavigationBar({ keycloak, isAuthenticated }) {
+function NavigationBar() {
+  const { isAuthenticated, user, login, logout } = useAuth();
   return (
     <Navbar expand="lg" style={{ backgroundColor: "#0797ff" }}>
       <Container>
@@ -44,20 +46,20 @@ function NavigationBar({ keycloak, isAuthenticated }) {
                 title={
                   <span>
                     <img
-                      src={`https://www.gravatar.com/avatar/${keycloak.tokenParsed?.emailHash}?d=identicon`}
+                      src={user?.avatar || `https://www.gravatar.com/avatar/?d=identicon`}
                       alt="Profile"
                       style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }}
                     />
-                    {keycloak.tokenParsed?.preferred_username}
+                    {user?.username || 'User'}
                   </span>
                 }
                 id="user-nav-dropdown"
               >
                 <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
-                <NavDropdown.Item onClick={() => keycloak.logout()}>Sign Out</NavDropdown.Item>
+                <NavDropdown.Item onClick={logout}>Sign Out</NavDropdown.Item>
               </NavDropdown>
             ) : (
-              <Button variant="outline-light" className="text-shadow" onClick={() => keycloak.login()}>
+              <Button variant="outline-light" className="text-shadow" onClick={login}>
                 Sign In
               </Button>
             )}

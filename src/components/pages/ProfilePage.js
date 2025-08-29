@@ -1,20 +1,22 @@
 import React from 'react';
 import useDocumentTitle from 'hooks/useDocumentTitle';
+import { useAuth } from 'contexts/AuthContext';
 
-const Profile = ({ keycloak }) => {
-  useDocumentTitle('Profile'); // Updated hook usage
+const Profile = () => {
+  useDocumentTitle('Profile');
+  const { isAuthenticated, user } = useAuth();
 
-  if (!keycloak.authenticated) {
+  if (!isAuthenticated) {
     return <div>Loading...</div>;
   }
 
   return (
     <div>
       <h1>Profile</h1>
-      <p><strong>Username:</strong> {keycloak.tokenParsed?.preferred_username}</p>
-      <p><strong>Email:</strong> {keycloak.tokenParsed?.email}</p>
-      <p><strong>First Name:</strong> {keycloak.tokenParsed?.given_name}</p>
-      <p><strong>Last Name:</strong> {keycloak.tokenParsed?.family_name}</p>
+      <p><strong>Username:</strong> {user?.username || 'N/A'}</p>
+      <p><strong>Email:</strong> {user?.email || 'N/A'}</p>
+      <p><strong>First Name:</strong> {user?.firstName || 'N/A'}</p>
+      <p><strong>Last Name:</strong> {user?.lastName || 'N/A'}</p>
     </div>
   );
 };
