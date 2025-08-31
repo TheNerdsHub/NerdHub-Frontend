@@ -1,0 +1,176 @@
+/* Quote Page Styles */
+.quote-text {
+  font-style: italic;
+  width: 400px;
+  max-width: 400px;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+/* Table column width consistency */
+.quoted-persons-cell {
+  width: 200px;
+  max-width: 200px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.submitter-cell {
+  width: 150px;
+  max-width: 150px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.date-cell {
+  width: 140px;
+  max-width: 140px;
+  white-space: nowrap;
+}
+
+.actions-cell {
+  width: 100px;
+  max-width: 100px;
+  text-align: right;
+}
+
+.spacer-cell {
+  width: 5px;
+  max-width: 5px;
+  background: transparent !important;
+}
+
+/* Full-width layout for kanban view */
+.quotes-page-fullwidth {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 0;
+}
+
+.kanban-header {
+  padding: 1rem 0;
+}
+
+.table-header {
+  padding: 1rem 0;
+}
+
+/* Quotes Counter - matching games page green */
+.quotes-counter {
+  background-color: #4caf50 !important;
+  color: white !important;
+  border-color: #4caf50 !important;
+}
+
+/* Sort Direction Button - matching games page styling */
+.sort-direction-button {
+  background-color: #5bc0de;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 36px;
+  box-shadow: 0 1px 2px rgba(91,192,222,0.08);
+}
+
+.sort-direction-button:hover {
+  background-color: #31b0d5;
+}
+
+/* Horizontal Kanban Layout */
+.kanban-container {
+  width: 100%;
+  height: calc(100vh - 300px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1rem;
+}
+
+.kanban-board {
+  display: flex;
+  gap: 1rem;
+  height: 100%;
+  padding: 0;
+  min-width: min-content;
+}
+
+.kanban-column {
+  flex: 0 0 320px;
+  min-width: 320px;
+  height: 100%;
+}
+
+.kanban-column-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.kanban-column-header {
+  flex-shrink: 0;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  padding: 1rem;
+}
+
+.kanban-column-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  background-color: #fafafa;
+}
+
+/* Responsive adjustments for different screen sizes */
+@media (max-width: 1200px) {
+  .kanban-column {
+    flex: 0 0 280px;
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .kanban-column {
+    flex: 0 0 250px;
+    min-width: 250px;
+  }
+  
+  .kanban-container {
+    padding: 0.5rem;
+  }
+}
+
+/* Legacy vertical kanban styles (kept for compatibility) */
+.quote-kanban-body {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.quote-card {
+  transition: transform 0.2s;
+  background: white;
+  border: 1px solid #dee2e6;
+}
+
+.quote-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.quote-content blockquote {
+  border-left: 4px solid #0d6efd;
+  padding-left: 1rem;
+  margin-left: 0;
+}
+
+.quote-meta {
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}

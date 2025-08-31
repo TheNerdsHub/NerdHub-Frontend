@@ -21,9 +21,8 @@ function NavigationBar() {
             <Nav.Link href="/games" className="navbar-link-white text-shadow">Games</Nav.Link>
             <Nav.Link href="/timeline" className="navbar-link-white text-shadow">Timeline</Nav.Link>
             <NavDropdown title="Quotes" id="basic-nav-dropdown" className="navbar-link-white">
-              <NavDropdown.Item href="/quotes">Table View</NavDropdown.Item>
-              <NavDropdown.Item href="/quotes">List View</NavDropdown.Item>
-              <NavDropdown.Item href="/quotes">KanBan View</NavDropdown.Item>
+              <NavDropdown.Item href="/quotes?view=table">Table View</NavDropdown.Item>
+              <NavDropdown.Item href="/quotes?view=kanban">Kanban View</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="https://trello.com/b/QZ49oGxK/quotes" target="_blank">
                 Legacy Trello
