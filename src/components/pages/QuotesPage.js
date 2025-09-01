@@ -17,7 +17,7 @@ function QuotesPage() {
     const urlView = searchParams.get('view');
     return urlView === 'kanban' || urlView === 'table' ? urlView : 'table';
   });
-  const [groupBy, setGroupBy] = useState('quotedPersons'); // 'quotedPersons' or 'submitter'
+  const [groupBy, setGroupBy] = useState('quotedPersons'); // 'quotedPersons', 'submitter', or 'channel'
   const [sortBy, setSortBy] = useState('timestamp'); // 'timestamp', 'submitter', 'quotedPersons'
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
 
@@ -34,6 +34,19 @@ function QuotesPage() {
       hour12: true
     };
     return date.toLocaleString('en-US', options);
+  };
+
+  // Format quote text to handle multiline quotes properly
+  const formatQuoteText = (quoteText) => {
+    // Check if it's a multiline quote (contains person attributions)
+    if (quoteText.includes(':\n') || quoteText.includes(': "')) {
+      return quoteText.split('\n').map((line, index) => (
+        <div key={index} className="quote-line">
+          {line}
+        </div>
+      ));
+    }
+    return `"${quoteText}"`;
   };
 
   useEffect(() => {
@@ -105,6 +118,8 @@ function QuotesPage() {
       let keys = [];
       if (groupBy === 'quotedPersons') {
         keys = quote.quotedPersons;
+      } else if (groupBy === 'channel') {
+        keys = [quote.channelName || 'Unknown Channel'];
       } else {
         keys = [quote.submitter];
       }
@@ -132,7 +147,7 @@ function QuotesPage() {
           <Card key={group} className="mb-4">
             <Card.Header>
               <h5 className="mb-0">
-                {groupBy === 'quotedPersons' ? '🗣️ ' : '📝 '}
+                {groupBy === 'quotedPersons' ? '🗣️ ' : groupBy === 'channel' ? '#️⃣ ' : '📝 '}
                 {group} ({groupQuotes.length} quotes)
               </h5>
             </Card.Header>
@@ -143,6 +158,7 @@ function QuotesPage() {
                     <th className="quote-text">Quote</th>
                     <th className="quoted-persons-cell">Quoted Person(s)</th>
                     <th className="submitter-cell">Submitted By</th>
+                    <th className="channel-cell">Channel</th>
                     <th className="date-cell">Date</th>
                     <th className="actions-cell">Actions</th>
                     <th className="spacer-cell"></th>
@@ -151,7 +167,7 @@ function QuotesPage() {
                 <tbody>
                   {groupQuotes.map((quote) => (
                     <tr key={quote.id}>
-                      <td className="quote-text">"{quote.quoteText}"</td>
+                      <td className="quote-text">{formatQuoteText(quote.quoteText)}</td>
                       <td className="quoted-persons-cell">
                         {quote.quotedPersons.map((person, index) => (
                           <Badge key={index} bg="secondary" className="me-1">
@@ -160,6 +176,9 @@ function QuotesPage() {
                         ))}
                       </td>
                       <td className="submitter-cell">{quote.submitter}</td>
+                      <td className="channel-cell">
+                        <Badge bg="info">#{quote.channelName || 'unknown'}</Badge>
+                      </td>
                       <td className="date-cell">{formatDateTime(quote.timestamp)}</td>
                       <td className="actions-cell">
                         <Button
@@ -193,7 +212,7 @@ function QuotesPage() {
               <Card className="kanban-column-card">
                 <Card.Header className="kanban-column-header">
                   <h6 className="mb-0">
-                    {groupBy === 'quotedPersons' ? '🗣️ ' : '📝 '}
+                    {groupBy === 'quotedPersons' ? '🗣️ ' : groupBy === 'channel' ? '#️⃣ ' : '📝 '}
                     {group}
                     <Badge bg="primary" className="ms-2">{groupQuotes.length}</Badge>
                   </h6>
@@ -204,7 +223,7 @@ function QuotesPage() {
                       <Card.Body className="py-2">
                         <div className="quote-content">
                           <blockquote className="blockquote mb-2">
-                            <p className="mb-1">"{quote.quoteText}"</p>
+                            <div className="mb-1">{formatQuoteText(quote.quoteText)}</div>
                           </blockquote>
                           <div className="quote-meta small text-muted">
                             <div>
@@ -212,6 +231,9 @@ function QuotesPage() {
                             </div>
                             <div>
                               <strong>By:</strong> {quote.submitter}
+                            </div>
+                            <div>
+                              <strong>Channel:</strong> #{quote.channelName || 'unknown'}
                             </div>
                             <div>
                               <strong>Date:</strong> {formatDateTime(quote.timestamp)}
@@ -292,6 +314,7 @@ function QuotesPage() {
                 >
                   <option value="quotedPersons">Quoted Person(s)</option>
                   <option value="submitter">Submitter</option>
+                  <option value="channel">Channel</option>
                 </Form.Select>
               </Form.Group>
             </Col>

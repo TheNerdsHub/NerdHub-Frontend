@@ -23,6 +23,10 @@ const quoteService = {
     }
     return response.ok;
   },
+
+  getQuoteCategories: async () => {
+    return await api.get('/api/QuoteCategories');
+  },
 };
 
 export default quoteService;

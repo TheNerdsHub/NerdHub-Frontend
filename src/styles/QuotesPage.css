@@ -9,6 +9,26 @@
   overflow-wrap: break-word;
 }
 
+/* Multiline quote formatting */
+.quote-line {
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.quote-line:last-child {
+  margin-bottom: 0;
+}
+
+/* Better formatting for multiline quotes in table view */
+.quote-text .quote-line {
+  font-style: italic;
+}
+
+/* Better formatting for multiline quotes in kanban view */
+.quote-content .quote-line {
+  font-style: italic;
+}
+
 /* Table column width consistency */
 .quoted-persons-cell {
   width: 200px;
@@ -20,6 +40,13 @@
 .submitter-cell {
   width: 150px;
   max-width: 150px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.channel-cell {
+  width: 120px;
+  max-width: 120px;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
