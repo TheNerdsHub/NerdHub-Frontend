@@ -19,21 +19,27 @@ function NavigationBar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link href="/games" className="navbar-link-white text-shadow">Games</Nav.Link>
-            <Nav.Link href="/timeline" className="navbar-link-white text-shadow">Timeline</Nav.Link>
-            <NavDropdown title="Quotes" id="basic-nav-dropdown" className="navbar-link-white">
-              <NavDropdown.Item href="/quotes?view=table">Table View</NavDropdown.Item>
-              <NavDropdown.Item href="/quotes?view=kanban">Kanban View</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="https://trello.com/b/QZ49oGxK/quotes" target="_blank">
-                Legacy Trello
-              </NavDropdown.Item>
-            </NavDropdown>
-            <NavDropdown title="Nerds Tools" id="basic-nav-dropdown" className="navbar-link-white">
-              <NavDropdown.Item href="URLTOCALENDAR">TheNerds Calendar</NavDropdown.Item>
-              <NavDropdown.Item href="URLTOFILESHARE">File Sharing</NavDropdown.Item>
-              <NavDropdown.Item href="URLTOKB">Knowledge Base</NavDropdown.Item>
-              <NavDropdown.Item href="URLTOBRACKETMAKER">Bracket Maker</NavDropdown.Item>
-            </NavDropdown>
+            {isAuthenticated && (
+              <Nav.Link href="/timeline" className="navbar-link-white text-shadow">Timeline</Nav.Link>
+            )}
+            {isAuthenticated && (
+              <NavDropdown title="Quotes" id="basic-nav-dropdown" className="navbar-link-white">
+                <NavDropdown.Item href="/quotes?view=table">Table View</NavDropdown.Item>
+                <NavDropdown.Item href="/quotes?view=kanban">Kanban View</NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item href="https://trello.com/b/QZ49oGxK/quotes" target="_blank">
+                  Legacy Trello
+                </NavDropdown.Item>
+              </NavDropdown>
+            )}
+            {isAuthenticated && (
+              <NavDropdown title="Nerds Tools" id="basic-nav-dropdown" className="navbar-link-white">
+                <NavDropdown.Item href="URLTOCALENDAR">TheNerds Calendar</NavDropdown.Item>
+                <NavDropdown.Item href="URLTOFILESHARE">File Sharing</NavDropdown.Item>
+                <NavDropdown.Item href="URLTOKB">Knowledge Base</NavDropdown.Item>
+                <NavDropdown.Item href="URLTOBRACKETMAKER">Bracket Maker</NavDropdown.Item>
+              </NavDropdown>
+            )}
             <Nav.Link href="/about" className="navbar-link-white text-shadow">About</Nav.Link>
             {isAuthenticated && (
               <Nav.Link href="/admin" className="navbar-link-white text-shadow">Admin</Nav.Link>

@@ -24,7 +24,16 @@ function AppRoutes() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/games" element={<GamesPage />} />
       <Route path="/games/:appid" element={<GameDetailsPage />} />
-      <Route path="/quotes" element={<QuotePage />} />
+      <Route
+        path="/quotes"
+        element={
+          isAuthenticated ? (
+            <QuotePage />
+          ) : (
+            <div>Please sign in to view the quotes page.</div>
+          )
+        }
+      />
       <Route
         path="/timeline"
         element={
