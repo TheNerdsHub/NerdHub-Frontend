@@ -317,6 +317,48 @@
   padding-bottom: 5px;
 }
 
+/* Playtime header with sorting controls */
+.playtime-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-controls label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9em;
+}
+
+.sort-select {
+  padding: 6px 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.sort-select:hover {
+  border-color: #0999f9;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: #0999f9;
+  box-shadow: 0 0 0 2px rgba(9, 153, 249, 0.1);
+}
+
 .playtime-platforms {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -399,6 +441,7 @@
   padding: 20px;
   border: 1px solid #e9ecef;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .user-playtime:hover {
@@ -406,6 +449,55 @@
   border-color: #0999f9;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(9, 153, 249, 0.15);
+}
+
+/* Hover tooltip */
+.user-hover-tooltip {
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  background: #333;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.85em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 200px;
+  opacity: 0;
+  animation: fadeInTooltip 0.2s ease forwards;
+}
+
+.user-hover-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-right: 6px solid #333;
+}
+
+.user-hover-tooltip div {
+  margin: 4px 0;
+  white-space: nowrap;
+}
+
+.user-hover-tooltip strong {
+  color: #0999f9;
+}
+
+@keyframes fadeInTooltip {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .user-playtime-header {
@@ -495,6 +587,29 @@
   
   .total-playtime-summary {
     padding: 12px;
+  }
+  
+  .playtime-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .sort-controls {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+  
+  .sort-select {
+    flex: 1;
+    max-width: 150px;
+  }
+  
+  .user-hover-tooltip {
+    right: 5px;
+    left: 5px;
+    min-width: auto;
+    max-width: none;
   }
   
   .playtime-item {

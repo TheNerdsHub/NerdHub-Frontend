@@ -16,6 +16,8 @@ function GameDetailsPage() {
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, userId: null });
   const [updateCount, setUpdateCount] = useState(0);
   const [expandedUsers, setExpandedUsers] = useState(new Set());
+  const [sortBy, setSortBy] = useState('playtime'); // 'playtime' or 'name'
+  const [hoveredUser, setHoveredUser] = useState(null);
   
   useDocumentTitle(gameDetails ? `${gameDetails.name}` : 'Game Details');
 
@@ -114,14 +116,20 @@ function GameDetailsPage() {
     }
   };
 
-  const handleContextMenu = (e, userId) => {
-    e.preventDefault();
-    setContextMenu({
-      visible: true,
-      x: e.clientX,
-      y: e.clientY,
-      userId: userId,
-      displayName: usernames[userId]?.nickname || usernames[userId]?.username || "Unknown User",
+  // Sort users based on current sort option
+  const sortUsers = (playtimeByUser) => {
+    const userEntries = Object.entries(playtimeByUser);
+    
+    return userEntries.sort(([steamIdA, userDataA], [steamIdB, userDataB]) => {
+      if (sortBy === 'playtime') {
+        // Sort by playtime (descending)
+        return userDataB.playtime_forever - userDataA.playtime_forever;
+      } else {
+        // Sort by name (ascending)
+        const nameA = usernames[steamIdA]?.nickname || usernames[steamIdA]?.username || `User ${steamIdA}`;
+        const nameB = usernames[steamIdB]?.nickname || usernames[steamIdB]?.username || `User ${steamIdB}`;
+        return nameA.localeCompare(nameB);
+      }
     });
   };
 
@@ -315,71 +323,6 @@ function GameDetailsPage() {
             )}
           </div>
 
-          {/* Owned By */}
-          <div className="game-details-info-block">
-            <h2>Owned By</h2>
-            
-            {/* Steam Users */}
-            {gameDetails.ownedBy?.steamId?.length > 0 ? (
-              <>
-                <p>
-                  <strong>Steam Users ({gameDetails.ownedBy.steamId.length}):</strong>
-                </p>
-                <ul className="owners-list">
-                  {gameDetails.ownedBy.steamId
-                    .map(id => ({
-                      id,
-                      displayName: usernames[id]?.nickname || usernames[id]?.username || "Unknown User",
-                      username: usernames[id]?.username || "Unknown",
-                      nickname: usernames[id]?.nickname || ""
-                    }))
-                    .sort((a, b) => a.displayName.localeCompare(b.displayName)) // Sort alphabetically by display name
-                    .map((user, index) => (
-                      <li 
-                        key={index} 
-                        className="owner-item"
-                        onClick={() => handleOpenGamesSearch(user.id)}
-                        onContextMenu={(e) => handleContextMenu(e, user.id)}
-                        data-tooltip-id={`user-tooltip-${user.id}`}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        {user.displayName}
-                        <div className="user-tooltip" id={`user-tooltip-${user.id}`}>
-                          {user.nickname && <div className="tooltip-row"><span>Nickname:</span> {user.nickname}</div>}
-                          <div className="tooltip-row"><span>Username:</span> {user.username}</div>
-                          <div className="tooltip-row"><span>SteamID:</span> {user.id}</div>
-                        </div>
-                      </li>
-                    ))}
-                </ul>
-              </>
-            ) : (
-              <p>No Steam users</p>
-            )}
-
-            {/* Epic Users */}
-            {gameDetails.ownedBy?.epicId?.length > 0 && (
-              <>
-                <p>
-                  <strong>Epic Users ({gameDetails.ownedBy.epicId.length}):</strong>
-                </p>
-                <ul className="owners-list">
-                  {gameDetails.ownedBy.epicId.map((id, index) => (
-                    <li key={index} className="owner-item">{id}</li>
-                  ))}
-                </ul>
-              </>
-            )}
-            
-            {/* Total Count */}
-            <p className="total-owners">
-              <strong>Total Owners:</strong> {
-                (gameDetails.ownedBy?.steamId?.length || 0) + 
-                (gameDetails.ownedBy?.epicId?.length || 0)
-              }
-            </p>
-          </div>
-
           {/* Playtime Data */}
           {playtimeData && playtimeData.playtime_by_user && Object.keys(playtimeData.playtime_by_user).length > 0 ? (
             <div className="game-details-info-block">
@@ -399,17 +342,35 @@ function GameDetailsPage() {
               
               {/* Per-User Playtime Breakdown */}
               <div className="playtime-breakdown">
-                <h3>Playtime by User ({Object.keys(playtimeData.playtime_by_user).length} user{Object.keys(playtimeData.playtime_by_user).length !== 1 ? 's' : ''}):</h3>
+                <div className="playtime-header">
+                  <h3>Playtime by User ({Object.keys(playtimeData.playtime_by_user).length} user{Object.keys(playtimeData.playtime_by_user).length !== 1 ? 's' : ''}):</h3>
+                  <div className="sort-controls">
+                    <label>Sort by: </label>
+                    <select 
+                      value={sortBy} 
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="sort-select"
+                    >
+                      <option value="playtime">Playtime</option>
+                      <option value="name">Name</option>
+                    </select>
+                  </div>
+                </div>
                 <div className="playtime-users">
-                  {Object.entries(playtimeData.playtime_by_user).map(([steamId, userData]) => (
-                    <div key={steamId} className="user-playtime">
+                  {sortUsers(playtimeData.playtime_by_user).map(([steamId, userData]) => (
+                    <div 
+                      key={steamId} 
+                      className="user-playtime"
+                      onMouseEnter={() => setHoveredUser(steamId)}
+                      onMouseLeave={() => setHoveredUser(null)}
+                    >
                       <div 
                         className="user-playtime-header" 
                         onClick={() => toggleUserExpansion(steamId)}
                         style={{ cursor: 'pointer' }}
                       >
                         <h4>
-                          {(usernames[steamId]?.username || usernames[steamId]?.nickname || `User ${steamId}`)}
+                          {(usernames[steamId]?.nickname || usernames[steamId]?.username || `User ${steamId}`)}
                           <span className="expand-icon">
                             {expandedUsers.has(steamId) ? ' ▼' : ' ▶'}
                           </span>
@@ -419,6 +380,23 @@ function GameDetailsPage() {
                           <p><strong>Last Played:</strong> {new Date(userData.rtime_last_played * 1000).toLocaleDateString()}</p>
                         )}
                       </div>
+
+                      {/* Hover tooltip with full user details */}
+                      {hoveredUser === steamId && (
+                        <div className="user-hover-tooltip">
+                          {usernames[steamId]?.nickname && (
+                            <div><strong>Nickname:</strong> {usernames[steamId].nickname}</div>
+                          )}
+                          {usernames[steamId]?.username && (
+                            <div><strong>Username:</strong> {usernames[steamId].username}</div>
+                          )}
+                          <div><strong>Steam ID:</strong> {steamId}</div>
+                          <div><strong>Total Playtime:</strong> {formatPlaytime(userData.playtime_forever)}</div>
+                          {userData.rtime_last_played > 0 && (
+                            <div><strong>Last Played:</strong> {new Date(userData.rtime_last_played * 1000).toLocaleDateString()}</div>
+                          )}
+                        </div>
+                      )}
                       
                       {/* Expandable Platform breakdown for this user */}
                       {expandedUsers.has(steamId) && (
