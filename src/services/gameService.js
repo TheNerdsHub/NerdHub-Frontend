@@ -15,3 +15,7 @@ export const fetchUsernames = async (steamIds) => {
 export const getGames = async () => {
   return await api.get('/api/games');
 };
+
+export const getGamePlaytime = async (appid) => {
+  return await api.get(`/api/Games/${appid}/playtime`);
+};
