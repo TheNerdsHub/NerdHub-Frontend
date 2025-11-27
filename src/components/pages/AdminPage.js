@@ -44,6 +44,7 @@ function AdminPage() {
   const [priceUpdateResult, setPriceUpdateResult] = useState(null);
   const [priceUpdateError, setPriceUpdateError] = useState(null);
   const priceUpdateProgressIntervalRef = useRef(null);
+  const [batchSize, setBatchSize] = useState(400);
 
   const autoResizeTextarea = (e) => {
     const textarea = e.target;
@@ -251,7 +252,7 @@ function AdminPage() {
     setPriceUpdateResult(null);
 
     try {
-      const response = await api.post('/api/Games/start-price-update');
+      const response = await api.post(`/api/Games/start-price-update?batchSize=${batchSize}`);
       const { operationId } = response;
       pollPriceUpdateProgress(operationId);
     } catch (error) {
@@ -410,6 +411,40 @@ function AdminPage() {
 
         <div className="admin-section">
           <h2>Update Game Prices</h2>
+          <div className="form-group batch-size-group">
+            <div className="batch-size-header">
+              <label htmlFor="batchSize">Batch Size:</label>
+              <input
+                type="number"
+                id="batchSizeInput"
+                min="1"
+                max="500"
+                value={batchSize}
+                onChange={(e) => {
+                  const value = Math.max(1, Math.min(500, parseInt(e.target.value) || 1));
+                  setBatchSize(value);
+                }}
+                className="batch-size-input"
+                placeholder="Enter batch size (1-500)"
+              />
+            </div>
+            <div className="slider-container">
+              <input
+                type="range"
+                id="batchSize"
+                min="1"
+                max="500"
+                value={batchSize}
+                onChange={(e) => setBatchSize(parseInt(e.target.value))}
+                className="batch-size-slider"
+              />
+              <div className="slider-labels">
+                <span>1</span>
+                <span>500</span>
+              </div>
+            </div>
+            <small>Controls how many games are processed in each batch. Lower this value if it is failing.</small>
+          </div>
           <button
             onClick={handleStartPriceUpdate}
             disabled={priceUpdateLoading}

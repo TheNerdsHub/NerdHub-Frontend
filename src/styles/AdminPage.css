@@ -327,3 +327,118 @@ button.small-button {
   gap: 10px;
   padding-top: 10px;
 }
+
+/* Batch Size Slider Styles */
+.batch-size-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.batch-size-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.batch-size-header label {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.batch-size-input {
+  width: 80px;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #222;
+  color: #fff;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.batch-size-input:focus {
+  border-color: #4aa5f0;
+  outline: none;
+  box-shadow: 0 0 5px rgba(74, 165, 240, 0.3);
+}
+
+/* Hide number input arrows */
+.batch-size-input::-webkit-outer-spin-button,
+.batch-size-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.batch-size-input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.slider-container {
+  position: relative;
+  margin: 10px 0;
+}
+
+.batch-size-slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #1a1a20;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.batch-size-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4aa5f0;
+  cursor: pointer;
+  border: 2px solid #222;
+  transition: all 0.2s ease;
+}
+
+.batch-size-slider::-webkit-slider-thumb:hover {
+  background: #3990e0;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(74, 165, 240, 0.5);
+}
+
+.batch-size-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4aa5f0;
+  cursor: pointer;
+  border: 2px solid #222;
+  transition: all 0.2s ease;
+}
+
+.batch-size-slider::-moz-range-thumb:hover {
+  background: #3990e0;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(74, 165, 240, 0.5);
+}
+
+.batch-size-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: #1a1a20;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.slider-labels span {
+  font-weight: bold;
+}
