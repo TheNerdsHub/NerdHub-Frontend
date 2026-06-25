@@ -6,7 +6,6 @@ import { copyToClipboard } from '@/lib/clipboard'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Progress } from '@/components/ui/progress'
 import { useToast } from '@/hooks/use-toast'
 import {
   Table,
@@ -16,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +22,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Copy } from 'lucide-react'
+import { MoreHorizontal, Copy, ShieldCheck, AlertOctagon, Terminal } from 'lucide-react'
 
 export default function AdminPage() {
   useDocumentTitle('Admin')
@@ -60,151 +58,181 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="container py-8 space-y-8 max-w-5xl">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-        <p className="mt-2 text-muted-foreground">Manage users and trigger backend updates.</p>
+    <div className="container max-w-7xl mx-auto py-12 px-6 space-y-10">
+      <div className="flex flex-col gap-4 border-b border-white/10 pb-8">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-destructive/20 text-destructive rounded-xl animate-pulse">
+            <ShieldCheck className="w-8 h-8" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight">Admin Console</h1>
+        </div>
+        <p className="text-muted-foreground font-mono uppercase tracking-widest text-sm">
+          Warning: Authorized personnel only. System overrides active.
+        </p>
       </div>
 
       <div className="grid gap-8 md:grid-cols-2">
         {/* User Mapping Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle>User Mappings</CardTitle>
-            <CardDescription>Link Steam IDs to Usernames.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleMappingSubmit} className="space-y-4">
+        <div className="glass-panel rounded-3xl p-8 space-y-6">
+          <div className="space-y-2">
+            <h2 className="text-xl font-bold font-mono text-primary flex items-center gap-2">
+              <Terminal className="w-5 h-5" /> IDENTITY_MAPPING
+            </h2>
+            <p className="text-sm text-muted-foreground">Link Steam IDs to Usernames in the network.</p>
+          </div>
+          
+          <form onSubmit={handleMappingSubmit} className="space-y-4">
+            <div className="space-y-4">
               <Input
                 placeholder="Steam ID *"
                 required
                 value={mappingForm.steamId}
                 onChange={(e) => setMappingForm({ ...mappingForm, steamId: e.target.value })}
+                className="bg-black/40 border-white/10 focus:border-primary font-mono text-sm"
               />
               <Input
                 placeholder="Username *"
                 required
                 value={mappingForm.username}
                 onChange={(e) => setMappingForm({ ...mappingForm, username: e.target.value })}
+                className="bg-black/40 border-white/10 focus:border-primary font-mono text-sm"
               />
               <Input
                 placeholder="Nickname (optional)"
                 value={mappingForm.nickname}
                 onChange={(e) => setMappingForm({ ...mappingForm, nickname: e.target.value })}
+                className="bg-black/40 border-white/10 focus:border-primary font-mono text-sm"
               />
               <Input
                 placeholder="Discord ID (optional)"
                 value={mappingForm.discordId}
                 onChange={(e) => setMappingForm({ ...mappingForm, discordId: e.target.value })}
+                className="bg-black/40 border-white/10 focus:border-primary font-mono text-sm"
               />
-              <Button type="submit" disabled={addMappingMutation.isPending} className="w-full">
-                {addMappingMutation.isPending ? 'Saving...' : 'Add / Update Mapping'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
+            <Button type="submit" disabled={addMappingMutation.isPending} className="w-full font-mono uppercase tracking-wider rounded-xl hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] transition-shadow">
+              {addMappingMutation.isPending ? 'PROCESSING...' : 'EXECUTE_OVERRIDE'}
+            </Button>
+          </form>
+        </div>
 
         {/* Owned Games Update */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Update Owned Games</CardTitle>
-            <CardDescription>Trigger an update for user libraries.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="glass-panel rounded-3xl p-8 space-y-6 border-accent/20">
+          <div className="space-y-2">
+            <h2 className="text-xl font-bold font-mono text-accent flex items-center gap-2">
+              <Terminal className="w-5 h-5" /> SYNC_LIBRARIES
+            </h2>
+            <p className="text-sm text-muted-foreground">Trigger manual synchronization of agent libraries.</p>
+          </div>
+          
+          <div className="space-y-4">
             <Textarea
               placeholder="Steam IDs (comma separated)"
               value={steamIdsInput}
               onChange={(e) => setSteamIdsInput(e.target.value)}
-              className="min-h-[100px]"
+              className="min-h-[120px] bg-black/40 border-white/10 focus:border-accent font-mono text-sm resize-none"
             />
             <Input
               placeholder="App IDs to update (optional, comma separated)"
               value={appIdsInput}
               onChange={(e) => setAppIdsInput(e.target.value)}
+              className="bg-black/40 border-white/10 focus:border-accent font-mono text-sm"
             />
             <UpdateTaskRunner 
-              title="Owned Games"
+              title="SYNC"
+              colorClass="accent"
               onStart={() => {
                 if (!steamIdsInput) return Promise.reject(new Error('Steam IDs required'))
                 const appIds = appIdsInput ? appIdsInput.split(',').map(s => parseInt(s.trim())) : undefined
                 return gameService.startUpdate(steamIdsInput, false, appIds)
               }}
             />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-8 md:grid-cols-2">
         {/* Bulk Updates */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Global Updates</CardTitle>
-            <CardDescription>Trigger global backend processing tasks.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2 border rounded-md p-4">
-              <div className="font-medium">Game Prices</div>
-              <p className="text-sm text-muted-foreground mb-4">Updates the price information for all games in the database.</p>
+        <div className="glass-panel rounded-3xl p-8 space-y-6 border-destructive/20 bg-destructive/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-8 opacity-10">
+            <AlertOctagon className="w-32 h-32 text-destructive" />
+          </div>
+          <div className="space-y-2 relative z-10">
+            <h2 className="text-xl font-bold font-mono text-destructive flex items-center gap-2">
+              <AlertOctagon className="w-5 h-5" /> GLOBAL_DIRECTIVES
+            </h2>
+            <p className="text-sm text-muted-foreground">Trigger heavy backend processing tasks. High resource cost.</p>
+          </div>
+          
+          <div className="space-y-6 relative z-10">
+            <div className="space-y-3 p-5 rounded-2xl bg-black/40 border border-destructive/20">
+              <div className="font-mono text-sm text-white/90">UPDATE_PRICING_TABLE</div>
+              <p className="text-xs text-muted-foreground">Updates the pricing manifest for all registered software.</p>
               <UpdateTaskRunner 
-                title="Price Update"
+                title="PRICING"
+                colorClass="destructive"
                 onStart={() => gameService.startPriceUpdate()}
               />
             </div>
             
-            <div className="space-y-2 border rounded-md p-4">
-              <div className="font-medium">Game Info</div>
-              <p className="text-sm text-muted-foreground mb-4">Updates detailed information for all games. This can take a while.</p>
+            <div className="space-y-3 p-5 rounded-2xl bg-black/40 border border-destructive/20">
+              <div className="font-mono text-sm text-white/90">UPDATE_MANIFESTS</div>
+              <p className="text-xs text-muted-foreground">Deep fetch of detailed software info. Extremely slow.</p>
               <UpdateTaskRunner 
-                title="Game Info Update"
+                title="MANIFESTS"
+                colorClass="destructive"
                 onStart={() => gameService.startGameInfoUpdate()}
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* User Mappings Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Existing Mappings ({userMappings?.length || 0})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border h-[400px] overflow-auto">
+        <div className="glass-panel rounded-3xl p-8 space-y-6 flex flex-col h-full min-h-[500px]">
+          <div className="space-y-2">
+            <h2 className="text-xl font-bold font-mono text-white flex items-center gap-2">
+              REGISTERED_AGENTS <span className="text-primary text-sm">[{userMappings?.length || 0}]</span>
+            </h2>
+          </div>
+          
+          <div className="flex-1 rounded-2xl border border-white/10 overflow-hidden bg-black/20 relative">
+            <div className="absolute inset-0 overflow-auto">
               <Table>
-                <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Steam ID</TableHead>
+                <TableHeader className="sticky top-0 bg-[#0a0a0a] z-10 shadow-sm border-b border-white/10">
+                  <TableRow className="border-none hover:bg-transparent">
+                    <TableHead className="font-mono text-xs uppercase text-muted-foreground">Agent</TableHead>
+                    <TableHead className="font-mono text-xs uppercase text-muted-foreground">Identifier</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {mappingsLoading ? (
-                    <TableRow><TableCell colSpan={3} className="text-center">Loading...</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={3} className="text-center font-mono text-sm text-muted-foreground py-12">FETCHING...</TableCell></TableRow>
                   ) : userMappings?.length ? (
                     userMappings.map((u) => (
-                      <TableRow key={u.steamId}>
+                      <TableRow key={u.steamId} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                         <TableCell>
-                          <div className="font-medium">{u.nickname || u.username}</div>
-                          {u.nickname && <div className="text-xs text-muted-foreground">{u.username}</div>}
+                          <div className="font-medium text-white/90">{u.nickname || u.username}</div>
+                          {u.nickname && <div className="text-xs text-primary font-mono">{u.username}</div>}
                         </TableCell>
-                        <TableCell className="font-mono text-xs">{u.steamId}</TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground">{u.steamId}</TableCell>
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
+                              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-white/10">
                                 <span className="sr-only">Open menu</span>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => {
+                            <DropdownMenuContent align="end" className="bg-[#141414] border-white/10 font-mono text-xs uppercase">
+                              <DropdownMenuItem className="hover:bg-white/10 hover:text-primary cursor-pointer" onClick={() => {
                                 setMappingForm(u)
                                 window.scrollTo({ top: 0, behavior: 'smooth' })
                               }}>
                                 Edit Mapping
                               </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => copyToClipboard(u.steamId)}>
+                              <DropdownMenuSeparator className="bg-white/10" />
+                              <DropdownMenuItem className="hover:bg-white/10 cursor-pointer" onClick={() => copyToClipboard(u.steamId)}>
                                 <Copy className="mr-2 h-4 w-4" /> Copy Steam ID
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -213,26 +241,34 @@ export default function AdminPage() {
                       </TableRow>
                     ))
                   ) : (
-                    <TableRow><TableCell colSpan={3} className="text-center">No mappings found.</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={3} className="text-center font-mono text-sm text-muted-foreground py-12">No agents found.</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   )
 }
 
 // Helper component to manage long-running tasks
-function UpdateTaskRunner({ title, onStart }: { title: string, onStart: () => Promise<{ operationId: string }> }) {
+function UpdateTaskRunner({ title, onStart, colorClass = "primary" }: { title: string, onStart: () => Promise<{ operationId: string }>, colorClass?: "primary" | "accent" | "destructive" }) {
   const { toast } = useToast()
   const [isRunning, setIsRunning] = useState(false)
   const [progress, setProgress] = useState(0)
   const [phase, setPhase] = useState('')
   const [message, setMessage] = useState('')
   const [result, setResult] = useState<any>(null)
+
+  const btnClass = colorClass === 'destructive' 
+    ? 'border-destructive/50 text-destructive hover:bg-destructive/10' 
+    : colorClass === 'accent'
+      ? 'border-accent/50 text-accent hover:bg-accent/10'
+      : 'border-primary/50 text-primary hover:bg-primary/10'
+      
+  const pbgClass = colorClass === 'destructive' ? 'bg-destructive' : colorClass === 'accent' ? 'bg-accent' : 'bg-primary'
 
   const handleStart = async () => {
     setIsRunning(true)
@@ -279,24 +315,32 @@ function UpdateTaskRunner({ title, onStart }: { title: string, onStart: () => Pr
 
   return (
     <div className="space-y-4">
-      <Button onClick={handleStart} disabled={isRunning} variant="outline" className="w-full">
-        {isRunning ? 'Running...' : `Start ${title}`}
+      <Button 
+        onClick={handleStart} 
+        disabled={isRunning} 
+        variant="outline" 
+        className={`w-full font-mono uppercase tracking-wider rounded-xl transition-all ${btnClass}`}
+      >
+        {isRunning ? 'EXECUTING...' : `START_${title}`}
       </Button>
 
       {isRunning && (
-        <div className="space-y-2 bg-muted p-4 rounded-md">
-          <div className="flex justify-between text-sm">
-            <span className="font-medium">{phase}</span>
-            <span>{progress}%</span>
+        <div className="space-y-3 bg-black/60 border border-white/10 p-4 rounded-xl">
+          <div className="flex justify-between text-xs font-mono uppercase text-muted-foreground">
+            <span>{phase}</span>
+            <span className={`text-${colorClass}`}>{progress}%</span>
           </div>
-          <Progress value={progress} className="h-2" />
-          <p className="text-xs text-muted-foreground">{message}</p>
+          {/* Custom progress bar for better cyberpunk feel */}
+          <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+            <div className={`h-full ${pbgClass} transition-all duration-500`} style={{ width: `${progress}%`, boxShadow: `0 0 10px var(--${colorClass})` }}></div>
+          </div>
+          <p className="text-[10px] font-mono text-muted-foreground/70 uppercase truncate">{message}</p>
         </div>
       )}
 
       {result && !isRunning && (
-        <div className="bg-muted p-4 rounded-md text-sm overflow-auto max-h-[200px]">
-          <pre className="text-xs">{JSON.stringify(result, null, 2)}</pre>
+        <div className="bg-black/60 border border-white/10 p-4 rounded-xl text-sm overflow-auto max-h-[200px]">
+          <pre className={`text-[10px] font-mono text-${colorClass}`}>{JSON.stringify(result, null, 2)}</pre>
         </div>
       )}
     </div>
