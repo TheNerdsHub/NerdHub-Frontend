@@ -69,7 +69,7 @@ export const gameService = {
     return api.post<{ operationId: string }>(`/api/Games/start-update?${params}`, steamIds)
   },
 
-  startPriceUpdate: () => api.post<{ operationId: string }>('/api/Games/start-price-update'),
+  startPriceUpdate: (batchSize = 400) => api.post<{ operationId: string }>(`/api/Games/start-price-update?batchSize=${batchSize}`),
 
   startGameInfoUpdate: () => api.post<{ operationId: string }>('/api/Games/start-game-info-update'),
 

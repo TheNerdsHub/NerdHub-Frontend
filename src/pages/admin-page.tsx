@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Copy, ShieldCheck, AlertOctagon, Terminal } from 'lucide-react'
+import { MoreHorizontal, Copy, ShieldCheck, AlertOctagon, Terminal, CheckSquare, Square } from 'lucide-react'
 
 export default function AdminPage() {
   useDocumentTitle('Admin')
@@ -33,6 +33,8 @@ export default function AdminPage() {
   const [mappingForm, setMappingForm] = useState<UserMapping>({ steamId: '', username: '', nickname: '', discordId: '' })
   const [steamIdsInput, setSteamIdsInput] = useState('')
   const [appIdsInput, setAppIdsInput] = useState('')
+  const [selectedSteamIds, setSelectedSteamIds] = useState<Set<string>>(new Set())
+  const [batchSize, setBatchSize] = useState(400)
 
   const { data: userMappings, isLoading: mappingsLoading } = useQuery({
     queryKey: ['user-mappings'],
@@ -168,10 +170,34 @@ export default function AdminPage() {
             <div className="space-y-3 p-5 rounded-2xl bg-black/40 border border-destructive/20">
               <div className="font-mono text-sm text-white/90">UPDATE_PRICING_TABLE</div>
               <p className="text-xs text-muted-foreground">Updates the pricing manifest for all registered software.</p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
+                  <span>Batch Size</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={500}
+                    value={batchSize}
+                    onChange={(e) => setBatchSize(Math.min(500, Math.max(1, Number(e.target.value) || 1)))}
+                    className="w-16 h-7 bg-black/60 border border-white/10 rounded-lg px-2 text-xs font-mono text-destructive text-center focus:outline-none focus:border-destructive [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={500}
+                  value={batchSize}
+                  onChange={(e) => setBatchSize(Number(e.target.value))}
+                  className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-white/10 accent-destructive
+                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
+                    [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-destructive
+                    [&::-webkit-slider-thumb]:shadow-[0_0_8px_hsl(var(--destructive))]"
+                />
+              </div>
               <UpdateTaskRunner 
                 title="PRICING"
                 colorClass="destructive"
-                onStart={() => gameService.startPriceUpdate()}
+                onStart={() => gameService.startPriceUpdate(batchSize)}
               />
             </div>
             
@@ -189,10 +215,30 @@ export default function AdminPage() {
 
         {/* User Mappings Table */}
         <div className="glass-panel rounded-3xl p-8 space-y-6 flex flex-col h-full min-h-[500px]">
-          <div className="space-y-2">
+          <div className="flex items-center justify-between gap-4">
             <h2 className="text-xl font-bold font-mono text-white flex items-center gap-2">
               REGISTERED_AGENTS <span className="text-primary text-sm">[{userMappings?.length || 0}]</span>
             </h2>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-accent/50 text-accent hover:bg-accent/10 font-mono text-xs uppercase tracking-wider rounded-xl gap-2"
+              onClick={() => {
+                const allSelected = userMappings?.every(u => selectedSteamIds.has(u.steamId))
+                if (allSelected) {
+                  setSelectedSteamIds(new Set())
+                } else {
+                  setSelectedSteamIds(new Set(userMappings?.map(u => u.steamId) || []))
+                }
+              }}
+            >
+              {userMappings?.every(u => selectedSteamIds.has(u.steamId)) ? (
+                <CheckSquare className="w-4 h-4" />
+              ) : (
+                <Square className="w-4 h-4" />
+              )}
+              SELECT ALL
+            </Button>
           </div>
           
           <div className="flex-1 rounded-2xl border border-white/10 overflow-hidden bg-black/20 relative">
@@ -200,6 +246,7 @@ export default function AdminPage() {
               <Table>
                 <TableHeader className="sticky top-0 bg-[#0a0a0a] z-10 shadow-sm border-b border-white/10">
                   <TableRow className="border-none hover:bg-transparent">
+                    <TableHead className="w-[40px]"></TableHead>
                     <TableHead className="font-mono text-xs uppercase text-muted-foreground">Agent</TableHead>
                     <TableHead className="font-mono text-xs uppercase text-muted-foreground">Identifier</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
@@ -207,10 +254,32 @@ export default function AdminPage() {
                 </TableHeader>
                 <TableBody>
                   {mappingsLoading ? (
-                    <TableRow><TableCell colSpan={3} className="text-center font-mono text-sm text-muted-foreground py-12">FETCHING...</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={4} className="text-center font-mono text-sm text-muted-foreground py-12">FETCHING...</TableCell></TableRow>
                   ) : userMappings?.length ? (
                     userMappings.map((u) => (
                       <TableRow key={u.steamId} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-accent"
+                            onClick={() => {
+                              const next = new Set(selectedSteamIds)
+                              if (next.has(u.steamId)) {
+                                next.delete(u.steamId)
+                              } else {
+                                next.add(u.steamId)
+                              }
+                              setSelectedSteamIds(next)
+                            }}
+                          >
+                            {selectedSteamIds.has(u.steamId) ? (
+                              <CheckSquare className="w-4 h-4 text-accent" />
+                            ) : (
+                              <Square className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </TableCell>
                         <TableCell>
                           <div className="font-medium text-white/90">{u.nickname || u.username}</div>
                           {u.nickname && <div className="text-xs text-primary font-mono">{u.username}</div>}
@@ -241,12 +310,25 @@ export default function AdminPage() {
                       </TableRow>
                     ))
                   ) : (
-                    <TableRow><TableCell colSpan={3} className="text-center font-mono text-sm text-muted-foreground py-12">No agents found.</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={4} className="text-center font-mono text-sm text-muted-foreground py-12">No agents found.</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
             </div>
           </div>
+          
+          {selectedSteamIds.size > 0 && (
+            <Button
+              variant="outline"
+              className="border-accent/50 text-accent hover:bg-accent/10 font-mono text-xs uppercase tracking-wider rounded-xl"
+              onClick={() => {
+                setSteamIdsInput(Array.from(selectedSteamIds).join(', '))
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+            >
+              Populate {selectedSteamIds.size} Agent{selectedSteamIds.size > 1 ? 's' : ''} into sync
+            </Button>
+          )}
         </div>
       </div>
     </div>
