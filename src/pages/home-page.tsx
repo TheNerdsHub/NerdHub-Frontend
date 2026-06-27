@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { quoteService } from '@/lib/quote-service'
 import { gameService } from '@/lib/game-service'
-import { Badge } from '@/components/ui/badge'
+import GameCard from '@/components/game-card'
 import { Quote, CalendarDays, Share2, BookOpen, Trophy } from 'lucide-react'
 
 export default function HomePage() {
@@ -20,8 +20,13 @@ export default function HomePage() {
     queryFn: () => gameService.getAllGames(),
     select: (data) => {
       const withImages = data.filter((g) => g.headerImage)
-      const shuffled = [...withImages].sort(() => 0.5 - Math.random())
-      return shuffled.slice(0, 4)
+      const scored = withImages.map((g) => {
+        const ownerCount = g.ownedBy?.steamId?.length ?? 0
+        const onSale = (g.priceOverview?.discountPercent ?? 0) > 0
+        return { game: g, score: ownerCount + (onSale ? 100 : 0) }
+      })
+      scored.sort((a, b) => b.score - a.score)
+      return scored.slice(0, 4).map((s) => s.game)
     },
   })
 
@@ -113,34 +118,7 @@ export default function HomePage() {
         {games ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {games.map((game) => (
-              <Link key={game.appid} to={`/games/${game.appid}`} className="group block h-full">
-                <div className="glass-panel h-full rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] relative">
-                  <div className="aspect-[460/215] w-full bg-black overflow-hidden relative">
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#141414] to-transparent z-10"></div>
-                    {game.headerImage ? (
-                      <img 
-                        src={game.headerImage} 
-                        alt={game.name} 
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100" 
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-muted-foreground text-xs font-mono">NO SIGNAL</div>
-                    )}
-                  </div>
-                  <div className="p-5 flex-1 flex flex-col relative z-20 -mt-8">
-                    <h3 className="font-bold text-lg leading-tight mb-2 group-hover:text-primary transition-colors line-clamp-1">{game.name}</h3>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mb-4 flex-1">
-                      {game.shortDescription || 'No description available in the database.'}
-                    </p>
-                    <div className="flex items-center justify-between mt-auto">
-                      <Badge variant={game.isFree ? 'secondary' : 'default'} className="font-mono text-[10px] uppercase tracking-wider bg-black/50 backdrop-blur">
-                        {game.priceOverview?.finalFormatted || (game.isFree ? 'Free' : 'N/A')}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </Link>
+              <GameCard key={game.appid} game={game} />
             ))}
           </div>
         ) : (
