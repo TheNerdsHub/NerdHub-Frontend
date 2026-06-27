@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import Sidebar from './sidebar'
+import BackToTop from '@/components/back-to-top'
 import { Toaster } from '@/components/ui/toaster'
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -9,6 +10,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <main className="flex-1 md:pl-20 pt-14 md:pt-0 w-full overflow-hidden">
         {children}
       </main>
+      <BackToTop />
       <Toaster />
     </div>
   )
