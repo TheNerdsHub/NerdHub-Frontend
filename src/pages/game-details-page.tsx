@@ -1,13 +1,22 @@
-import { useParams, Link } from 'react-router-dom'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useDocumentTitle } from '@/hooks/use-document-title'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { gameService } from '@/lib/game-service'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Clock, Users, Calendar, Trophy, Monitor, Tag, Gamepad2 } from 'lucide-react'
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select'
+import { copyToClipboard } from '@/lib/clipboard'
+import {
+  ArrowLeft, Clock, Calendar, Trophy, Monitor, Tag, Gamepad2,
+  ExternalLink, RefreshCw, ChevronDown, ChevronRight, Copy, Search,
+} from 'lucide-react'
 
 export default function GameDetailsPage() {
   const { appid } = useParams<{ appid: string }>()
+  const navigate = useNavigate()
   const parsedAppId = parseInt(appid || '0', 10)
 
   const { data: game, isLoading, isError } = useQuery({
@@ -18,12 +27,78 @@ export default function GameDetailsPage() {
 
   useDocumentTitle(game?.name || `Game #${parsedAppId}`)
 
-  // Fetch usernames for owners
   const { data: userMappings } = useQuery({
     queryKey: ['usernames', game?.ownedBy?.steamId],
     queryFn: () => gameService.fetchUsernames(game!.ownedBy!.steamId!),
     enabled: !!(game?.ownedBy?.steamId && game.ownedBy.steamId.length > 0),
   })
+
+  const queryClient = useQueryClient()
+
+  const updateMutation = useMutation({
+    mutationFn: () => gameService.updateGameInfo(parsedAppId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['game', parsedAppId] })
+    },
+  })
+
+  const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set())
+  const [sortBy, setSortBy] = useState<'playtime' | 'name'>('playtime')
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean; x: number; y: number; steamId: string | null
+  }>({ visible: false, x: 0, y: 0, steamId: null })
+  const contextMenuRef = useRef<HTMLDivElement>(null)
+
+  const toggleUserExpansion = (steamId: string) => {
+    setExpandedUsers(prev => {
+      const next = new Set(prev)
+      if (next.has(steamId)) next.delete(steamId)
+      else next.add(steamId)
+      return next
+    })
+  }
+
+  const closeContextMenu = useCallback(() => {
+    setContextMenu(prev => ({ ...prev, visible: false }))
+  }, [])
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
+        closeContextMenu()
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [closeContextMenu])
+
+  const handleContextMenu = (e: React.MouseEvent, steamId: string) => {
+    e.preventDefault()
+    setContextMenu({ visible: true, x: e.clientX, y: e.clientY, steamId })
+  }
+
+  const playtimeUsers = game?.playtimeByUser
+    ? Object.entries(game.playtimeByUser).sort(([aId, aData], [bId, bData]) => {
+        if (sortBy === 'playtime') return bData.playtime_forever - aData.playtime_forever
+        const nameA = userMappings?.[aId]?.nickname || userMappings?.[aId]?.username || aId
+        const nameB = userMappings?.[bId]?.nickname || userMappings?.[bId]?.username || bId
+        return nameA.localeCompare(nameB)
+      })
+    : []
+
+  const calculateTotalPlaytime = () => {
+    if (!game?.playtimeByUser) return 0
+    return Object.values(game.playtimeByUser).reduce((sum, u) => sum + (u.playtime_forever || 0), 0)
+  }
+
+  const getLastPlayedDate = () => {
+    if (!game?.playtimeByUser) return null
+    const times = Object.values(game.playtimeByUser)
+      .map(u => u.rtime_last_played)
+      .filter(t => t > 0)
+    if (times.length === 0) return null
+    return new Date(Math.max(...times) * 1000)
+  }
 
   if (isLoading) {
     return (
@@ -48,12 +123,69 @@ export default function GameDetailsPage() {
     )
   }
 
-  const owners = game.ownedBy?.steamId || []
   const platforms = [
     game.platforms?.windows && 'Windows',
     game.platforms?.mac && 'Mac',
     game.platforms?.linux && 'Linux',
   ].filter(Boolean) as string[]
+  const hasMac = platforms.includes('Mac')
+  const hasLinux = platforms.includes('Linux')
+
+  const playtimeByUser = game.playtimeByUser
+  const totalPlaytime = calculateTotalPlaytime()
+  const lastPlayedDate = getLastPlayedDate()
+
+  const formatPlaytime = (minutes?: number) => {
+    if (!minutes || minutes === 0) return '0m'
+    const h = Math.floor(minutes / 60)
+    const m = minutes % 60
+    if (h === 0) return `${m}m`
+    if (m === 0) return `${h}h`
+    return `${h}h ${m}m`
+  }
+
+  const decodeHtml = (html?: string) => {
+    if (!html) return ''
+    const ta = document.createElement('textarea')
+    ta.innerHTML = html
+    return ta.value
+  }
+
+  const systemRequirements = (
+    pc: typeof game.pcRequirements,
+    mac: typeof game.macRequirements,
+    linux: typeof game.linuxRequirements
+  ) => {
+    const sections: { label: string; req: { minimum?: string } | undefined }[] = [
+      { label: 'PC', req: pc },
+    ]
+    if (hasMac) sections.push({ label: 'Mac', req: mac })
+    if (hasLinux) sections.push({ label: 'Linux', req: linux })
+
+    const hasAny = sections.some(s => s.req?.minimum)
+    if (!hasAny) return null
+
+    return (
+      <div className="glass-panel rounded-3xl p-8 space-y-4">
+        <h3 className="text-sm font-mono text-primary flex items-center gap-2">
+          <Monitor className="w-4 h-4" /> System Requirements
+        </h3>
+        <div className="space-y-3">
+          {sections.map(({ label, req }) =>
+            req?.minimum ? (
+              <div key={label}>
+                <strong className="text-sm text-white/80">{label}:</strong>
+                <div
+                  className="text-sm text-muted-foreground mt-1 leading-relaxed [&>br]:mb-1"
+                  dangerouslySetInnerHTML={{ __html: decodeHtml(req.minimum) }}
+                />
+              </div>
+            ) : null
+          )}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen pb-20">
@@ -76,7 +208,7 @@ export default function GameDetailsPage() {
               Return
             </Link>
           </Button>
-          
+
           <div className="flex flex-col md:flex-row gap-8 items-end">
             <div className="w-full max-w-[300px] rounded-2xl overflow-hidden glass-panel shadow-2xl shadow-primary/20 shrink-0">
               {game.headerImage ? (
@@ -85,7 +217,7 @@ export default function GameDetailsPage() {
                 <div className="flex h-32 items-center justify-center text-muted-foreground font-mono text-xs">NO IMAGE</div>
               )}
             </div>
-            
+
             <div className="space-y-4 flex-1">
               <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white drop-shadow-md">
                 {game.name}
@@ -102,6 +234,34 @@ export default function GameDetailsPage() {
         </div>
       </div>
 
+      {/* Quick Links */}
+      <div className="container max-w-7xl mx-auto px-6 pt-6">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <a href={`https://store.steampowered.com/app/${game.appid}`} target="_blank" rel="noreferrer" className="gap-1.5">
+              <ExternalLink className="w-3.5 h-3.5" />
+              Steam
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a href={`https://steamdb.info/app/${game.appid}`} target="_blank" rel="noreferrer" className="gap-1.5">
+              <ExternalLink className="w-3.5 h-3.5" />
+              SteamDB
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a href={`https://www.protondb.com/app/${game.appid}`} target="_blank" rel="noreferrer" className="gap-1.5">
+              <ExternalLink className="w-3.5 h-3.5" />
+              ProtonDB
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending}>
+            <RefreshCw className={`w-3.5 h-3.5 ${updateMutation.isPending ? 'animate-spin' : ''}`} />
+            {updateMutation.isPending ? 'Updating...' : 'Update'}
+          </Button>
+        </div>
+      </div>
+
       <div className="container max-w-7xl mx-auto px-6 pt-12">
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main Content */}
@@ -113,6 +273,19 @@ export default function GameDetailsPage() {
               <p className="text-lg text-muted-foreground leading-relaxed">
                 {game.shortDescription}
               </p>
+
+              {/* Categories */}
+              {game.categories && game.categories.length > 0 && (
+                <div className="pt-2">
+                  <div className="flex flex-wrap gap-1.5">
+                    {game.categories.map((cat) => (
+                      <Badge key={cat.description} variant="outline" className="text-[10px] font-mono bg-white/[0.07] border-white/10 text-white/70">
+                        {cat.description}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {game.detailedDescription && (
@@ -121,8 +294,8 @@ export default function GameDetailsPage() {
                   <Gamepad2 className="w-32 h-32" />
                 </div>
                 <h3 className="text-sm font-mono text-accent relative z-10">Data Log // Full Description</h3>
-                
-                <div 
+
+                <div
                   className="prose prose-sm md:prose-base dark:prose-invert max-w-none relative z-10
                     [&>img]:rounded-xl [&>img]:my-6 [&>img]:border [&>img]:border-white/5
                     [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:mt-8 [&>h2]:mb-4 [&>h2]:text-white
@@ -132,24 +305,43 @@ export default function GameDetailsPage() {
                 />
               </div>
             )}
+
+            {/* System Requirements */}
+            {systemRequirements(game.pcRequirements, game.macRequirements, game.linuxRequirements)}
           </div>
 
           {/* Sidebar details */}
           <div className="space-y-6">
             <div className="glass-panel rounded-3xl p-6 space-y-6">
               <h3 className="text-sm font-mono text-white border-b border-white/5 pb-4">Specs</h3>
-              
+
               <div className="space-y-4">
                 <div className="flex justify-between items-center group">
                   <span className="text-muted-foreground text-sm flex items-center gap-2">
                     <span className="w-1 h-1 rounded-full bg-primary/50 group-hover:bg-primary transition-colors"></span>
                     Acquisition Cost
                   </span>
-                  <Badge className="bg-primary/20 text-primary border-primary/30 hover:bg-primary/30 font-mono">
-                    {game.priceOverview?.finalFormatted || (game.isFree ? 'Free' : 'N/A')}
-                  </Badge>
+                  <span className="text-right">
+                    {game.isFree ? (
+                      <span className="text-[11px] font-mono font-bold text-green-400">Free</span>
+                    ) : !game.priceOverview?.finalFormatted ? (
+                      <span className="text-[9px] font-mono text-muted-foreground">N/A</span>
+                    ) : game.priceOverview.discountPercent > 0 ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-bold font-mono text-green-400 bg-green-500/15 px-1.5 py-0.5 rounded-sm">
+                          -{game.priceOverview.discountPercent}%
+                        </span>
+                        <div className="flex flex-col items-end leading-tight">
+                          <span className="text-[9px] font-mono text-muted-foreground line-through">{game.priceOverview.initialFormatted}</span>
+                          <span className="text-[11px] font-bold font-mono text-white">{game.priceOverview.finalFormatted}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-[11px] font-mono font-bold text-white">{game.priceOverview.finalFormatted}</span>
+                    )}
+                  </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center group">
                   <span className="text-muted-foreground text-sm flex items-center gap-2">
                     <Calendar className="w-4 h-4" /> Launched
@@ -180,52 +372,195 @@ export default function GameDetailsPage() {
                   </div>
                 )}
 
-                <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-4">
-                  <span className="text-muted-foreground text-sm">Steam ID</span>
-                  <a 
-                    href={`https://store.steampowered.com/app/${game.appid}`} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="text-sm font-mono text-primary hover:text-white hover:underline transition-colors"
-                  >
-                    [{game.appid}]
-                  </a>
-                </div>
+                {game.controllerSupport && (
+                  <div className="flex justify-between items-center group">
+                    <span className="text-muted-foreground text-sm flex items-center gap-2">
+                      <Gamepad2 className="w-4 h-4" /> Controller
+                    </span>
+                    <span className="text-xs font-mono">{game.controllerSupport}</span>
+                  </div>
+                )}
+
               </div>
             </div>
 
-            <div className="glass-panel rounded-3xl p-6 space-y-6 border-accent/20 bg-accent/5">
-              <h3 className="text-sm font-mono text-accent flex items-center gap-2 border-b border-white/5 pb-4">
-                <Users className="w-4 h-4" /> Active Agents ({owners.length})
-              </h3>
-              
-              {owners.length > 0 ? (
-                <ul className="space-y-3">
-                  {owners.map((steamId) => {
-                    const user = userMappings?.[steamId]
-                    const displayName = user?.nickname || user?.username || steamId
-                    const playtime = game.playtimeByUser?.[steamId]?.playtime_forever || 0
-                    
-                    return (
-                      <li key={steamId} className="flex justify-between items-center p-3 rounded-xl bg-black/40 border border-white/5 hover:border-accent/30 transition-colors">
-                        <span className="font-medium text-sm text-white/90">{displayName}</span>
-                        {playtime > 0 && (
-                          <span className="text-xs font-mono text-accent flex items-center gap-1.5">
-                            <Clock className="w-3 h-3" />
-                            {Math.round(playtime / 60)}H
-                          </span>
-                        )}
-                      </li>
-                    )
-                  })}
-                </ul>
-              ) : (
-                <p className="text-xs font-mono text-muted-foreground text-center py-4">No agents registered.</p>
-              )}
+            {/* Playtime Statistics */}
+            {playtimeByUser && Object.keys(playtimeByUser).length > 0 && (
+              <div className="glass-panel rounded-3xl p-6 space-y-6 border-accent/20 bg-accent/5">
+                <h3 className="text-sm font-mono text-accent flex items-center gap-2 border-b border-white/5 pb-4">
+                  <Clock className="w-4 h-4" /> Playtime Statistics
+                </h3>
+
+                {/* Total Playtime Summary */}
+                <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs">
+                  <div>
+                    <span className="text-muted-foreground">Total Playtime:</span>{' '}
+                    <span className="font-mono text-accent">{formatPlaytime(totalPlaytime)}</span>
+                  </div>
+                  {lastPlayedDate && (
+                    <div>
+                      <span className="text-muted-foreground">Last Played:</span>{' '}
+                      <span className="font-mono">{lastPlayedDate.toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Per-User Breakdown */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs text-muted-foreground font-mono">
+                      {playtimeUsers.length} user{playtimeUsers.length !== 1 ? 's' : ''}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <label className="text-[10px] text-muted-foreground font-mono">Sort:</label>
+                      <Select value={sortBy} onValueChange={(v) => setSortBy(v as 'playtime' | 'name')}>
+                        <SelectTrigger className="h-6 px-1.5 py-0 text-[10px] font-mono gap-1 border-white/10 bg-black/40 text-muted-foreground focus:ring-0 focus:border-accent/50 w-[80px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="border-white/10 bg-background/95 backdrop-blur-xl text-[10px] font-mono min-w-[80px]">
+                          <SelectItem value="playtime" className="text-[10px] font-mono">Playtime</SelectItem>
+                          <SelectItem value="name" className="text-[10px] font-mono">Name</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    {playtimeUsers.map(([steamId, userData]) => {
+                      const user = userMappings?.[steamId]
+                      const displayName = user?.nickname || user?.username || `User ${steamId.slice(0, 8)}`
+                      const expanded = expandedUsers.has(steamId)
+                      const hasPlatformData =
+                        (userData.playtime_windows_forever ?? 0) > 0 ||
+                        (userData.playtime_mac_forever ?? 0) > 0 ||
+                        (userData.playtime_linux_forever ?? 0) > 0 ||
+                        (userData.playtime_deck_forever ?? 0) > 0 ||
+                        (userData.playtime_disconnected ?? 0) > 0
+
+                      return (
+                        <div
+                          key={steamId}
+                          className="rounded-xl bg-black/40 border border-white/5 hover:border-accent/30 transition-colors relative"
+                          onContextMenu={(e) => handleContextMenu(e, steamId)}
+                        >
+                          <button
+                            onClick={() => toggleUserExpansion(steamId)}
+                            className="w-full flex items-center justify-between p-2.5 text-left"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              {expanded ? (
+                                <ChevronDown className="w-3 h-3 shrink-0 text-muted-foreground" />
+                              ) : (
+                                <ChevronRight className="w-3 h-3 shrink-0 text-muted-foreground" />
+                              )}
+                              <span className="text-xs text-white/90 truncate">{displayName}</span>
+                            </div>
+                            <div className="flex items-center gap-3 shrink-0">
+                              {userData.rtime_last_played > 0 && (
+                                <span className="text-[10px] text-muted-foreground hidden sm:inline">
+                                  {new Date(userData.rtime_last_played * 1000).toLocaleDateString()}
+                                </span>
+                              )}
+                              <span className="text-[11px] font-mono text-accent">
+                                {formatPlaytime(userData.playtime_forever)}
+                              </span>
+                            </div>
+                          </button>
+
+                          {/* Expandable Platform Breakdown */}
+                          {expanded && (
+                            <div className="px-2.5 pb-2.5 pt-0 border-t border-white/5 mt-0">
+                              <div className="pt-2.5 space-y-0.5 text-[11px] text-muted-foreground">
+                                <h5 className="text-white/60 mb-1 font-mono text-[10px]">Platform Breakdown:</h5>
+                                {(userData.playtime_windows_forever ?? 0) > 0 && (
+                                  <div className="flex justify-between"><span>Windows</span><span className="font-mono">{formatPlaytime(userData.playtime_windows_forever)}</span></div>
+                                )}
+                                {(userData.playtime_mac_forever ?? 0) > 0 && (
+                                  <div className="flex justify-between"><span>Mac</span><span className="font-mono">{formatPlaytime(userData.playtime_mac_forever)}</span></div>
+                                )}
+                                {(userData.playtime_linux_forever ?? 0) > 0 && (
+                                  <div className="flex justify-between"><span>Linux</span><span className="font-mono">{formatPlaytime(userData.playtime_linux_forever)}</span></div>
+                                )}
+                                {(userData.playtime_deck_forever ?? 0) > 0 && (
+                                  <div className="flex justify-between"><span>Steam Deck</span><span className="font-mono">{formatPlaytime(userData.playtime_deck_forever)}</span></div>
+                                )}
+                                {(userData.playtime_disconnected ?? 0) > 0 && (
+                                  <div className="flex justify-between"><span>Offline</span><span className="font-mono">{formatPlaytime(userData.playtime_disconnected)}</span></div>
+                                )}
+                                {!hasPlatformData && (
+                                  <p className="italic text-[10px]">No platform-specific data available</p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* DB Record */}
+            <div className="glass-panel rounded-3xl p-6 space-y-3">
+              <h3 className="text-sm font-mono text-white/60 border-b border-white/5 pb-3">DB Record</h3>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-muted-foreground">Steam ID</span>
+                <a
+                  href={`https://store.steampowered.com/app/${game.appid}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-mono text-primary hover:text-white hover:underline transition-colors"
+                >
+                  [{game.appid}]
+                </a>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-muted-foreground">Last Modified</span>
+                <span className="text-xs font-mono text-muted-foreground">
+                  {game.lastModifiedTime
+                    ? new Date(game.lastModifiedTime).toLocaleString()
+                    : 'Not available'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Context Menu */}
+      {contextMenu.visible && contextMenu.steamId && (
+        <div
+          ref={contextMenuRef}
+          className="fixed z-50 min-w-[180px] rounded-md border border-white/10 bg-popover/95 backdrop-blur-xl p-1 shadow-xl"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+        >
+          {(() => {
+            const sid = contextMenu.steamId!
+            const u = userMappings?.[sid]
+            const items = [
+              { label: 'Copy SteamID', action: () => copyToClipboard(sid) },
+              { label: 'Copy Username', action: () => copyToClipboard(u?.username || 'Unknown') },
+              { label: 'Copy Name', action: () => copyToClipboard(u?.nickname || u?.username || 'Unknown') },
+              { label: 'Open Games Search', action: () => { navigate(`/games?owner=${sid}`); closeContextMenu() } },
+            ]
+            return items.map((item) => (
+              <button
+                key={item.label}
+                className="w-full text-left px-2 py-1.5 text-xs font-mono text-muted-foreground hover:text-white hover:bg-accent/20 rounded-sm transition-colors flex items-center gap-2"
+                onClick={() => { item.action(); closeContextMenu() }}
+              >
+                {item.label === 'Copy SteamID' || item.label === 'Copy Username' || item.label === 'Copy Name' ? (
+                  <Copy className="w-3 h-3" />
+                ) : (
+                  <Search className="w-3 h-3" />
+                )}
+                {item.label}
+              </button>
+            ))
+          })()}
+        </div>
+      )}
     </div>
   )
 }

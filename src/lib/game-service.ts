@@ -24,10 +24,23 @@ export interface GameDetails {
   categories?: { description: string }[]
   detailedDescription?: string
   aboutTheGame?: string
+  controllerSupport?: string
+  pcRequirements?: { minimum?: string; recommended?: string }
+  macRequirements?: { minimum?: string; recommended?: string }
+  linuxRequirements?: { minimum?: string; recommended?: string }
   ownedBy?: { steamId: string[] }
-  playtimeByUser?: Record<string, { playtime_forever: number; rtime_last_played: number }>
+  playtimeByUser?: Record<string, {
+    playtime_forever: number
+    rtime_last_played: number
+    playtime_windows_forever?: number
+    playtime_mac_forever?: number
+    playtime_linux_forever?: number
+    playtime_deck_forever?: number
+    playtime_disconnected?: number
+  }>
   totalPlaytimeFormatted?: string
   lastPlayedDateFormatted?: string
+  lastModifiedTime?: string
 }
 
 export interface UserMapping {

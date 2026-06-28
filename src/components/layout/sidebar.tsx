@@ -4,11 +4,11 @@ import {
   History, 
   MessageSquareQuote, 
   Info, 
-  ShieldCheck, 
   LogOut,
   Moon,
   Sun,
-  Menu
+  Menu,
+  ShieldCheck
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { cn } from '@/lib/utils'

@@ -40,6 +40,15 @@ export default function GameCard({ game, ownerMap }: { game: GameDetails; ownerM
       <div className="glass-panel h-full rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] relative">
         <div className="aspect-[460/215] w-full bg-black overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-t from-[#141414] to-transparent z-10"></div>
+          {game.isFree && (
+            <div className="absolute top-0 right-0 z-20">
+              <div className="relative">
+                <div className="bg-green-500 text-black text-[9px] font-bold font-mono px-6 py-0.5 rotate-45 translate-x-[18%] translate-y-[60%]">
+                  FREE
+                </div>
+              </div>
+            </div>
+          )}
           {game.headerImage ? (
             <img 
               src={game.headerImage} 

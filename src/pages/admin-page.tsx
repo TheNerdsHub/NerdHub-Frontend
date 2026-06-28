@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { gameService, type UserMapping } from '@/lib/game-service'
@@ -15,14 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Copy, ShieldCheck, AlertOctagon, Terminal, CheckSquare, Square } from 'lucide-react'
+import { Copy, ShieldCheck, AlertOctagon, Terminal, CheckSquare, Square, ArrowUp, ArrowDown } from 'lucide-react'
 
 export default function AdminPage() {
   useDocumentTitle('Admin')
@@ -35,11 +29,44 @@ export default function AdminPage() {
   const [appIdsInput, setAppIdsInput] = useState('')
   const [selectedSteamIds, setSelectedSteamIds] = useState<Set<string>>(new Set())
   const [batchSize, setBatchSize] = useState(400)
+  const [sortColumn, setSortColumn] = useState<string>('nickname')
+  const [sortDesc, setSortDesc] = useState(false)
+  const [contextMenu, setContextMenu] = useState<{ user: UserMapping; x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    const close = () => setContextMenu(null)
+    if (contextMenu) document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [contextMenu])
+
+  const handleSort = (col: string) => {
+    if (sortColumn === col) {
+      setSortDesc(!sortDesc)
+    } else {
+      setSortColumn(col)
+      setSortDesc(false)
+    }
+  }
 
   const { data: userMappings, isLoading: mappingsLoading } = useQuery({
     queryKey: ['user-mappings'],
     queryFn: () => gameService.getUserMappings(),
   })
+
+  const sortedMappings = useMemo(() => {
+    if (!userMappings) return []
+    const sorted = [...userMappings]
+    if (!sortColumn) return sorted
+    sorted.sort((a, b) => {
+      let cmp = 0
+      if (sortColumn === 'username') cmp = (a.username || '').localeCompare(b.username || '')
+      else if (sortColumn === 'steamId') cmp = a.steamId.localeCompare(b.steamId)
+      else if (sortColumn === 'discordId') cmp = (a.discordId || '').localeCompare(b.discordId || '')
+      else if (sortColumn === 'nickname') cmp = (a.nickname || '').localeCompare(b.nickname || '')
+      return sortDesc ? -cmp : cmp
+    })
+    return sorted
+  }, [userMappings, sortColumn, sortDesc])
 
   const addMappingMutation = useMutation({
     mutationFn: (data: UserMapping) => gameService.addOrUpdateUserMapping(data),
@@ -78,7 +105,7 @@ export default function AdminPage() {
         <div className="glass-panel rounded-3xl p-8 space-y-6">
           <div className="space-y-2">
             <h2 className="text-xl font-bold font-mono text-primary flex items-center gap-2">
-              <Terminal className="w-5 h-5" /> IDENTITY_MAPPING
+              <Terminal className="w-5 h-5" /> Identity Mapping
             </h2>
             <p className="text-sm text-muted-foreground">Link Steam IDs to Usernames in the network.</p>
           </div>
@@ -113,7 +140,7 @@ export default function AdminPage() {
               />
             </div>
             <Button type="submit" disabled={addMappingMutation.isPending} className="w-full font-mono rounded-xl hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] transition-shadow">
-              {addMappingMutation.isPending ? 'PROCESSING...' : 'EXECUTE_OVERRIDE'}
+              {addMappingMutation.isPending ? 'Processing...' : 'Execute Override'}
             </Button>
           </form>
         </div>
@@ -122,7 +149,7 @@ export default function AdminPage() {
         <div className="glass-panel rounded-3xl p-8 space-y-6 border-accent/20">
           <div className="space-y-2">
             <h2 className="text-xl font-bold font-mono text-accent flex items-center gap-2">
-              <Terminal className="w-5 h-5" /> SYNC_LIBRARIES
+              <Terminal className="w-5 h-5" /> Sync Libraries
             </h2>
             <p className="text-sm text-muted-foreground">Trigger manual synchronization of agent libraries.</p>
           </div>
@@ -141,7 +168,7 @@ export default function AdminPage() {
               className="bg-black/40 border-white/10 focus:border-accent font-mono text-sm"
             />
             <UpdateTaskRunner 
-              title="SYNC"
+              title="Sync"
               colorClass="accent"
               onStart={() => {
                 if (!steamIdsInput) return Promise.reject(new Error('Steam IDs required'))
@@ -161,14 +188,14 @@ export default function AdminPage() {
           </div>
           <div className="space-y-2 relative z-10">
             <h2 className="text-xl font-bold font-mono text-destructive flex items-center gap-2">
-              <AlertOctagon className="w-5 h-5" /> GLOBAL_DIRECTIVES
+              <AlertOctagon className="w-5 h-5" /> Global Directives
             </h2>
             <p className="text-sm text-muted-foreground">Trigger heavy backend processing tasks. High resource cost.</p>
           </div>
           
           <div className="space-y-6 relative z-10">
             <div className="space-y-3 p-5 rounded-2xl bg-black/40 border border-destructive/20">
-              <div className="font-mono text-sm text-white/90">UPDATE_PRICING_TABLE</div>
+              <div className="font-mono text-sm text-white/90">Update Pricing Table</div>
               <p className="text-xs text-muted-foreground">Updates the pricing manifest for all registered software.</p>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
@@ -195,17 +222,17 @@ export default function AdminPage() {
                 />
               </div>
               <UpdateTaskRunner 
-                title="PRICING"
+                title="Pricing"
                 colorClass="destructive"
                 onStart={() => gameService.startPriceUpdate(batchSize)}
               />
             </div>
             
             <div className="space-y-3 p-5 rounded-2xl bg-black/40 border border-destructive/20">
-              <div className="font-mono text-sm text-white/90">UPDATE_MANIFESTS</div>
+              <div className="font-mono text-sm text-white/90">Update Manifests</div>
               <p className="text-xs text-muted-foreground">Deep fetch of detailed software info. Extremely slow.</p>
               <UpdateTaskRunner 
-                title="MANIFESTS"
+                title="Manifests"
                 colorClass="destructive"
                 onStart={() => gameService.startGameInfoUpdate()}
               />
@@ -217,7 +244,7 @@ export default function AdminPage() {
         <div className="glass-panel rounded-3xl p-8 space-y-6 flex flex-col h-full min-h-[500px]">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-xl font-bold font-mono text-white flex items-center gap-2">
-              REGISTERED_AGENTS <span className="text-primary text-sm">[{userMappings?.length || 0}]</span>
+              Registered Agents <span className="text-primary text-sm">[{userMappings?.length || 0}]</span>
             </h2>
             <Button
               variant="outline"
@@ -237,8 +264,18 @@ export default function AdminPage() {
               ) : (
                 <Square className="w-4 h-4" />
               )}
-              SELECT ALL
+              Select All
             </Button>
+            {selectedSteamIds.size > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-white/20 text-muted-foreground hover:text-white hover:border-white/40 font-mono text-xs rounded-xl"
+                onClick={() => setSelectedSteamIds(new Set())}
+              >
+                Clear All
+              </Button>
+            )}
           </div>
           
           <div className="flex-1 rounded-2xl border border-white/10 overflow-hidden bg-black/20 relative">
@@ -247,18 +284,38 @@ export default function AdminPage() {
                 <TableHeader className="sticky top-0 bg-[#0a0a0a] z-10 shadow-sm border-b border-white/10">
                   <TableRow className="border-none hover:bg-transparent">
                     <TableHead className="w-[40px]"></TableHead>
-                    <TableHead className="font-mono text-xs text-muted-foreground">Agent</TableHead>
-                    <TableHead className="font-mono text-xs text-muted-foreground">Identifier</TableHead>
-                    <TableHead className="w-[50px]"></TableHead>
+                    <TableHead className="font-mono text-xs text-muted-foreground cursor-pointer select-none whitespace-nowrap w-[120px]" onClick={() => handleSort('nickname')}>
+                      Nickname{sortColumn === 'nickname' && (sortDesc ? <ArrowDown className="w-3 h-3 inline ml-1" /> : <ArrowUp className="w-3 h-3 inline ml-1" />)}
+                    </TableHead>
+                    <TableHead className="font-mono text-xs text-muted-foreground cursor-pointer select-none" onClick={() => handleSort('steamId')}>
+                      Steam ID{sortColumn === 'steamId' && (sortDesc ? <ArrowDown className="w-3 h-3 inline ml-1" /> : <ArrowUp className="w-3 h-3 inline ml-1" />)}
+                    </TableHead>
+                    <TableHead className="font-mono text-xs text-muted-foreground cursor-pointer select-none" onClick={() => handleSort('discordId')}>
+                      Discord ID{sortColumn === 'discordId' && (sortDesc ? <ArrowDown className="w-3 h-3 inline ml-1" /> : <ArrowUp className="w-3 h-3 inline ml-1" />)}
+                    </TableHead>
+                    <TableHead className="font-mono text-xs text-muted-foreground cursor-pointer select-none" onClick={() => handleSort('username')}>
+                      Username{sortColumn === 'username' && (sortDesc ? <ArrowDown className="w-3 h-3 inline ml-1" /> : <ArrowUp className="w-3 h-3 inline ml-1" />)}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {mappingsLoading ? (
-                    <TableRow><TableCell colSpan={4} className="text-center font-mono text-sm text-muted-foreground py-12">FETCHING...</TableCell></TableRow>
-                  ) : userMappings?.length ? (
-                    userMappings.map((u) => (
-                      <TableRow key={u.steamId} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                        <TableCell>
+                    <TableRow><TableCell colSpan={5} className="text-center font-mono text-sm text-muted-foreground py-12">Fetching...</TableCell></TableRow>
+                  ) : sortedMappings.length ? (
+                    sortedMappings.map((u) => (
+                      <TableRow key={u.steamId} className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer" onClick={() => {
+                        const next = new Set(selectedSteamIds)
+                        if (next.has(u.steamId)) {
+                          next.delete(u.steamId)
+                        } else {
+                          next.add(u.steamId)
+                        }
+                        setSelectedSteamIds(next)
+                      }} onContextMenu={(e) => {
+                        e.preventDefault()
+                        setContextMenu({ user: u, x: e.clientX, y: e.clientY })
+                      }}>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -281,42 +338,47 @@ export default function AdminPage() {
                           </Button>
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium text-white/90">{u.nickname || u.username}</div>
-                          {u.nickname && <div className="text-xs text-primary font-mono">{u.username}</div>}
+                          <div className="font-medium text-white/90">{u.nickname || '—'}</div>
                         </TableCell>
                         <TableCell className="font-mono text-xs text-muted-foreground">{u.steamId}</TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-white/10">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-[#141414] border-white/10 font-mono text-xs">
-                              <DropdownMenuItem className="hover:bg-white/10 hover:text-primary cursor-pointer" onClick={() => {
-                                setMappingForm(u)
-                                window.scrollTo({ top: 0, behavior: 'smooth' })
-                              }}>
-                                Edit Mapping
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator className="bg-white/10" />
-                              <DropdownMenuItem className="hover:bg-white/10 cursor-pointer" onClick={() => copyToClipboard(u.steamId)}>
-                                <Copy className="mr-2 h-4 w-4" /> Copy Steam ID
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground">{u.discordId || '—'}</TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground">{u.username}</TableCell>
                       </TableRow>
                     ))
                   ) : (
-                    <TableRow><TableCell colSpan={4} className="text-center font-mono text-sm text-muted-foreground py-12">No agents found.</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={5} className="text-center font-mono text-sm text-muted-foreground py-12">No users found.</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
             </div>
           </div>
-          
+
+          {contextMenu && createPortal(
+            <div
+              className="fixed z-50 bg-[#141414] border border-white/10 rounded-xl py-1 font-mono text-xs shadow-2xl"
+              style={{ left: contextMenu.x, top: contextMenu.y }}
+              onClick={() => setContextMenu(null)}
+            >
+              <button className="w-full text-left px-3 py-1.5 hover:bg-white/10 hover:text-primary cursor-pointer" onClick={() => { setMappingForm(contextMenu.user); window.scrollTo({ top: 0, behavior: 'smooth' }); setContextMenu(null) }}>
+                Edit Mapping
+              </button>
+              <div className="border-t border-white/10 my-1" />
+              <button className="w-full text-left px-3 py-1.5 hover:bg-white/10 cursor-pointer flex items-center gap-2" onClick={() => { copyToClipboard(contextMenu.user.steamId); setContextMenu(null) }}>
+                <Copy className="w-3.5 h-3.5" /> Copy Steam ID
+              </button>
+              <button className="w-full text-left px-3 py-1.5 hover:bg-white/10 cursor-pointer flex items-center gap-2" onClick={() => { copyToClipboard(contextMenu.user.discordId || ''); setContextMenu(null) }}>
+                <Copy className="w-3.5 h-3.5" /> Copy Discord ID
+              </button>
+              <button className="w-full text-left px-3 py-1.5 hover:bg-white/10 cursor-pointer flex items-center gap-2" onClick={() => { copyToClipboard(contextMenu.user.username); setContextMenu(null) }}>
+                <Copy className="w-3.5 h-3.5" /> Copy Username
+              </button>
+              <button className="w-full text-left px-3 py-1.5 hover:bg-white/10 cursor-pointer flex items-center gap-2" onClick={() => { copyToClipboard(contextMenu.user.nickname || ''); setContextMenu(null) }}>
+                <Copy className="w-3.5 h-3.5" /> Copy Nickname
+              </button>
+            </div>,
+            document.body
+          )}
+
           {selectedSteamIds.size > 0 && (
             <Button
               variant="outline"
@@ -403,7 +465,7 @@ function UpdateTaskRunner({ title, onStart, colorClass = "primary" }: { title: s
         variant="outline" 
         className={`w-full font-mono rounded-xl transition-all ${btnClass}`}
       >
-        {isRunning ? 'EXECUTING...' : `START_${title}`}
+        {isRunning ? 'Executing...' : `Start ${title}`}
       </Button>
 
       {isRunning && (
