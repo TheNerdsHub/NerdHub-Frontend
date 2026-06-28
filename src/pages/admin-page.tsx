@@ -1,43 +1,29 @@
-import { useState, useMemo, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { useDocumentTitle } from '@/hooks/use-document-title'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { gameService, type UserMapping } from '@/lib/game-service'
-import { copyToClipboard } from '@/lib/clipboard'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Copy, ShieldCheck, AlertOctagon, Terminal, CheckSquare, Square, ArrowUp, ArrowDown } from 'lucide-react'
+import { useState, useMemo } from "react"
+import { useDocumentTitle } from "@/hooks/use-document-title"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { gameService, type UserMapping } from "@/lib/game-service"
+import { GameContextMenu } from "@/components/game-context-menu"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { SortableTable } from "@/components/ui/sortable-table"
+import { UpdateTaskRunner } from "@/components/ui/update-task-runner"
+import { useToast } from "@/hooks/use-toast"
+import { Copy, ShieldCheck, AlertOctagon, Terminal, CheckSquare, Square, ArrowUp, ArrowDown } from "lucide-react"
 
 export default function AdminPage() {
-  useDocumentTitle('Admin')
+  useDocumentTitle("Admin")
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
   // User Mappings State
-  const [mappingForm, setMappingForm] = useState<UserMapping>({ steamId: '', username: '', nickname: '', discordId: '' })
-  const [steamIdsInput, setSteamIdsInput] = useState('')
-  const [appIdsInput, setAppIdsInput] = useState('')
+  const [mappingForm, setMappingForm] = useState<UserMapping>({ steamId: "", username: "", nickname: "", discordId: "" })
+  const [steamIdsInput, setSteamIdsInput] = useState("")
+  const [appIdsInput, setAppIdsInput] = useState("")
   const [selectedSteamIds, setSelectedSteamIds] = useState<Set<string>>(new Set())
   const [batchSize, setBatchSize] = useState(400)
-  const [sortColumn, setSortColumn] = useState<string>('nickname')
+  const [sortColumn, setSortColumn] = useState<string>("nickname")
   const [sortDesc, setSortDesc] = useState(false)
-  const [contextMenu, setContextMenu] = useState<{ user: UserMapping; x: number; y: number } | null>(null)
-
-  useEffect(() => {
-    const close = () => setContextMenu(null)
-    if (contextMenu) document.addEventListener('click', close)
-    return () => document.removeEventListener('click', close)
-  }, [contextMenu])
 
   const handleSort = (col: string) => {
     if (sortColumn === col) {
@@ -49,7 +35,7 @@ export default function AdminPage() {
   }
 
   const { data: userMappings, isLoading: mappingsLoading } = useQuery({
-    queryKey: ['user-mappings'],
+    queryKey: ["user-mappings"],
     queryFn: () => gameService.getUserMappings(),
   })
 
@@ -59,10 +45,10 @@ export default function AdminPage() {
     if (!sortColumn) return sorted
     sorted.sort((a, b) => {
       let cmp = 0
-      if (sortColumn === 'username') cmp = (a.username || '').localeCompare(b.username || '')
-      else if (sortColumn === 'steamId') cmp = a.steamId.localeCompare(b.steamId)
-      else if (sortColumn === 'discordId') cmp = (a.discordId || '').localeCompare(b.discordId || '')
-      else if (sortColumn === 'nickname') cmp = (a.nickname || '').localeCompare(b.nickname || '')
+      if (sortColumn === "username") cmp = (a.username || "").localeCompare(b.username || "")
+      else if (sortColumn === "steamId") cmp = a.steamId.localeCompare(b.steamId)
+      else if (sortColumn === "discordId") cmp = (a.discordId || "").localeCompare(b.discordId || "")
+      else if (sortColumn === "nickname") cmp = (a.nickname || "").localeCompare(b.nickname || "")
       return sortDesc ? -cmp : cmp
     })
     return sorted
@@ -71,12 +57,12 @@ export default function AdminPage() {
   const addMappingMutation = useMutation({
     mutationFn: (data: UserMapping) => gameService.addOrUpdateUserMapping(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-mappings'] })
-      toast({ title: 'Success', description: 'User mapping updated.' })
-      setMappingForm({ steamId: '', username: '', nickname: '', discordId: '' })
+      queryClient.invalidateQueries({ queryKey: ["user-mappings"] })
+      toast({ title: "Success", description: "User mapping updated." })
+      setMappingForm({ steamId: "", username: "", nickname: "", discordId: "" })
     },
     onError: (err: any) => {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' })
+      toast({ title: "Error", description: err.message, variant: "destructive" })
     }
   })
 
@@ -85,6 +71,62 @@ export default function AdminPage() {
     if (!mappingForm.steamId || !mappingForm.username) return
     addMappingMutation.mutate(mappingForm)
   }
+
+  const tableColumns = [
+    {
+      key: "select",
+      header: "",
+      width: "w-[40px]",
+      render: (u: UserMapping) => (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 p-0 text-muted-foreground hover:text-accent"
+          onClick={(e) => {
+            e.stopPropagation()
+            const next = new Set(selectedSteamIds)
+            if (next.has(u.steamId)) {
+              next.delete(u.steamId)
+            } else {
+              next.add(u.steamId)
+            }
+            setSelectedSteamIds(next)
+          }}
+        >
+          {selectedSteamIds.has(u.steamId) ? (
+            <CheckSquare className="w-4 h-4 text-accent" />
+          ) : (
+            <Square className="w-4 h-4" />
+          )}
+        </Button>
+      ),
+    },
+    {
+      key: "nickname",
+      header: "Nickname",
+      sortable: true,
+      width: "w-[120px]",
+      render: (u: UserMapping) => <div className="font-medium text-white/90">{u.nickname || "\u2014"}</div>,
+    },
+    {
+      key: "steamId",
+      header: "Steam ID",
+      sortable: true,
+      render: (u: UserMapping) => <span className="font-mono text-xs text-muted-foreground">{u.steamId}</span>,
+    },
+    {
+      key: "discordId",
+      header: "Discord ID",
+      sortable: true,
+      render: (u: UserMapping) => <span className="font-mono text-xs text-muted-foreground">{u.discordId || "\u2014"}</span>,
+    },
+    {
+      key: "username",
+      header: "Username",
+      sortable: true,
+      render: (u: UserMapping) => <span className="font-mono text-xs text-muted-foreground">{u.username}</span>,
+    },
+  ]
 
   return (
     <div className="container max-w-7xl mx-auto py-12 px-6 space-y-10">
@@ -140,7 +182,7 @@ export default function AdminPage() {
               />
             </div>
             <Button type="submit" disabled={addMappingMutation.isPending} className="w-full font-mono rounded-xl hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] transition-shadow">
-              {addMappingMutation.isPending ? 'Processing...' : 'Execute Override'}
+              {addMappingMutation.isPending ? "Processing..." : "Execute Override"}
             </Button>
           </form>
         </div>
@@ -171,8 +213,8 @@ export default function AdminPage() {
               title="Sync"
               colorClass="accent"
               onStart={() => {
-                if (!steamIdsInput) return Promise.reject(new Error('Steam IDs required'))
-                const appIds = appIdsInput ? appIdsInput.split(',').map(s => parseInt(s.trim())) : undefined
+                if (!steamIdsInput) return Promise.reject(new Error("Steam IDs required"))
+                const appIds = appIdsInput ? appIdsInput.split(",").map(s => parseInt(s.trim())) : undefined
                 return gameService.startUpdate(steamIdsInput, false, appIds)
               }}
             />
@@ -278,215 +320,52 @@ export default function AdminPage() {
             )}
           </div>
           
-          <div className="flex-1 rounded-2xl border border-white/10 overflow-hidden bg-black/20 relative">
-            <div className="absolute inset-0 overflow-auto">
-              <Table>
-                <TableHeader className="sticky top-0 bg-[#0a0a0a] z-10 shadow-sm border-b border-white/10">
-                  <TableRow className="border-none hover:bg-transparent">
-                    <TableHead className="w-[40px]"></TableHead>
-                    <TableHead className="font-mono text-xs text-muted-foreground cursor-pointer select-none whitespace-nowrap w-[120px]" onClick={() => handleSort('nickname')}>
-                      Nickname{sortColumn === 'nickname' && (sortDesc ? <ArrowDown className="w-3 h-3 inline ml-1" /> : <ArrowUp className="w-3 h-3 inline ml-1" />)}
-                    </TableHead>
-                    <TableHead className="font-mono text-xs text-muted-foreground cursor-pointer select-none" onClick={() => handleSort('steamId')}>
-                      Steam ID{sortColumn === 'steamId' && (sortDesc ? <ArrowDown className="w-3 h-3 inline ml-1" /> : <ArrowUp className="w-3 h-3 inline ml-1" />)}
-                    </TableHead>
-                    <TableHead className="font-mono text-xs text-muted-foreground cursor-pointer select-none" onClick={() => handleSort('discordId')}>
-                      Discord ID{sortColumn === 'discordId' && (sortDesc ? <ArrowDown className="w-3 h-3 inline ml-1" /> : <ArrowUp className="w-3 h-3 inline ml-1" />)}
-                    </TableHead>
-                    <TableHead className="font-mono text-xs text-muted-foreground cursor-pointer select-none" onClick={() => handleSort('username')}>
-                      Username{sortColumn === 'username' && (sortDesc ? <ArrowDown className="w-3 h-3 inline ml-1" /> : <ArrowUp className="w-3 h-3 inline ml-1" />)}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mappingsLoading ? (
-                    <TableRow><TableCell colSpan={5} className="text-center font-mono text-sm text-muted-foreground py-12">Fetching...</TableCell></TableRow>
-                  ) : sortedMappings.length ? (
-                    sortedMappings.map((u) => (
-                      <TableRow key={u.steamId} className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer" onClick={() => {
-                        const next = new Set(selectedSteamIds)
-                        if (next.has(u.steamId)) {
-                          next.delete(u.steamId)
-                        } else {
-                          next.add(u.steamId)
-                        }
-                        setSelectedSteamIds(next)
-                      }} onContextMenu={(e) => {
-                        e.preventDefault()
-                        setContextMenu({ user: u, x: e.clientX, y: e.clientY })
-                      }}>
-                        <TableCell onClick={(e) => e.stopPropagation()}>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-accent"
-                            onClick={() => {
-                              const next = new Set(selectedSteamIds)
-                              if (next.has(u.steamId)) {
-                                next.delete(u.steamId)
-                              } else {
-                                next.add(u.steamId)
-                              }
-                              setSelectedSteamIds(next)
-                            }}
-                          >
-                            {selectedSteamIds.has(u.steamId) ? (
-                              <CheckSquare className="w-4 h-4 text-accent" />
-                            ) : (
-                              <Square className="w-4 h-4" />
-                            )}
-                          </Button>
-                        </TableCell>
-                        <TableCell>
-                          <div className="font-medium text-white/90">{u.nickname || '—'}</div>
-                        </TableCell>
-                        <TableCell className="font-mono text-xs text-muted-foreground">{u.steamId}</TableCell>
-                        <TableCell className="font-mono text-xs text-muted-foreground">{u.discordId || '—'}</TableCell>
-                        <TableCell className="font-mono text-xs text-muted-foreground">{u.username}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow><TableCell colSpan={5} className="text-center font-mono text-sm text-muted-foreground py-12">No users found.</TableCell></TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-
-          {contextMenu && createPortal(
-            <div
-              className="fixed z-50 bg-[#141414] border border-white/10 rounded-xl py-1 font-mono text-xs shadow-2xl"
-              style={{ left: contextMenu.x, top: contextMenu.y }}
-              onClick={() => setContextMenu(null)}
-            >
-              <button className="w-full text-left px-3 py-1.5 hover:bg-white/10 hover:text-primary cursor-pointer" onClick={() => { setMappingForm(contextMenu.user); window.scrollTo({ top: 0, behavior: 'smooth' }); setContextMenu(null) }}>
-                Edit Mapping
-              </button>
-              <div className="border-t border-white/10 my-1" />
-              <button className="w-full text-left px-3 py-1.5 hover:bg-white/10 cursor-pointer flex items-center gap-2" onClick={() => { copyToClipboard(contextMenu.user.steamId); setContextMenu(null) }}>
-                <Copy className="w-3.5 h-3.5" /> Copy Steam ID
-              </button>
-              <button className="w-full text-left px-3 py-1.5 hover:bg-white/10 cursor-pointer flex items-center gap-2" onClick={() => { copyToClipboard(contextMenu.user.discordId || ''); setContextMenu(null) }}>
-                <Copy className="w-3.5 h-3.5" /> Copy Discord ID
-              </button>
-              <button className="w-full text-left px-3 py-1.5 hover:bg-white/10 cursor-pointer flex items-center gap-2" onClick={() => { copyToClipboard(contextMenu.user.username); setContextMenu(null) }}>
-                <Copy className="w-3.5 h-3.5" /> Copy Username
-              </button>
-              <button className="w-full text-left px-3 py-1.5 hover:bg-white/10 cursor-pointer flex items-center gap-2" onClick={() => { copyToClipboard(contextMenu.user.nickname || ''); setContextMenu(null) }}>
-                <Copy className="w-3.5 h-3.5" /> Copy Nickname
-              </button>
-            </div>,
-            document.body
-          )}
+          <SortableTable
+            columns={tableColumns}
+            data={sortedMappings}
+            sortColumn={sortColumn}
+            sortDesc={sortDesc}
+            onSort={handleSort}
+            keyExtractor={(u) => u.steamId}
+            isLoading={mappingsLoading}
+            emptyMessage="No users found."
+            onRowClick={(u) => {
+              const next = new Set(selectedSteamIds)
+              if (next.has(u.steamId)) {
+                next.delete(u.steamId)
+              } else {
+                next.add(u.steamId)
+              }
+              setSelectedSteamIds(next)
+            }}
+            rowWrapper={(u, children) => (
+              <GameContextMenu
+                steamId={u.steamId}
+                userMapping={u}
+                onEdit={() => {
+                  setMappingForm(u)
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }}
+              >
+                {children}
+              </GameContextMenu>
+            )}
+          />
 
           {selectedSteamIds.size > 0 && (
             <Button
               variant="outline"
               className="border-accent/50 text-accent hover:bg-accent/10 font-mono text-xs rounded-xl"
               onClick={() => {
-                setSteamIdsInput(Array.from(selectedSteamIds).join(', '))
-                window.scrollTo({ top: 0, behavior: 'smooth' })
+                setSteamIdsInput(Array.from(selectedSteamIds).join(", "))
+                window.scrollTo({ top: 0, behavior: "smooth" })
               }}
             >
-              Populate {selectedSteamIds.size} Agent{selectedSteamIds.size > 1 ? 's' : ''} into sync
+              Populate {selectedSteamIds.size} Agent{selectedSteamIds.size > 1 ? "s" : ""} into sync
             </Button>
           )}
         </div>
       </div>
-    </div>
-  )
-}
-
-// Helper component to manage long-running tasks
-function UpdateTaskRunner({ title, onStart, colorClass = "primary" }: { title: string, onStart: () => Promise<{ operationId: string }>, colorClass?: "primary" | "accent" | "destructive" }) {
-  const { toast } = useToast()
-  const [isRunning, setIsRunning] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [phase, setPhase] = useState('')
-  const [message, setMessage] = useState('')
-  const [result, setResult] = useState<any>(null)
-
-  const btnClass = colorClass === 'destructive' 
-    ? 'border-destructive/50 text-destructive hover:bg-destructive/10' 
-    : colorClass === 'accent'
-      ? 'border-accent/50 text-accent hover:bg-accent/10'
-      : 'border-primary/50 text-primary hover:bg-primary/10'
-      
-  const pbgClass = colorClass === 'destructive' ? 'bg-destructive' : colorClass === 'accent' ? 'bg-accent' : 'bg-primary'
-
-  const handleStart = async () => {
-    setIsRunning(true)
-    setProgress(0)
-    setPhase('Initializing')
-    setMessage('Starting...')
-    setResult(null)
-
-    try {
-      const res = await onStart()
-      pollProgress(res.operationId)
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' })
-      setIsRunning(false)
-    }
-  }
-
-  const pollProgress = async (operationId: string) => {
-    try {
-      const p = await gameService.getProgress(operationId)
-      setProgress(p.progress)
-      setPhase(p.phase)
-      setMessage(p.message)
-
-      if (p.progress >= 100) {
-        setPhase('Completed')
-        setIsRunning(false)
-        try {
-          const finalResult = await gameService.getUpdateResult(operationId)
-          setResult(finalResult)
-          toast({ title: `${title} Completed` })
-        } catch (e) {
-          // ignore
-        }
-        return
-      }
-
-      setTimeout(() => pollProgress(operationId), (p.retryAfterSeconds || 1) * 1000)
-    } catch (err) {
-      setIsRunning(false)
-      toast({ title: 'Polling failed', variant: 'destructive' })
-    }
-  }
-
-  return (
-    <div className="space-y-4">
-      <Button 
-        onClick={handleStart} 
-        disabled={isRunning} 
-        variant="outline" 
-        className={`w-full font-mono rounded-xl transition-all ${btnClass}`}
-      >
-        {isRunning ? 'Executing...' : `Start ${title}`}
-      </Button>
-
-      {isRunning && (
-        <div className="space-y-3 bg-black/60 border border-white/10 p-4 rounded-xl">
-          <div className="flex justify-between text-xs font-mono text-muted-foreground">
-            <span>{phase}</span>
-            <span className={`text-${colorClass}`}>{progress}%</span>
-          </div>
-          {/* Custom progress bar for better cyberpunk feel */}
-          <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-            <div className={`h-full ${pbgClass} transition-all duration-500`} style={{ width: `${progress}%`, boxShadow: `0 0 10px var(--${colorClass})` }}></div>
-          </div>
-          <p className="text-[10px] font-mono text-muted-foreground/70 truncate">{message}</p>
-        </div>
-      )}
-
-      {result && !isRunning && (
-        <div className="bg-black/60 border border-white/10 p-4 rounded-xl text-sm overflow-auto max-h-[200px]">
-          <pre className={`text-[10px] font-mono text-${colorClass}`}>{JSON.stringify(result, null, 2)}</pre>
-        </div>
-      )}
     </div>
   )
 }

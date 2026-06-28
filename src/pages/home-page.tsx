@@ -7,6 +7,8 @@ import { quoteService } from '@/lib/quote-service'
 import { gameService } from '@/lib/game-service'
 import GameCard from '@/components/game-card'
 import { Quote, CalendarDays, Share2, BookOpen, Trophy } from 'lucide-react'
+import { useOwnerMap } from '@/hooks/use-owner-map'
+import { GameCardSkeleton } from '@/components/game-card-skeleton'
 
 export default function HomePage() {
   useDocumentTitle('Home')
@@ -39,14 +41,7 @@ export default function HomePage() {
     staleTime: 5 * 60 * 1000,
   })
 
-  const ownerMap = useMemo(() => {
-    if (!userMappings) return undefined
-    const map: Record<string, string> = {}
-    for (const u of userMappings) {
-      map[u.steamId] = u.nickname || u.username
-    }
-    return map
-  }, [userMappings])
+  const ownerMap = useOwnerMap(userMappings)
 
   return (
     <div className="container max-w-7xl mx-auto space-y-16 py-16 px-6">
@@ -142,7 +137,7 @@ export default function HomePage() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-[280px] rounded-2xl bg-white/5 animate-pulse border border-white/5" />
+              <GameCardSkeleton key={i} />
             ))}
           </div>
         )}
