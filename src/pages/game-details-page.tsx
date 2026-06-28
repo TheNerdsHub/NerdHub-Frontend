@@ -39,7 +39,7 @@ export default function GameDetailsPage() {
       <div className="container py-24 text-center">
         <div className="glass-panel border-destructive/30 bg-destructive/5 rounded-3xl p-12 inline-flex flex-col items-center gap-6">
           <h2 className="text-3xl font-bold text-destructive">Data Not Found</h2>
-          <p className="text-muted-foreground font-mono uppercase">Record ID {appid} does not exist in the database.</p>
+          <p className="text-muted-foreground font-mono">Record ID {appid} does not exist in the database.</p>
           <Button variant="outline" className="border-destructive/50 hover:bg-destructive/10 text-destructive" asChild>
             <Link to="/games">Abort & Return</Link>
           </Button>
@@ -71,7 +71,7 @@ export default function GameDetailsPage() {
 
         <div className="container max-w-7xl mx-auto px-6 relative z-10 pb-12 w-full">
           <Button variant="ghost" asChild className="mb-8 hover:bg-white/10 hover:text-white group">
-            <Link to="/games" className="gap-2 font-mono uppercase tracking-wider text-xs">
+            <Link to="/games" className="gap-2 font-mono text-xs">
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               Return
             </Link>
@@ -92,7 +92,7 @@ export default function GameDetailsPage() {
               </h1>
               <div className="flex flex-wrap gap-2 pt-2">
                 {game.genres?.map((g) => (
-                  <Badge key={g.description} variant="outline" className="bg-white/5 border-white/10 backdrop-blur font-mono text-[10px] uppercase">
+                  <Badge key={g.description} variant="outline" className="bg-white/5 border-white/10 backdrop-blur font-mono text-[10px]">
                     {g.description}
                   </Badge>
                 ))}
@@ -107,7 +107,7 @@ export default function GameDetailsPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             <div className="glass-panel rounded-3xl p-8 space-y-4">
-              <h3 className="text-sm font-mono uppercase tracking-widest text-primary flex items-center gap-2">
+              <h3 className="text-sm font-mono text-primary flex items-center gap-2">
                 <Tag className="w-4 h-4" /> Briefing
               </h3>
               <p className="text-lg text-muted-foreground leading-relaxed">
@@ -120,7 +120,7 @@ export default function GameDetailsPage() {
                 <div className="absolute top-0 right-0 p-8 opacity-5">
                   <Gamepad2 className="w-32 h-32" />
                 </div>
-                <h3 className="text-sm font-mono uppercase tracking-widest text-accent relative z-10">Data Log // Full Description</h3>
+                <h3 className="text-sm font-mono text-accent relative z-10">Data Log // Full Description</h3>
                 
                 <div 
                   className="prose prose-sm md:prose-base dark:prose-invert max-w-none relative z-10
@@ -137,7 +137,7 @@ export default function GameDetailsPage() {
           {/* Sidebar details */}
           <div className="space-y-6">
             <div className="glass-panel rounded-3xl p-6 space-y-6">
-              <h3 className="text-sm font-mono uppercase tracking-widest text-white border-b border-white/5 pb-4">Specs</h3>
+              <h3 className="text-sm font-mono text-white border-b border-white/5 pb-4">Specs</h3>
               
               <div className="space-y-4">
                 <div className="flex justify-between items-center group">
@@ -176,7 +176,7 @@ export default function GameDetailsPage() {
                     <span className="text-muted-foreground text-sm flex items-center gap-2">
                       <Monitor className="w-4 h-4" /> Systems
                     </span>
-                    <span className="text-xs font-mono uppercase tracking-wider">{platforms.join(' / ')}</span>
+                    <span className="text-xs font-mono">{platforms.join(' / ')}</span>
                   </div>
                 )}
 
@@ -195,7 +195,7 @@ export default function GameDetailsPage() {
             </div>
 
             <div className="glass-panel rounded-3xl p-6 space-y-6 border-accent/20 bg-accent/5">
-              <h3 className="text-sm font-mono uppercase tracking-widest text-accent flex items-center gap-2 border-b border-white/5 pb-4">
+              <h3 className="text-sm font-mono text-accent flex items-center gap-2 border-b border-white/5 pb-4">
                 <Users className="w-4 h-4" /> Active Agents ({owners.length})
               </h3>
               
@@ -220,7 +220,7 @@ export default function GameDetailsPage() {
                   })}
                 </ul>
               ) : (
-                <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground text-center py-4">No agents registered.</p>
+                <p className="text-xs font-mono text-muted-foreground text-center py-4">No agents registered.</p>
               )}
             </div>
           </div>

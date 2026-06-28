@@ -46,8 +46,8 @@ export default function Sidebar() {
   const NavContent = () => (
     <>
       <div className="flex flex-col items-center py-6 gap-4 border-b border-white/5">
-        <Link to="/" className="text-xl font-bold tracking-tighter text-primary">
-          NH
+        <Link to="/" className="block">
+          <img src="/TheNerdsLogo.png" alt="NerdHub" className="w-10 h-10 object-contain rounded-md" />
         </Link>
       </div>
 
@@ -71,7 +71,7 @@ export default function Sidebar() {
                   <item.icon className="w-5 h-5" />
                 </Link>
                 {/* Tooltip */}
-                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-popover text-popover-foreground text-xs font-mono uppercase tracking-wider rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-border">
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-popover text-popover-foreground text-xs font-mono rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-border">
                   {item.label}
                 </div>
               </div>
@@ -90,7 +90,7 @@ export default function Sidebar() {
                   className="w-10 h-10 rounded-full border-2 border-transparent hover:border-primary transition-colors"
                 />
               </Link>
-              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-popover text-popover-foreground text-xs font-mono uppercase tracking-wider rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-border">
+              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-popover text-popover-foreground text-xs font-mono rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-border">
                 Profile
               </div>
             </div>
@@ -102,7 +102,7 @@ export default function Sidebar() {
               >
                 <LogOut className="w-5 h-5" />
               </button>
-              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-popover text-popover-foreground text-xs font-mono uppercase tracking-wider rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-border">
+              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-popover text-popover-foreground text-xs font-mono rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-border">
                 Sign Out
               </div>
             </div>
@@ -117,7 +117,7 @@ export default function Sidebar() {
                 ?
               </div>
             </Link>
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-popover text-popover-foreground text-xs font-mono uppercase tracking-wider rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-border">
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 bg-popover text-popover-foreground text-xs font-mono rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-border">
               Sign In
             </div>
           </div>
@@ -137,7 +137,10 @@ export default function Sidebar() {
     <>
       {/* Mobile Toggle */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/80 backdrop-blur-md border-b z-40 flex items-center justify-between px-4">
-        <Link to="/" className="text-xl font-bold tracking-tighter text-primary">NH</Link>
+        <Link to="/" className="flex items-center gap-2">
+          <img src="/TheNerdsLogo.png" alt="NerdHub" className="w-8 h-8 object-contain rounded-md" />
+          <span className="text-lg font-black tracking-tighter text-primary">NerdHub</span>
+        </Link>
         <button onClick={() => setIsMobileOpen(!isMobileOpen)} className="p-2">
           <Menu className="w-6 h-6" />
         </button>

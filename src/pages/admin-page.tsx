@@ -68,7 +68,7 @@ export default function AdminPage() {
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight">Admin Console</h1>
         </div>
-        <p className="text-muted-foreground font-mono uppercase tracking-widest text-sm">
+        <p className="text-muted-foreground font-mono text-sm">
           Warning: Authorized personnel only. System overrides active.
         </p>
       </div>
@@ -112,7 +112,7 @@ export default function AdminPage() {
                 className="bg-black/40 border-white/10 focus:border-primary font-mono text-sm"
               />
             </div>
-            <Button type="submit" disabled={addMappingMutation.isPending} className="w-full font-mono uppercase tracking-wider rounded-xl hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] transition-shadow">
+            <Button type="submit" disabled={addMappingMutation.isPending} className="w-full font-mono rounded-xl hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] transition-shadow">
               {addMappingMutation.isPending ? 'PROCESSING...' : 'EXECUTE_OVERRIDE'}
             </Button>
           </form>
@@ -222,7 +222,7 @@ export default function AdminPage() {
             <Button
               variant="outline"
               size="sm"
-              className="border-accent/50 text-accent hover:bg-accent/10 font-mono text-xs uppercase tracking-wider rounded-xl gap-2"
+              className="border-accent/50 text-accent hover:bg-accent/10 font-mono text-xs rounded-xl gap-2"
               onClick={() => {
                 const allSelected = userMappings?.every(u => selectedSteamIds.has(u.steamId))
                 if (allSelected) {
@@ -247,8 +247,8 @@ export default function AdminPage() {
                 <TableHeader className="sticky top-0 bg-[#0a0a0a] z-10 shadow-sm border-b border-white/10">
                   <TableRow className="border-none hover:bg-transparent">
                     <TableHead className="w-[40px]"></TableHead>
-                    <TableHead className="font-mono text-xs uppercase text-muted-foreground">Agent</TableHead>
-                    <TableHead className="font-mono text-xs uppercase text-muted-foreground">Identifier</TableHead>
+                    <TableHead className="font-mono text-xs text-muted-foreground">Agent</TableHead>
+                    <TableHead className="font-mono text-xs text-muted-foreground">Identifier</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -293,7 +293,7 @@ export default function AdminPage() {
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-[#141414] border-white/10 font-mono text-xs uppercase">
+                            <DropdownMenuContent align="end" className="bg-[#141414] border-white/10 font-mono text-xs">
                               <DropdownMenuItem className="hover:bg-white/10 hover:text-primary cursor-pointer" onClick={() => {
                                 setMappingForm(u)
                                 window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -320,7 +320,7 @@ export default function AdminPage() {
           {selectedSteamIds.size > 0 && (
             <Button
               variant="outline"
-              className="border-accent/50 text-accent hover:bg-accent/10 font-mono text-xs uppercase tracking-wider rounded-xl"
+              className="border-accent/50 text-accent hover:bg-accent/10 font-mono text-xs rounded-xl"
               onClick={() => {
                 setSteamIdsInput(Array.from(selectedSteamIds).join(', '))
                 window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -401,14 +401,14 @@ function UpdateTaskRunner({ title, onStart, colorClass = "primary" }: { title: s
         onClick={handleStart} 
         disabled={isRunning} 
         variant="outline" 
-        className={`w-full font-mono uppercase tracking-wider rounded-xl transition-all ${btnClass}`}
+        className={`w-full font-mono rounded-xl transition-all ${btnClass}`}
       >
         {isRunning ? 'EXECUTING...' : `START_${title}`}
       </Button>
 
       {isRunning && (
         <div className="space-y-3 bg-black/60 border border-white/10 p-4 rounded-xl">
-          <div className="flex justify-between text-xs font-mono uppercase text-muted-foreground">
+          <div className="flex justify-between text-xs font-mono text-muted-foreground">
             <span>{phase}</span>
             <span className={`text-${colorClass}`}>{progress}%</span>
           </div>
@@ -416,7 +416,7 @@ function UpdateTaskRunner({ title, onStart, colorClass = "primary" }: { title: s
           <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
             <div className={`h-full ${pbgClass} transition-all duration-500`} style={{ width: `${progress}%`, boxShadow: `0 0 10px var(--${colorClass})` }}></div>
           </div>
-          <p className="text-[10px] font-mono text-muted-foreground/70 uppercase truncate">{message}</p>
+          <p className="text-[10px] font-mono text-muted-foreground/70 truncate">{message}</p>
         </div>
       )}
 

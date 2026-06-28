@@ -42,7 +42,7 @@ export default function AboutPage() {
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight">System Info</h1>
         </div>
-        <p className="text-muted-foreground font-mono uppercase tracking-widest text-sm">
+        <p className="text-muted-foreground font-mono text-sm">
           Telemetry data for NerdHub services.
         </p>
       </div>
@@ -100,7 +100,7 @@ export default function AboutPage() {
 function Section({ title, value }: { title: string; value: string | null }) {
   return (
     <div className="relative z-10 border-l-2 border-white/10 pl-4 py-1">
-      <h3 className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{title}</h3>
+      <h3 className="text-xs font-mono text-muted-foreground">{title}</h3>
       <div className="mt-2 flex items-center">
         {value ? (
           <span className="font-mono text-lg text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.4)] bg-primary/10 px-3 py-1 rounded-md border border-primary/20">

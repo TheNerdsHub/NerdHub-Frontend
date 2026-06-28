@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { useQuery } from '@tanstack/react-query'
 import { gameService } from '@/lib/game-service'
@@ -12,21 +13,71 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 
-type SortKey = 'name' | 'price' | 'appid' | 'owners'
+type SortKey = 'name' | 'price' | 'appid' | 'owners' | 'discount'
 
 export default function GamesPage() {
   useDocumentTitle('Games')
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const [search, setSearch] = useState('')
-  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
-  const [sortBy, setSortBy] = useState<SortKey>('owners')
-  const [sortDesc, setSortDesc] = useState(true)
-  const [hideNoPrice, setHideNoPrice] = useState(true)
+  const search = searchParams.get('q') ?? ''
+  const setSearch = (val: string) => {
+    const next = new URLSearchParams(searchParams)
+    if (val) next.set('q', val); else next.delete('q')
+    setSearchParams(next, { replace: true })
+  }
+  const selectedTags = useMemo(() => {
+    const raw = searchParams.get('tags')
+    return raw ? new Set(raw.split(',').filter(Boolean)) : new Set<string>()
+  }, [searchParams])
+  const setSelectedTags = (next: Set<string>) => {
+    const p = new URLSearchParams(searchParams)
+    if (next.size > 0) p.set('tags', Array.from(next).join(',')); else p.delete('tags')
+    setSearchParams(p, { replace: true })
+  }
+  const sortBy = (searchParams.get('sort') as SortKey) ?? 'owners'
+  const setSortBy = (val: SortKey) => {
+    const p = new URLSearchParams(searchParams)
+    if (val !== 'owners') p.set('sort', val); else p.delete('sort')
+    setSearchParams(p, { replace: true })
+  }
+  const sortDesc = searchParams.get('dir') !== 'asc'
+  const setSortDesc = (val: boolean) => {
+    const p = new URLSearchParams(searchParams)
+    if (!val) p.set('dir', 'asc'); else p.delete('dir')
+    setSearchParams(p, { replace: true })
+  }
+  const hideNoPrice = searchParams.get('noprice') !== '0'
+  const setHideNoPrice = (val: boolean) => {
+    const p = new URLSearchParams(searchParams)
+    if (!val) p.set('noprice', '0'); else p.delete('noprice')
+    setSearchParams(p, { replace: true })
+  }
+  const multiOwner = searchParams.get('multi') === '1'
+  const setMultiOwner = (val: boolean) => {
+    const p = new URLSearchParams(searchParams)
+    if (val) p.set('multi', '1'); else p.delete('multi')
+    setSearchParams(p, { replace: true })
+  }
 
   const { data: games, isLoading, isError } = useQuery({
     queryKey: ['games'],
     queryFn: () => gameService.getAllGames(),
   })
+
+  const { data: userMappings } = useQuery({
+    queryKey: ['user-mappings'],
+    queryFn: () => gameService.getUserMappings(),
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const ownerMap = useMemo(() => {
+    if (!userMappings) return undefined
+    const map: Record<string, string> = {}
+    for (const u of userMappings) {
+      map[u.steamId] = u.nickname || u.username
+    }
+    return map
+  }, [userMappings])
 
   const allTags = useMemo(() => {
     if (!games) return []
@@ -65,6 +116,11 @@ export default function GamesPage() {
       result = result.filter((g) => g.priceOverview?.finalFormatted)
     }
 
+    // Only games with 2+ owners
+    if (multiOwner) {
+      result = result.filter((g) => (g.ownedBy?.steamId?.length ?? 0) >= 2)
+    }
+
     // Sort
     result.sort((a, b) => {
       let cmp = 0
@@ -80,17 +136,22 @@ export default function GamesPage() {
         const aOwners = a.ownedBy?.steamId?.length ?? 0
         const bOwners = b.ownedBy?.steamId?.length ?? 0
         cmp = aOwners - bOwners
+      } else if (sortBy === 'discount') {
+        const aDisc = a.priceOverview?.discountPercent ?? 0
+        const bDisc = b.priceOverview?.discountPercent ?? 0
+        cmp = aDisc - bDisc
       }
       return sortDesc ? -cmp : cmp
     })
 
     return result
-  }, [games, search, selectedTags, sortBy, sortDesc, hideNoPrice])
+  }, [games, search, selectedTags, sortBy, sortDesc, hideNoPrice, multiOwner])
 
   const sortOptions: { key: SortKey; label: string }[] = [
     { key: 'owners', label: 'Owners' },
     { key: 'name', label: 'Name' },
     { key: 'price', label: 'Price' },
+    { key: 'discount', label: 'Discount' },
     { key: 'appid', label: 'App ID' },
   ]
 
@@ -139,7 +200,7 @@ export default function GamesPage() {
                         setSortDesc(false)
                       }
                     }}
-                    className={`flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded-lg transition-colors ${
+                    className={`flex items-center gap-1 text-[10px] font-mono px-2 py-1 rounded-lg transition-colors ${
                       sortBy === opt.key
                         ? 'bg-accent/20 text-accent'
                         : 'text-muted-foreground hover:text-white'
@@ -157,13 +218,26 @@ export default function GamesPage() {
               <button
                 onClick={() => setHideNoPrice(!hideNoPrice)}
                 title="Hide games that are no longer sold on Steam and have no pricing data available."
-                className={`text-[10px] font-mono uppercase tracking-wider px-3 py-1.5 rounded-xl border transition-colors ${
+                className={`text-[10px] font-mono px-3 py-1.5 rounded-xl border transition-colors ${
                   hideNoPrice
                     ? 'bg-destructive/20 border-destructive/40 text-destructive'
                     : 'bg-black/40 border-white/10 text-muted-foreground hover:text-white'
                 }`}
               >
                 {hideNoPrice ? 'Excluding N/A Prices' : 'Exclude N/A Prices'}
+              </button>
+
+              {/* Multi-owner filter */}
+              <button
+                onClick={() => setMultiOwner(!multiOwner)}
+                title="Only show games owned by 2+ agents."
+                className={`text-[10px] font-mono px-3 py-1.5 rounded-xl border transition-colors ${
+                  multiOwner
+                    ? 'bg-accent/20 border-accent/40 text-accent'
+                    : 'bg-black/40 border-white/10 text-muted-foreground hover:text-white'
+                }`}
+              >
+                {multiOwner ? '2+ Owners' : '2+ Owners'}
               </button>
             </div>
           </div>
@@ -174,7 +248,7 @@ export default function GamesPage() {
           <div className="flex flex-wrap items-center gap-2 mt-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-muted-foreground hover:text-white hover:border-white/20 transition-colors">
+                <button className="flex items-center gap-2 text-[10px] font-mono px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-muted-foreground hover:text-white hover:border-white/20 transition-colors">
                   <Tags className="w-3.5 h-3.5" />
                   Tags{selectedTags.size > 0 && <span className="text-primary">({selectedTags.size})</span>}
                 </button>
@@ -224,29 +298,21 @@ export default function GamesPage() {
       {isError && (
         <div className="glass-panel border-destructive/30 bg-destructive/5 rounded-2xl p-8 text-center text-destructive flex flex-col items-center gap-4">
           <AlertCircle className="w-12 h-12" />
-          <p className="font-mono uppercase tracking-wider">System Failure: Could not connect to game database.</p>
+          <p className="font-mono">System Failure: Could not connect to game database.</p>
         </div>
       )}
 
       {filteredGames && (
         <div className="space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="h-px bg-white/10 flex-1"></div>
-            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-              {filteredGames.length} MATCH{filteredGames.length !== 1 ? 'ES' : ''} FOUND
-            </p>
-            <div className="h-px bg-white/10 flex-1"></div>
-          </div>
-          
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
             {filteredGames.map((game) => (
-              <GameCard key={game.appid} game={game} />
+              <GameCard key={game.appid} game={game} ownerMap={ownerMap} />
             ))}
           </div>
 
           {filteredGames.length === 0 && !isLoading && (
             <div className="py-24 text-center text-muted-foreground glass-panel rounded-3xl border-dashed">
-              <p className="font-mono uppercase tracking-wider">No records matching "{search}"</p>
+              <p className="font-mono">No records matching "{search}"</p>
             </div>
           )}
         </div>

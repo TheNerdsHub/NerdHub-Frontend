@@ -13,7 +13,7 @@ export default function ProfilePage() {
         <div className="glass-panel border-primary/30 bg-primary/5 rounded-3xl p-12 inline-flex flex-col items-center gap-6 text-center max-w-md">
           <ShieldAlert className="w-16 h-16 text-primary animate-pulse" />
           <h2 className="text-3xl font-black tracking-tight text-white">Access Denied</h2>
-          <p className="text-muted-foreground font-mono text-sm uppercase tracking-wider">
+          <p className="text-muted-foreground font-mono text-sm">
             Authentication required to view profile records. Please sign in to proceed.
           </p>
         </div>
@@ -30,7 +30,7 @@ export default function ProfilePage() {
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight">Agent Profile</h1>
         </div>
-        <p className="text-muted-foreground font-mono uppercase tracking-widest text-sm">
+        <p className="text-muted-foreground font-mono text-sm">
           Identity and credentials record.
         </p>
       </div>
@@ -53,7 +53,7 @@ export default function ProfilePage() {
           <div className="text-center sm:text-left space-y-2 mt-4">
             <h2 className="text-3xl font-black tracking-tight text-white">{user?.username}</h2>
             <p className="text-accent font-mono text-sm">{user?.email || 'NO_EMAIL_RECORDED'}</p>
-            <div className="inline-block mt-2 px-2 py-1 rounded bg-white/10 text-xs font-mono uppercase tracking-wider text-muted-foreground border border-white/10">
+            <div className="inline-block mt-2 px-2 py-1 rounded bg-white/10 text-xs font-mono text-muted-foreground border border-white/10">
               STATUS: ACTIVE
             </div>
           </div>
@@ -61,11 +61,11 @@ export default function ProfilePage() {
 
         <div className="grid gap-6 sm:grid-cols-2 pt-8 border-t border-white/10 relative z-10">
           <div className="space-y-1 bg-black/40 p-4 rounded-xl border border-white/5">
-            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">First Name</div>
+            <div className="text-xs font-mono text-muted-foreground">First Name</div>
             <div className="text-lg font-medium text-white/90">{user?.firstName || '—'}</div>
           </div>
           <div className="space-y-1 bg-black/40 p-4 rounded-xl border border-white/5">
-            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Last Name</div>
+            <div className="text-xs font-mono text-muted-foreground">Last Name</div>
             <div className="text-lg font-medium text-white/90">{user?.lastName || '—'}</div>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function ProfilePage() {
           <Button 
             variant="destructive" 
             onClick={logout}
-            className="font-mono uppercase tracking-wider rounded-xl gap-2 shadow-[0_0_15px_hsl(var(--destructive)/0.3)] hover:shadow-[0_0_20px_hsl(var(--destructive)/0.6)]"
+            className="font-mono rounded-xl gap-2 shadow-[0_0_15px_hsl(var(--destructive)/0.3)] hover:shadow-[0_0_20px_hsl(var(--destructive)/0.6)]"
           >
             <LogOut className="w-4 h-4" /> DISCONNECT
           </Button>

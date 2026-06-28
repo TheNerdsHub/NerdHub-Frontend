@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
@@ -15,20 +16,37 @@ export default function HomePage() {
     queryFn: () => quoteService.getQuoteOfTheDay(),
   })
 
-  const { data: games } = useQuery({
-    queryKey: ['featured-games'],
+  const { data: allGames } = useQuery({
+    queryKey: ['games'],
     queryFn: () => gameService.getAllGames(),
-    select: (data) => {
-      const withImages = data.filter((g) => g.headerImage)
-      const scored = withImages.map((g) => {
-        const ownerCount = g.ownedBy?.steamId?.length ?? 0
-        const onSale = (g.priceOverview?.discountPercent ?? 0) > 0
-        return { game: g, score: ownerCount + (onSale ? 100 : 0) }
-      })
-      scored.sort((a, b) => b.score - a.score)
-      return scored.slice(0, 4).map((s) => s.game)
-    },
   })
+
+  const games = useMemo(() => {
+    if (!allGames) return undefined
+    const withImages = allGames.filter((g) => g.headerImage)
+    const scored = withImages.map((g) => {
+      const ownerCount = g.ownedBy?.steamId?.length ?? 0
+      const onSale = (g.priceOverview?.discountPercent ?? 0) > 0
+      return { game: g, score: ownerCount + (onSale ? 100 : 0) }
+    })
+    scored.sort((a, b) => b.score - a.score)
+    return scored.slice(0, 4).map((s) => s.game)
+  }, [allGames])
+
+  const { data: userMappings } = useQuery({
+    queryKey: ['user-mappings'],
+    queryFn: () => gameService.getUserMappings(),
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const ownerMap = useMemo(() => {
+    if (!userMappings) return undefined
+    const map: Record<string, string> = {}
+    for (const u of userMappings) {
+      map[u.steamId] = u.nickname || u.username
+    }
+    return map
+  }, [userMappings])
 
   return (
     <div className="container max-w-7xl mx-auto space-y-16 py-16 px-6">
@@ -56,7 +74,7 @@ export default function HomePage() {
           <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur opacity-30 group-hover:opacity-70 transition duration-500"></div>
           <div className="relative glass-panel rounded-3xl p-8 h-full flex flex-col justify-center overflow-hidden">
             <Quote className="absolute -top-4 -right-4 w-32 h-32 text-white/5 group-hover:text-primary/10 transition-colors duration-500" />
-            <h2 className="mb-6 text-sm font-mono uppercase tracking-widest text-primary">Quote of the Day</h2>
+            <h2 className="mb-6 text-sm font-mono text-primary">Quote of the Day</h2>
             {quote ? (
               <div className="relative z-10">
                 <blockquote className="text-2xl font-serif italic text-foreground/90 leading-relaxed mb-6">
@@ -64,7 +82,7 @@ export default function HomePage() {
                 </blockquote>
                 <div className="flex flex-col items-end gap-1">
                   <p className="font-bold text-accent text-lg">— {quote.quotedPersons.join(', ')}</p>
-                  <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                  <p className="text-xs font-mono text-muted-foreground">
                     SYS.LOG // {quote.submitter}
                   </p>
                 </div>
@@ -79,7 +97,7 @@ export default function HomePage() {
 
         {/* Quick Links / Community */}
         <section className="glass-panel rounded-3xl p-8 flex flex-col">
-          <h2 className="mb-2 text-sm font-mono uppercase tracking-widest text-accent">Network Nodes</h2>
+          <h2 className="mb-2 text-sm font-mono text-accent">Network Nodes</h2>
           <p className="text-muted-foreground mb-6 text-sm">Quick access to connected community resources.</p>
           
           <div className="grid gap-4 sm:grid-cols-2 mt-auto">
@@ -110,7 +128,7 @@ export default function HomePage() {
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
             Featured Games
           </h2>
-          <Button variant="ghost" asChild className="hover:text-primary transition-colors text-sm font-mono uppercase tracking-wider">
+          <Button variant="ghost" asChild className="hover:text-primary transition-colors text-sm font-mono">
             <Link to="/games">View All &rarr;</Link>
           </Button>
         </div>
@@ -118,7 +136,7 @@ export default function HomePage() {
         {games ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {games.map((game) => (
-              <GameCard key={game.appid} game={game} />
+              <GameCard key={game.appid} game={game} ownerMap={ownerMap} />
             ))}
           </div>
         ) : (

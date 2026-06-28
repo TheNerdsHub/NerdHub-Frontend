@@ -43,7 +43,7 @@ export default function QuotesPage() {
         <div className="glass-panel border-primary/30 bg-primary/5 rounded-3xl p-12 inline-flex flex-col items-center gap-6 text-center max-w-md">
           <ShieldAlert className="w-16 h-16 text-primary animate-pulse" />
           <h2 className="text-3xl font-black tracking-tight text-white">Access Denied</h2>
-          <p className="text-muted-foreground font-mono text-sm uppercase tracking-wider">
+          <p className="text-muted-foreground font-mono text-sm">
             Authentication required to view system logs. Please sign in to proceed.
           </p>
         </div>
@@ -84,8 +84,8 @@ export default function QuotesPage() {
       <Tabs defaultValue="cards" className="w-full">
         <div className="flex justify-center mb-8">
           <TabsList className="bg-black/40 border border-white/10 p-1 rounded-xl">
-            <TabsTrigger value="cards" className="rounded-lg data-[state=active]:bg-white/10 data-[state=active]:text-primary font-mono text-xs uppercase tracking-wider px-6 py-2">Grid</TabsTrigger>
-            <TabsTrigger value="table" className="rounded-lg data-[state=active]:bg-white/10 data-[state=active]:text-primary font-mono text-xs uppercase tracking-wider px-6 py-2">Table</TabsTrigger>
+            <TabsTrigger value="cards" className="rounded-lg data-[state=active]:bg-white/10 data-[state=active]:text-primary font-mono text-xs px-6 py-2">Grid</TabsTrigger>
+            <TabsTrigger value="table" className="rounded-lg data-[state=active]:bg-white/10 data-[state=active]:text-primary font-mono text-xs px-6 py-2">Table</TabsTrigger>
           </TabsList>
         </div>
 
@@ -116,7 +116,7 @@ export default function QuotesPage() {
                         {quote.quotedPersons.join(', ')}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center text-xs font-mono text-muted-foreground uppercase">
+                    <div className="flex justify-between items-center text-xs font-mono text-muted-foreground">
                       <span>Logged By: {quote.submitter}</span>
                       <span className="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md">
                         <Calendar className="h-3 w-3" />
@@ -130,7 +130,7 @@ export default function QuotesPage() {
           ) : (
             <div className="py-24 text-center text-muted-foreground glass-panel rounded-3xl border-dashed flex flex-col items-center gap-4">
               <QuoteIcon className="w-12 h-12 text-muted-foreground/30" />
-              <p className="font-mono uppercase tracking-wider">No matching records found.</p>
+              <p className="font-mono">No matching records found.</p>
             </div>
           )}
         </TabsContent>
@@ -140,10 +140,10 @@ export default function QuotesPage() {
             <Table>
               <TableHeader className="bg-black/40">
                 <TableRow className="border-white/5 hover:bg-transparent">
-                  <TableHead className="w-[50%] font-mono text-xs uppercase tracking-wider">Audio Transcript</TableHead>
-                  <TableHead className="font-mono text-xs uppercase tracking-wider">Subject(s)</TableHead>
-                  <TableHead className="font-mono text-xs uppercase tracking-wider">Intercepted By</TableHead>
-                  <TableHead className="text-right font-mono text-xs uppercase tracking-wider">Timestamp</TableHead>
+                  <TableHead className="w-[50%] font-mono text-xs">Audio Transcript</TableHead>
+                  <TableHead className="font-mono text-xs">Subject(s)</TableHead>
+                  <TableHead className="font-mono text-xs">Intercepted By</TableHead>
+                  <TableHead className="text-right font-mono text-xs">Timestamp</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -169,7 +169,7 @@ export default function QuotesPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-32 text-center text-muted-foreground font-mono uppercase tracking-wider">
+                    <TableCell colSpan={4} className="h-32 text-center text-muted-foreground font-mono">
                       No records found.
                     </TableCell>
                   </TableRow>

@@ -21,7 +21,7 @@ export default function NotFoundPage() {
           <h1 className="text-5xl font-black tracking-tight text-white drop-shadow-[0_0_10px_hsl(var(--primary)/0.5)]">
             SYS_404
           </h1>
-          <p className="text-lg text-muted-foreground font-mono uppercase tracking-wider">
+          <p className="text-lg text-muted-foreground font-mono">
             Sector Not Found
           </p>
         </div>
@@ -30,7 +30,7 @@ export default function NotFoundPage() {
           The requested coordinate does not exist within the current database directory.
         </p>
 
-        <Button asChild className="mt-4 font-mono uppercase tracking-wider rounded-xl shadow-[0_0_15px_hsl(var(--primary)/0.4)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.6)] relative z-10">
+        <Button asChild className="mt-4 font-mono rounded-xl shadow-[0_0_15px_hsl(var(--primary)/0.4)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.6)] relative z-10">
           <Link to="/">Initialize Reboot</Link>
         </Button>
       </div>
