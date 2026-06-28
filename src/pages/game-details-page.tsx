@@ -9,6 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { copyToClipboard } from '@/lib/clipboard'
+import { getProxyImageUrl } from '@/lib/get-proxy-image'
 import {
   ArrowLeft, Clock, Calendar, Trophy, Monitor, Tag, Gamepad2,
   ExternalLink, RefreshCw, ChevronDown, ChevronRight, Copy, Search,
@@ -193,7 +194,7 @@ export default function GameDetailsPage() {
       <div className="relative h-[50vh] min-h-[400px] w-full bg-black overflow-hidden flex items-end">
         <div className="absolute inset-0 z-0">
           {game.headerImage ? (
-            <img src={game.headerImage} alt="" className="w-full h-full object-cover opacity-40 blur-sm" />
+            <img src={getProxyImageUrl(game.headerImage)} alt="" className="w-full h-full object-cover opacity-40 blur-sm" />
           ) : (
             <div className="w-full h-full bg-[#050505]"></div>
           )}
@@ -212,7 +213,7 @@ export default function GameDetailsPage() {
           <div className="flex flex-col md:flex-row gap-8 items-end">
             <div className="w-full max-w-[300px] rounded-2xl overflow-hidden glass-panel shadow-2xl shadow-primary/20 shrink-0">
               {game.headerImage ? (
-                <img src={game.headerImage} alt={game.name} className="w-full h-auto object-cover" />
+                <img src={getProxyImageUrl(game.headerImage)} alt={game.name} className="w-full h-auto object-cover" />
               ) : (
                 <div className="flex h-32 items-center justify-center text-muted-foreground font-mono text-xs">NO IMAGE</div>
               )}

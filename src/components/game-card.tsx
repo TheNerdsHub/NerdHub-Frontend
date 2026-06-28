@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import type { GameDetails } from '@/lib/game-service'
+import { getProxyImageUrl } from '@/lib/get-proxy-image'
 
 export default function GameCard({ game, ownerMap }: { game: GameDetails; ownerMap?: Record<string, string> }) {
   const p = game.priceOverview
@@ -51,7 +52,7 @@ export default function GameCard({ game, ownerMap }: { game: GameDetails; ownerM
           )}
           {game.headerImage ? (
             <img 
-              src={game.headerImage} 
+              src={getProxyImageUrl(game.headerImage)} 
               alt={game.name} 
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100" 
               loading="lazy"

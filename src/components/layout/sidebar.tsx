@@ -136,7 +136,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Toggle */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/80 backdrop-blur-md border-b z-40 flex items-center justify-between px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-background/80 backdrop-blur-md border-b z-40 flex items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
           <img src="/TheNerdsLogo.png" alt="NerdHub" className="w-8 h-8 object-contain rounded-md" />
           <span className="text-lg font-black tracking-tighter text-primary">NerdHub</span>
@@ -147,13 +147,13 @@ export default function Sidebar() {
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-20 flex-col bg-[#0a0a0a] border-r border-white/5 z-40">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-20 flex-col bg-[#0a0a0a] border-r border-white/5 z-40">
         <NavContent />
       </aside>
 
       {/* Mobile Sidebar Overlay */}
       {isMobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
+        <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileOpen(false)} />
           <aside className="relative w-20 h-full bg-[#0a0a0a] border-r border-white/5 flex flex-col pt-14">
             <NavContent />
