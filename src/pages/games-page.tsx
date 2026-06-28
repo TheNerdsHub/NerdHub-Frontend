@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { useQuery } from '@tanstack/react-query'
 import { gameService } from '@/lib/game-service'
 import GameCard from '@/components/game-card'
 import {
   Search, Gamepad2, AlertCircle, X, ArrowUpDown, ArrowUp, ArrowDown,
-  Tags, Users, List, Percent, ChevronLeft, ChevronRight, SlidersHorizontal,
+  Tags, Users, List, Percent,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -15,89 +15,49 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
-import { motion, AnimatePresence } from 'motion/react'
+import { FilterBar } from '@/components/ui/filter-bar'
+import SidebarLayout from '@/components/ui/sidebar-layout'
 
 type SortKey = 'name' | 'price' | 'appid' | 'owners' | 'discount' | 'lastModified'
 
 export default function GamesPage() {
   useDocumentTitle('Games')
-  const [searchParams, setSearchParams] = useSearchParams()
 
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [search, setSearch] = useState(() => localStorage.getItem('gamesPage_q') ?? '')
+  useEffect(() => { localStorage.setItem('gamesPage_q', search) }, [search])
 
-  const search = searchParams.get('q') ?? ''
-  const setSearch = (val: string) => {
-    const next = new URLSearchParams(searchParams)
-    if (val) next.set('q', val); else next.delete('q')
-    setSearchParams(next, { replace: true })
-  }
-
-  const selectedTags = useMemo(() => {
-    const raw = searchParams.get('tags')
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(() => {
+    const raw = localStorage.getItem('gamesPage_tags')
     return raw ? new Set(raw.split(',').filter(Boolean)) : new Set<string>()
-  }, [searchParams])
-  const setSelectedTags = (next: Set<string>) => {
-    const p = new URLSearchParams(searchParams)
-    if (next.size > 0) p.set('tags', Array.from(next).join(',')); else p.delete('tags')
-    setSearchParams(p, { replace: true })
-  }
+  })
+  useEffect(() => { localStorage.setItem('gamesPage_tags', Array.from(selectedTags).join(',')) }, [selectedTags])
 
-  const sortBy = (searchParams.get('sort') as SortKey) ?? 'owners'
-  const sortDesc = searchParams.get('dir') !== 'asc'
-
-  const hideNoPrice = searchParams.get('noprice') !== '0'
-  const setHideNoPrice = (val: boolean) => {
-    const p = new URLSearchParams(searchParams)
-    if (!val) p.set('noprice', '0'); else p.delete('noprice')
-    setSearchParams(p, { replace: true })
-  }
-
-  const multiOwner = searchParams.get('multi') === '1'
-  const setMultiOwner = (val: boolean) => {
-    const p = new URLSearchParams(searchParams)
-    if (val) p.set('multi', '1'); else p.delete('multi')
-    setSearchParams(p, { replace: true })
-  }
-
-  const onlyOnSale = searchParams.get('sale') === '1'
-  const setOnlyOnSale = (val: boolean) => {
-    const p = new URLSearchParams(searchParams)
-    if (val) p.set('sale', '1'); else p.delete('sale')
-    setSearchParams(p, { replace: true })
-  }
-
-  const selectedOwners = useMemo(() => {
-    const raw = searchParams.get('owners')
-    return raw ? new Set(raw.split(',').filter(Boolean)) : new Set<string>()
-  }, [searchParams])
-  const setSelectedOwners = (next: Set<string>) => {
-    const p = new URLSearchParams(searchParams)
-    if (next.size > 0) p.set('owners', Array.from(next).join(',')); else p.delete('owners')
-    setSearchParams(p, { replace: true })
-  }
-
-  const selectedCategories = useMemo(() => {
-    const raw = searchParams.get('cats')
-    return raw ? new Set(raw.split(',').filter(Boolean)) : new Set<string>()
-  }, [searchParams])
-  const setSelectedCategories = (next: Set<string>) => {
-    const p = new URLSearchParams(searchParams)
-    if (next.size > 0) p.set('cats', Array.from(next).join(',')); else p.delete('cats')
-    setSearchParams(p, { replace: true })
-  }
-
+  const [sortBy, setSortBy] = useState<SortKey>(() => (localStorage.getItem('gamesPage_sortBy') as SortKey) ?? 'owners')
   useEffect(() => { localStorage.setItem('gamesPage_sortBy', sortBy) }, [sortBy])
+
+  const [sortDesc, setSortDesc] = useState(() => localStorage.getItem('gamesPage_sortDesc') !== 'false')
   useEffect(() => { localStorage.setItem('gamesPage_sortDesc', String(sortDesc)) }, [sortDesc])
+
+  const [hideNoPrice, setHideNoPrice] = useState(() => localStorage.getItem('gamesPage_hideNoPrice') !== 'false')
   useEffect(() => { localStorage.setItem('gamesPage_hideNoPrice', String(hideNoPrice)) }, [hideNoPrice])
+
+  const [multiOwner, setMultiOwner] = useState(() => localStorage.getItem('gamesPage_multiOwner') === 'true')
   useEffect(() => { localStorage.setItem('gamesPage_multiOwner', String(multiOwner)) }, [multiOwner])
+
+  const [onlyOnSale, setOnlyOnSale] = useState(() => localStorage.getItem('gamesPage_onlyOnSale') === 'true')
   useEffect(() => { localStorage.setItem('gamesPage_onlyOnSale', String(onlyOnSale)) }, [onlyOnSale])
+
+  const [selectedOwners, setSelectedOwners] = useState<Set<string>>(() => {
+    const raw = localStorage.getItem('gamesPage_owners')
+    return raw ? new Set(raw.split(',').filter(Boolean)) : new Set<string>()
+  })
+  useEffect(() => { localStorage.setItem('gamesPage_owners', Array.from(selectedOwners).join(',')) }, [selectedOwners])
+
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(() => {
+    const raw = localStorage.getItem('gamesPage_cats')
+    return raw ? new Set(raw.split(',').filter(Boolean)) : new Set<string>()
+  })
+  useEffect(() => { localStorage.setItem('gamesPage_cats', Array.from(selectedCategories).join(',')) }, [selectedCategories])
 
   const { data: games, isLoading, isError } = useQuery({
     queryKey: ['games'],
@@ -245,14 +205,12 @@ export default function GamesPage() {
   ]
 
   const handleSort = (key: SortKey) => {
-    const p = new URLSearchParams(searchParams)
     if (sortBy === key) {
-      if (sortDesc) p.set('dir', 'asc'); else p.delete('dir')
+      setSortDesc(!sortDesc)
     } else {
-      if (key !== 'owners') p.set('sort', key); else p.delete('sort')
-      p.delete('dir')
+      setSortBy(key)
+      setSortDesc(true)
     }
-    setSearchParams(p, { replace: true })
   }
 
   const filterButtons = (
@@ -297,25 +255,21 @@ export default function GamesPage() {
   )
 
   const sortPills = (
-    <div className="flex items-center gap-1 flex-wrap bg-black/40 border border-white/10 rounded-xl px-2 py-1.5">
+    <FilterBar>
       <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
       {sortOptions.map((opt) => (
-        <button
+        <FilterBar.Pill
           key={opt.key}
+          active={sortBy === opt.key}
           onClick={() => handleSort(opt.key)}
-          className={`flex items-center gap-1 text-[10px] font-mono px-2 py-1 rounded-lg transition-colors ${
-            sortBy === opt.key
-              ? 'bg-accent/20 text-accent'
-              : 'text-muted-foreground hover:text-white'
-          }`}
         >
           {opt.label}
           {sortBy === opt.key && (
             sortDesc ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />
           )}
-        </button>
+        </FilterBar.Pill>
       ))}
-    </div>
+    </FilterBar>
   )
 
   const tagDropdown = allTags.length > 0 && (
@@ -469,142 +423,59 @@ export default function GamesPage() {
   )
 
   return (
-    <motion.div layout className="py-12 px-6 flex gap-6 items-start">
-      {/* Desktop sidebar */}
-      <motion.aside
-        animate={{ width: sidebarOpen ? 288 : 56 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="hidden lg:block glass-panel rounded-2xl overflow-hidden shrink-0 sticky top-12 self-start"
-      >
-        <motion.div layout transition={{ duration: 0.3 }}>
-          <div className="flex items-center justify-between p-3">
-            {sidebarOpen && (
-              <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Menu</span>
-            )}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-1 rounded-lg hover:bg-white/5 transition-colors text-muted-foreground hover:text-white"
-            >
-              {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </button>
-          </div>
-
-          <AnimatePresence mode="popLayout">
-          {sidebarOpen ? (
-            <motion.div
-              key="expanded"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
-              <div className="p-4 pt-0">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-primary/10 rounded-lg shrink-0">
-                    <Gamepad2 className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="text-lg font-black tracking-tight truncate">Game Library</h2>
-                    <p className="text-xs text-muted-foreground font-mono truncate">
-                      {filteredGames.length !== games?.length
-                        ? `${filteredGames.length} / ${games?.length ?? 0}`
-                        : `${games?.length ?? 0}`} Games
-                    </p>
-                  </div>
-                </div>
-
-                {controlsPanel}
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="collapsed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
-              <div className="flex flex-col items-center gap-4 py-4 px-1">
-                <div title="Search"><Search className="w-4 h-4 text-muted-foreground" /></div>
-                <div title="Sort"><ArrowUpDown className="w-4 h-4 text-muted-foreground" /></div>
-                <div title="Filters"><Percent className="w-4 h-4 text-muted-foreground" /></div>
-                <div title="Tags"><Tags className="w-4 h-4 text-muted-foreground" /></div>
-                <div title="Owners"><Users className="w-4 h-4 text-muted-foreground" /></div>
-                <div title="Categories"><List className="w-4 h-4 text-muted-foreground" /></div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        </motion.div>
-      </motion.aside>
-
-      {/* Main content area */}
-      <motion.div layout className="flex-1 min-w-0 space-y-10">
-        {/* Mobile header */}
-        <div className="flex lg:hidden items-center gap-3 min-w-0">
-          <div className="p-2 bg-primary/10 rounded-lg shrink-0">
-            <Gamepad2 className="w-5 h-5 text-primary" />
-          </div>
-          <div className="min-w-0">
-            <h1 className="text-xl font-black tracking-tight truncate">Game Library</h1>
-            <p className="text-xs text-muted-foreground font-mono truncate">
-              {filteredGames.length !== games?.length
-                ? `${filteredGames.length} / ${games?.length ?? 0} Games`
-                : `${games?.length ?? 0} Games`}
-            </p>
-          </div>
-        </div>
-
-        {isLoading && (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            {Array.from({ length: 18 }).map((_, i) => (
-              <div key={i} className="h-[280px] rounded-2xl bg-white/5 animate-pulse border border-white/5" />
-            ))}
-          </div>
-        )}
-
-        {isError && (
-          <div className="glass-panel border-destructive/30 bg-destructive/5 rounded-2xl p-8 text-center text-destructive flex flex-col items-center gap-4">
-            <AlertCircle className="w-12 h-12" />
-            <p className="font-mono">System Failure: Could not connect to game database.</p>
-          </div>
-        )}
-
-        {filteredGames && (
-          <div className="space-y-6">
+    <SidebarLayout
+      icon={<Gamepad2 className="w-5 h-5 text-primary" />}
+      iconContainerClass="bg-primary/10"
+      title="Game Library"
+      subtitle={`${filteredGames.length !== games?.length ? `${filteredGames.length} / ${games?.length ?? 0}` : `${games?.length ?? 0}`} Games`}
+      controlsPanel={controlsPanel}
+      mainContent={
+        <>
+          {isLoading && (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-              {filteredGames.map((game) => (
-                <GameCard key={game.appid} game={game} ownerMap={ownerMap} />
+              {Array.from({ length: 18 }).map((_, i) => (
+                <div key={i} className="h-[280px] rounded-2xl bg-white/5 animate-pulse border border-white/5" />
               ))}
             </div>
+          )}
 
-            {filteredGames.length === 0 && !isLoading && (
-              <div className="py-24 text-center text-muted-foreground glass-panel rounded-3xl border-dashed">
-                <p className="font-mono">No records matching &ldquo;{search}&rdquo;</p>
-              </div>
-            )}
-          </div>
-        )}
+          {isError && (
+            <div className="glass-panel border-destructive/30 bg-destructive/5 rounded-2xl p-8 text-center text-destructive flex flex-col items-center gap-4">
+              <AlertCircle className="w-12 h-12" />
+              <p className="font-mono">System Failure: Could not connect to game database.</p>
+            </div>
+          )}
 
-        {/* Mobile floating filter button */}
-        <div className="lg:hidden fixed bottom-8 left-8 z-50">
-          <Sheet>
-            <SheetTrigger asChild>
-              <button className="p-3 rounded-2xl border border-accent/30 bg-background/80 backdrop-blur-md text-accent shadow-lg transition-all duration-300 hover:border-accent hover:shadow-[0_0_20px_hsl(var(--accent)/0.3)]">
-                <SlidersHorizontal className="w-5 h-5" />
-              </button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="bg-[#141414] border-white/10 max-h-[80vh]">
-              <SheetHeader>
-                <SheetTitle className="text-white font-mono text-sm">Filters & Sort</SheetTitle>
-              </SheetHeader>
-              <div className="overflow-y-auto py-4">
-                {controlsPanel}
+          {filteredGames && (
+            <div className="space-y-6">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                {filteredGames.map((game) => (
+                  <GameCard key={game.appid} game={game} ownerMap={ownerMap} />
+                ))}
               </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-      </motion.div>
-    </motion.div>
+
+              {filteredGames.length === 0 && !isLoading && (
+                <div className="py-24 text-center text-muted-foreground glass-panel rounded-3xl border-dashed">
+                  <p className="font-mono">No records matching &ldquo;{search}&rdquo;</p>
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      }
+      collapsedSections={[
+        { icon: <Search className="w-4 h-4 text-muted-foreground" />, label: 'Search' },
+        { icon: <ArrowUpDown className="w-4 h-4 text-muted-foreground" />, label: 'Sort' },
+        { icon: <Percent className="w-4 h-4 text-muted-foreground" />, label: 'Filters' },
+        { icon: <Tags className="w-4 h-4 text-muted-foreground" />, label: 'Tags' },
+        { icon: <Users className="w-4 h-4 text-muted-foreground" />, label: 'Owners' },
+        { icon: <List className="w-4 h-4 text-muted-foreground" />, label: 'Categories' },
+      ]}
+      mobileIcon={<Gamepad2 className="w-5 h-5 text-primary" />}
+      mobileIconContainerClass="bg-primary/10"
+      mobileTitle="Game Library"
+      mobileSubtitle={`${filteredGames.length !== games?.length ? `${filteredGames.length} / ${games?.length ?? 0}` : `${games?.length ?? 0}`} Games`}
+      storageKey="games"
+    />
   )
 }
