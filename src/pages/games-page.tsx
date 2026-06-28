@@ -323,7 +323,7 @@ export default function GamesPage() {
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 text-[10px] font-mono px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-muted-foreground hover:text-white hover:border-white/20 transition-colors w-full">
           <Tags className="w-3.5 h-3.5" />
-          {selectedTags.size > 0 ? `${selectedTags.size} selected` : 'All tags'}
+          {selectedTags.size > 0 ? `${selectedTags.size} selected` : 'All Tags'}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-h-72 bg-[#141414] border-white/10 font-mono text-xs">
@@ -363,7 +363,7 @@ export default function GamesPage() {
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 text-[10px] font-mono px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-muted-foreground hover:text-white hover:border-white/20 transition-colors w-full">
           <Users className="w-3.5 h-3.5" />
-          {selectedOwners.size > 0 ? `${selectedOwners.size} selected` : 'All owners'}
+          {selectedOwners.size > 0 ? `${selectedOwners.size} selected` : 'All Owners'}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-h-72 bg-[#141414] border-white/10 font-mono text-xs">
@@ -403,7 +403,7 @@ export default function GamesPage() {
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 text-[10px] font-mono px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-muted-foreground hover:text-white hover:border-white/20 transition-colors w-full">
           <List className="w-3.5 h-3.5" />
-          {selectedCategories.size > 0 ? `${selectedCategories.size} selected` : 'All categories'}
+          {selectedCategories.size > 0 ? `${selectedCategories.size} selected` : 'All Categories'}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-h-72 bg-[#141414] border-white/10 font-mono text-xs">
@@ -465,12 +465,6 @@ export default function GamesPage() {
       {ownerDropdown}
 
       {categoryDropdown}
-
-      <div className="text-[10px] font-mono text-muted-foreground">
-        {filteredGames.length !== games?.length
-          ? `${filteredGames.length} / ${games?.length ?? 0} Games`
-          : `${games?.length ?? 0} Games`}
-      </div>
     </div>
   )
 
@@ -514,7 +508,7 @@ export default function GamesPage() {
                     <p className="text-xs text-muted-foreground font-mono truncate">
                       {filteredGames.length !== games?.length
                         ? `${filteredGames.length} / ${games?.length ?? 0}`
-                        : `${games?.length ?? 0}`} Titles
+                        : `${games?.length ?? 0}`} Games
                     </p>
                   </div>
                 </div>
