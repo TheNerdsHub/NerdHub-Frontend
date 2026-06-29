@@ -7,10 +7,16 @@ export function usePersistentState<T>(key: string, initialValue: T): [T, SetValu
     try {
       const storedValue = localStorage.getItem(key);
       if (storedValue) {
-        return JSON.parse(storedValue);
+        const parsed = JSON.parse(storedValue);
+        // If the initial value was a Set, assume we stored an Array and convert back
+        if (initialValue instanceof Set) {
+          return new Set(parsed) as T;
+        }
+        return parsed;
       }
     } catch (error) {
       console.error('Error reading from localStorage', error);
+      localStorage.removeItem(key); // Clear the corrupted data
     }
     return initialValue;
   });
@@ -19,7 +25,9 @@ export function usePersistentState<T>(key: string, initialValue: T): [T, SetValu
     (value) => {
       setState((prev) => {
         const valueToStore = value instanceof Function ? value(prev) : value;
-        localStorage.setItem(key, JSON.stringify(valueToStore));
+        // Serialize Set as Array
+        const serializedValue = valueToStore instanceof Set ? Array.from(valueToStore) : valueToStore;
+        localStorage.setItem(key, JSON.stringify(serializedValue));
         return valueToStore;
       });
     },
