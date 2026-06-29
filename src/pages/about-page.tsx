@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { Info, Server, Code2, Bot, AlertTriangle } from 'lucide-react'
+import { api } from '@/lib/api'
 
 export default function AboutPage() {
   useDocumentTitle('System Info')
@@ -20,8 +21,7 @@ export default function AboutPage() {
   const frontendVersion = import.meta.env.VITE_VERSION
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_ROOT}/api/Version`)
-      .then((res) => res.json())
+    api.get<any>('/api/Version')
       .then((data) =>
         setInfo({
           backendVersion: data.backendVersion ?? null,
