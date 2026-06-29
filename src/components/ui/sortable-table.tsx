@@ -33,7 +33,6 @@ export function SortableTable<T>({
   onSort,
   keyExtractor,
   isLoading = false,
-  loadingRows = 5,
   emptyMessage = 'No data found.',
   onRowClick,
   onContextMenu,

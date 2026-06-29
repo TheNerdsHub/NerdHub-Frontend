@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { SortableTable } from "@/components/ui/sortable-table"
 import { UpdateTaskRunner } from "@/components/ui/update-task-runner"
 import { useToast } from "@/hooks/use-toast"
-import { Copy, ShieldCheck, AlertOctagon, Terminal, CheckSquare, Square, ArrowUp, ArrowDown } from "lucide-react"
+import { ShieldCheck, AlertOctagon, Terminal, CheckSquare, Square } from "lucide-react"
 
 export default function AdminPage() {
   useDocumentTitle("Admin")

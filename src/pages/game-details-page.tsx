@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { gameService } from '@/lib/game-service'
@@ -20,7 +20,6 @@ import { GameContextMenu } from '@/components/game-context-menu'
 
 export default function GameDetailsPage() {
   const { appid } = useParams<{ appid: string }>()
-  const navigate = useNavigate()
   const parsedAppId = parseInt(appid || '0', 10)
 
   const { data: game, isLoading, isError } = useQuery({
@@ -356,7 +355,7 @@ export default function GameDetailsPage() {
                         (userData.playtime_disconnected ?? 0) > 0
 
                       return (
-                        <GameContextMenu key={steamId} steamId={steamId} userMapping={user}>
+                        <GameContextMenu key={steamId} steamId={steamId} userMapping={user ? { ...user, steamId } : undefined}>
                           <div
                             className="rounded-xl bg-black/40 border border-white/5 hover:border-accent/30 transition-colors relative cursor-context-menu"
                           >
